@@ -17,12 +17,10 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100 dark:bg-[#0f1115] flex flex-col sm:flex-row w-full"
-        x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false' }"
-        x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))">
+    <div x-data="sidebarLayout()" class="min-h-screen bg-gray-100 dark:bg-[#0f1115] flex flex-col sm:flex-row w-full">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 transition-all duration-300">
             <!-- Page Heading -->
             @if(isset($header) || View::hasSection('header'))
                 <header class="bg-white dark:bg-[#161b22] shadow dark:shadow-none dark:border-b dark:border-gray-800">
@@ -40,6 +38,18 @@
             </main>
         </div>
     </div>
+
+    <script>
+        function sidebarLayout() {
+            return {
+                sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+                toggleSidebar() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                    localStorage.setItem('sidebarOpen', this.sidebarOpen);
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>

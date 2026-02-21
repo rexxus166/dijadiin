@@ -188,27 +188,27 @@
                         </div>
 
                         <div
-                            class="max-w-[1200px] w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center h-full pt-16 pb-8 overflow-y-auto">
+                            class="max-w-[1200px] w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center h-full pt-10 pb-6 overflow-y-auto">
 
                             <!-- Left Section (Copy & Illustration) -->
-                            <div class="space-y-6">
+                            <div class="space-y-4">
                                 <div
                                     class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-900/30 border border-blue-500/20 text-blue-300 text-sm font-medium shadow-[0_0_15px_rgba(59,130,246,0.2)]">
                                     <span
                                         class="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_rgba(96,165,250,0.8)]"></span>
                                     Sedang Berlangsung
                                 </div>
-                                <h2 class="text-4xl md:text-5xl font-extrabold leading-[1.1] text-white tracking-tight">
+                                <h2 class="text-3xl lg:text-4xl font-extrabold leading-[1.1] text-white tracking-tight">
                                     Meracik Aplikasi<br>Impianmu
                                 </h2>
-                                <p class="text-lg text-[#94a3b8] max-w-md leading-relaxed font-light">
+                                <p class="text-base text-[#94a3b8] max-w-md leading-relaxed font-light">
                                     Duduk santai ya! AI Arsitek kami sedang sibuk menyusun kode terbaik agar idemu
                                     segera hidup.
                                 </p>
 
                                 <!-- Illustration Box -->
                                 <div
-                                    class="relative w-full max-w-lg aspect-[5/3] mt-8 rounded-2xl border border-gray-800/60 bg-[#161c2d]/70 overflow-hidden shadow-2xl backdrop-blur-sm bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:2rem_2rem]">
+                                    class="relative w-full max-w-[420px] aspect-[16/10] mt-5 rounded-2xl border border-gray-800/60 bg-[#161c2d]/70 overflow-hidden shadow-2xl backdrop-blur-sm bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:2rem_2rem]">
                                     <!-- Animated elements inside box -->
                                     <div class="absolute inset-0 flex items-center justify-center">
                                         <div
@@ -269,11 +269,11 @@
                             </div>
 
                             <!-- Right Section (Status & Steps) -->
-                            <div class="space-y-6 w-full max-w-lg mx-auto lg:ml-auto select-none">
+                            <div class="space-y-4 w-full max-w-md mx-auto lg:ml-auto select-none">
                                 <!-- Status Card -->
                                 <div
-                                    class="bg-[#151a2b] border border-[#2a3143] rounded-2xl p-6 relative overflow-hidden shadow-2xl">
-                                    <div class="absolute -right-6 -bottom-6 text-[120px] font-black italic text-white/[0.04] pointer-events-none tracking-tighter"
+                                    class="bg-[#151a2b] border border-[#2a3143] rounded-2xl p-5 relative overflow-hidden shadow-2xl">
+                                    <div class="absolute -right-4 -bottom-4 text-[100px] font-black italic text-white/[0.04] pointer-events-none tracking-tighter"
                                         id="bg-progress-text">0%</div>
 
                                     <div class="flex justify-between items-end mb-4 relative z-10">
@@ -283,7 +283,7 @@
                                             id="progress-percentage">0%</span>
                                     </div>
 
-                                    <div class="w-full bg-[#1e2538] rounded-full h-2.5 mb-8 relative z-10">
+                                    <div class="w-full bg-[#1e2538] rounded-full h-2.5 mb-5 relative z-10">
                                         <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-2.5 rounded-full transition-all duration-300 shadow-[0_0_12px_rgba(56,189,248,0.6)]"
                                             id="progress-bar" style="width: 0%"></div>
                                         <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.9)] transition-all duration-300"
@@ -291,20 +291,20 @@
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-4 relative z-10">
-                                        <div class="bg-[#1a2035] rounded-xl p-4 flex flex-col justify-center">
+                                        <div class="bg-[#1a2035] rounded-xl p-3 flex flex-col justify-center">
                                             <p
-                                                class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-1">
+                                                class="text-[9px] text-gray-500 uppercase tracking-widest font-semibold mb-1">
                                                 WAKTU BERJALAN</p>
-                                            <p class="text-2xl font-semibold text-white tracking-tight"
+                                            <p class="text-xl sm:text-2xl font-semibold text-white tracking-tight"
                                                 id="timer-display">00:00 <span
                                                     class="text-sm text-gray-500 font-sans">mnt</span></p>
                                         </div>
-                                        <div class="bg-[#1a2035] rounded-xl p-4 flex flex-col justify-center">
+                                        <div class="bg-[#1a2035] rounded-xl p-3 flex flex-col justify-center">
                                             <p
-                                                class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-1">
+                                                class="text-[9px] text-gray-500 uppercase tracking-widest font-semibold mb-1">
                                                 ESTIMASI SELESAI</p>
-                                            <p class="text-2xl font-semibold text-blue-400 tracking-tight">~45 <span
-                                                    class="text-sm text-gray-500 font-sans">dtk</span></p>
+                                            <p class="text-xl sm:text-2xl font-semibold text-blue-400 tracking-tight">
+                                                ~45 <span class="text-sm text-gray-500 font-sans">dtk</span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -312,16 +312,16 @@
                                 <!-- Tasks Card -->
                                 <div
                                     class="bg-[#151a2b] border border-[#2a3143] rounded-2xl overflow-hidden shadow-2xl">
-                                    <div class="p-5 border-b border-[#2a3143] flex items-center gap-3">
+                                    <div class="p-4 border-b border-[#2a3143] flex items-center gap-3">
                                         <div
                                             class="w-6 h-6 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-400 text-xs shadow-inner">
                                             💡</div>
                                         <h4 class="text-sm font-bold text-white tracking-wide">Cerita Pembuatan</h4>
                                     </div>
-                                    <div class="py-3 px-2">
+                                    <div class="py-2 px-2">
                                         <div class="space-y-1 relative" id="steps-container">
                                             <!-- Step 1 -->
-                                            <div class="step-item p-3 flex gap-4 items-start rounded-xl transition-all duration-300"
+                                            <div class="step-item p-2.5 flex gap-3.5 items-start rounded-xl transition-all duration-300"
                                                 id="step-1">
                                                 <div
                                                     class="step-icon mt-1 w-6 h-6 rounded-full border border-gray-600 text-gray-500 flex items-center justify-center shrink-0">
@@ -334,15 +334,17 @@
                                                     </svg>
                                                 </div>
                                                 <div>
-                                                    <p class="text-sm font-semibold text-gray-300 step-title">Mencatat
+                                                    <p class="text-[13px] font-semibold text-gray-300 step-title">
+                                                        Mencatat
                                                         ide hebatmu...</p>
-                                                    <p class="text-xs text-gray-500 mt-1.5 step-desc">Semua detail sudah
+                                                    <p class="text-[11px] text-gray-500 mt-1 step-desc">Semua detail
+                                                        sudah
                                                         kami simpan dengan aman.</p>
                                                 </div>
                                             </div>
 
                                             <!-- Step 2 -->
-                                            <div class="step-item p-3 flex gap-4 items-start rounded-xl transition-all duration-300 opacity-50"
+                                            <div class="step-item p-2.5 flex gap-3.5 items-start rounded-xl transition-all duration-300 opacity-50"
                                                 id="step-2">
                                                 <div
                                                     class="step-icon mt-1 w-6 h-6 rounded-full border border-gray-600 text-gray-500 flex items-center justify-center shrink-0">
@@ -355,15 +357,17 @@
                                                     </svg>
                                                 </div>
                                                 <div>
-                                                    <p class="text-sm font-semibold text-gray-400 step-title">Menyusun
+                                                    <p class="text-[13px] font-semibold text-gray-400 step-title">
+                                                        Menyusun
                                                         fondasi aplikasi...</p>
-                                                    <p class="text-xs text-gray-500 mt-1.5 step-desc">Struktur database
+                                                    <p class="text-[11px] text-gray-500 mt-1 step-desc">Struktur
+                                                        database
                                                         sudah siap digunakan.</p>
                                                 </div>
                                             </div>
 
                                             <!-- Step 3 -->
-                                            <div class="step-item p-3 flex gap-4 items-start rounded-xl transition-all duration-300 opacity-50"
+                                            <div class="step-item p-2.5 flex gap-3.5 items-start rounded-xl transition-all duration-300 opacity-50"
                                                 id="step-3">
                                                 <div
                                                     class="step-icon mt-1 w-6 h-6 rounded-full border border-gray-600 text-gray-500 flex items-center justify-center shrink-0">
@@ -375,15 +379,16 @@
                                                     </svg>
                                                 </div>
                                                 <div>
-                                                    <p class="text-sm font-semibold text-gray-400 step-title">Merapikan
+                                                    <p class="text-[13px] font-semibold text-gray-400 step-title">
+                                                        Merapikan
                                                         kode agar cantik...</p>
-                                                    <p class="text-xs text-gray-500 mt-1.5 step-desc">Sedang memoles
+                                                    <p class="text-[11px] text-gray-500 mt-1 step-desc">Sedang memoles
                                                         tampilan dan logika biar mulus.</p>
                                                 </div>
                                             </div>
 
                                             <!-- Step 4 -->
-                                            <div class="step-item p-3 flex gap-4 items-start rounded-xl transition-all duration-300 opacity-50"
+                                            <div class="step-item p-2.5 flex gap-3.5 items-start rounded-xl transition-all duration-300 opacity-50"
                                                 id="step-4">
                                                 <div
                                                     class="step-icon mt-1 w-6 h-6 rounded-full border border-gray-500 text-gray-400 flex items-center justify-center shrink-0 border-dashed">
@@ -394,9 +399,10 @@
                                                     </svg>
                                                 </div>
                                                 <div>
-                                                    <p class="text-sm font-regular text-gray-500 step-title">Siap untuk
+                                                    <p class="text-[13px] font-regular text-gray-500 step-title">Siap
+                                                        untuk
                                                         kamu coba!</p>
-                                                    <p class="text-xs text-gray-600 mt-1.5 step-desc">Menunggu langkah
+                                                    <p class="text-[11px] text-gray-600 mt-1 step-desc">Menunggu langkah
                                                         sebelumnya selesai.</p>
                                                 </div>
                                             </div>
@@ -404,7 +410,7 @@
                                     </div>
                                 </div>
 
-                                <div class="text-center pt-2 pb-8">
+                                <div class="text-center pt-1 pb-4">
                                     <button type="button" onclick="window.location.reload()"
                                         class="text-sm text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,13 +1,17 @@
-<aside class="w-64 bg-[#0d1117] border-r border-[#21262d] z-10 hidden sm:flex flex-col shrink-0 sticky top-0 h-screen">
-
+{{-- ===== DESKTOP SIDEBAR ===== --}}
+<aside
+    :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden border-r-0'"
+    class="bg-[#0d1117] border-r border-[#21262d] z-10 hidden sm:flex flex-col shrink-0 sticky top-0 h-screen transition-all duration-300 ease-in-out"
+    style="will-change: width;"
+>
     {{-- Logo --}}
-    <div class="px-5 py-5 border-b border-[#21262d]">
+    <div class="px-5 py-5 border-b border-[#21262d] shrink-0">
         <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
            class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
                 <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="w-6 h-6 object-contain" />
             </div>
-            <div>
+            <div x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap">
                 <p class="font-bold text-sm text-white leading-tight">DIJADIIN</p>
                 <p class="text-[10px] text-blue-400 font-medium leading-tight">AI App Generator</p>
             </div>
@@ -15,74 +19,78 @@
     </div>
 
     {{-- Nav --}}
-    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-
-        @php
-            $navItem = fn($label, $icon, $active) =>
-                '<a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ' .
-                ($active ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300') .
-                '">' . $icon . $label . '</a>';
-        @endphp
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto overflow-x-hidden">
 
         @if(Auth::user()->role === 'admin')
             <a href="{{ route('admin.dashboard') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Admin Dashboard
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}"
+               :title="!sidebarOpen ? 'Admin Dashboard' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap">Admin Dashboard</span>
             </a>
         @else
             <a href="{{ route('dashboard') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('dashboard') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                My Projects
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('dashboard') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}"
+               :title="!sidebarOpen ? 'My Projects' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap">My Projects</span>
             </a>
 
             {{-- Templates (coming soon) --}}
             <a href="#"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                Templates
-                <span class="ml-auto text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none"
+               :title="!sidebarOpen ? 'Templates (Soon)' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap flex items-center gap-2">
+                    Templates
+                    <span class="text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
+                </span>
             </a>
 
             {{-- API Keys (coming soon) --}}
             <a href="#"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                API Keys
-                <span class="ml-auto text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none"
+               :title="!sidebarOpen ? 'API Keys (Soon)' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap flex items-center gap-2">
+                    API Keys
+                    <span class="text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
+                </span>
             </a>
 
             {{-- Settings --}}
             <a href="{{ route('profile.edit') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('profile.edit') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                Settings
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('profile.edit') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}"
+               :title="!sidebarOpen ? 'Settings' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap">Settings</span>
             </a>
         @endif
 
         {{-- Divider --}}
         <div class="pt-2 mt-2 border-t border-[#21262d]">
             <a href="#"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-400 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                Documentation
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-400 transition-colors"
+               :title="!sidebarOpen ? 'Documentation' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="whitespace-nowrap">Documentation</span>
             </a>
         </div>
 
     </nav>
 
     {{-- User Profile --}}
-    <div class="border-t border-[#21262d] p-3">
+    <div class="border-t border-[#21262d] p-3 shrink-0">
         <div class="flex items-center gap-2.5">
             <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/avatar/avatar-1.png') }}"
                  alt="{{ Auth::user()->name }}"
-                 class="w-9 h-9 rounded-full object-cover shrink-0 border border-[#30363d]">
-            <div class="flex flex-col truncate flex-1 min-w-0">
+                 class="w-9 h-9 rounded-full object-cover shrink-0 border border-[#30363d]"
+                 :title="!sidebarOpen ? '{{ Auth::user()->name }}' : ''">
+            <div x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="flex flex-col truncate flex-1 min-w-0 whitespace-nowrap">
                 <span class="text-xs font-semibold text-gray-200 truncate leading-tight">{{ Auth::user()->name }}</span>
                 <span class="text-[10px] text-gray-500 truncate leading-tight">{{ Auth::user()->email }}</span>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
+            <form x-show="sidebarOpen" method="POST" action="{{ route('logout') }}" x-transition:enter="transition-opacity duration-200 delay-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                 @csrf
                 <button type="submit" title="Log Out"
                         class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors shrink-0">
@@ -94,8 +102,24 @@
 
 </aside>
 
+{{-- ===== FLOATING TOGGLE BUTTON (Desktop) ===== --}}
+<button
+    @click="toggleSidebar()"
+    :title="sidebarOpen ? 'Sembunyikan Sidebar' : 'Tampilkan Sidebar'"
+    class="hidden sm:flex fixed z-50 items-center justify-center w-7 h-7 rounded-full bg-[#21262d] border border-[#30363d] text-gray-400 hover:text-white hover:bg-[#30363d] hover:border-blue-500/50 shadow-lg transition-all duration-300 cursor-pointer"
+    :style="sidebarOpen ? 'left: calc(16rem - 14px); top: 50%;' : 'left: 8px; top: 50%;'"
+    style="transform: translateY(-50%);"
+>
+    {{-- Chevron icon rotates based on state --}}
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+         :class="sidebarOpen ? '' : 'rotate-180'"
+         class="transition-transform duration-300">
+        <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+</button>
 
-{{-- Mobile Header --}}
+
+{{-- ===== MOBILE HEADER ===== --}}
 <div class="sm:hidden flex items-center justify-between p-4 bg-[#0d1117] border-b border-[#21262d] shrink-0">
     <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
        class="flex items-center gap-2">
