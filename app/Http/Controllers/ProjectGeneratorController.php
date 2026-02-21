@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+use App\Models\GeneratedProject;
 use App\Services\ScaffoldProjectService;
 use App\Services\EnvGeneratorService;
 use App\Http\Requests\GenerateProjectRequest;
@@ -38,7 +40,20 @@ class ProjectGeneratorController extends Controller
             return back()->withInput()->withErrors(['project_name' => 'Project generated but failed to modify the .env file.']);
         }
 
-        // 3. Return redirection to explorer
+        // 3. Save record to database
+        GeneratedProject::create([
+            'user_id'     => Auth::id(),
+            'name'        => $projectName,
+            'description' => $data['description'] ?? null,
+            'db_type'     => $data['db_type'] ?? 'mysql',
+            'db_name'     => $data['db_name'] ?? null,
+            'db_port'     => $data['db_port'] ?? null,
+            'db_username' => $data['db_username'] ?? null,
+            'ai_prompt'   => $data['ai_prompt'] ?? null,
+            'path'        => $projectPath,
+        ]);
+
+        // 4. Redirect to explorer
         return redirect()->route('project.explorer.index', ['project' => $projectName]);
     }
 }

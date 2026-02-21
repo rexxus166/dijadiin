@@ -45,8 +45,8 @@ class ScaffoldProjectService
 
         $process->setWorkingDirectory($basePath);
 
-        // Composer downloads can be slow; allow 10 minutes timeout
-        $process->setTimeout(600);
+        // Composer downloads can be slow; allow 3 minutes timeout (60x3)
+        $process->setTimeout(180);
 
         try {
             // run execution synchronously for now
@@ -139,7 +139,7 @@ class ScaffoldProjectService
         $process = new Process($processArgs, null, $env);
 
         $process->setWorkingDirectory($basePath);
-        $process->setTimeout(600);
+        $process->setTimeout(180); // 60x3 seconds
 
         try {
             // Provide the stream callback directly to the process

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Services\ScaffoldProjectService;
 use App\Services\EnvGeneratorService;
@@ -27,6 +28,9 @@ class ProjectStreamController extends Controller
 
         // Prepare SSE Response
         $response = new StreamedResponse(function () use ($projectName, $basePath, $data, $scaffoldService, $envService) {
+
+            // Remove PHP execution time limit for long-running composer installs
+            set_time_limit(0);
 
             // Disable Output Buffering
             while (ob_get_level() > 0) {
@@ -62,13 +66,14 @@ class ProjectStreamController extends Controller
                 \App\Models\GeneratedProject::updateOrCreate(
                     ['name' => $projectName],
                     [
+                        'user_id'     => Auth::id(),
                         'description' => $data['description'] ?? null,
-                        'db_type' => $data['db_type'] ?? 'mysql',
-                        'db_name' => $data['db_name'] ?? null,
-                        'db_port' => $data['db_port'] ?? null,
+                        'db_type'     => $data['db_type'] ?? 'mysql',
+                        'db_name'     => $data['db_name'] ?? null,
+                        'db_port'     => $data['db_port'] ?? null,
                         'db_username' => $data['db_username'] ?? null,
-                        'ai_prompt' => $data['ai_prompt'] ?? null,
-                        'path' => $status['path'],
+                        'ai_prompt'   => $data['ai_prompt'] ?? null,
+                        'path'        => $status['path'],
                     ]
                 );
 
