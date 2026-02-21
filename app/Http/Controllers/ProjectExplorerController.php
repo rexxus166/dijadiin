@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Process;
 
 class ProjectExplorerController extends Controller
 {
@@ -274,5 +277,102 @@ class ProjectExplorerController extends Controller
             'ok'     => empty($errors),
             'errors' => $errors,
         ]);
+    }
+
+    public function startPreview(Request $request, string $project)
+    {
+        $basePath    = $this->basePath();
+        $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $project);
+
+        if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {
+            return response()->json(['success' => false, 'message' => 'Invalid project path.']);
+        }
+
+        $userId = Auth::id() ?? 1;
+        $port = 8001; // Gunakan port spesifik agar bisa mati otomatis dan di-reuse
+
+        // Stop process apapun yang mungkin sedang jalan di port 8001 (baik dari GUI atau terminal manual)
+        $this->killProcessOnPort($port);
+
+        // Composer install if vendor not exist
+        if (!is_dir($projectPath . '/vendor')) {
+            $process = new Process(['composer', 'install'], $projectPath);
+            $process->setTimeout(300); // 5 menit
+            $process->run();
+            if (!$process->isSuccessful()) {
+                Log::error('Composer install failed: ' . $process->getErrorOutput());
+                return response()->json(['success' => false, 'message' => 'Composer install failed: ' . $process->getErrorOutput()]);
+            }
+        }
+
+        // key:generate if needed
+        if (!file_exists($projectPath . '/.env')) {
+            if (file_exists($projectPath . '/.env.example')) {
+                copy($projectPath . '/.env.example', $projectPath . '/.env');
+            } else {
+                file_put_contents($projectPath . '/.env', "APP_NAME=Laravel\nAPP_ENV=local\nAPP_KEY=\nAPP_DEBUG=true\nAPP_URL=http://localhost:$port\n");
+            }
+            $process = new Process(['php', 'artisan', 'key:generate'], $projectPath);
+            $process->run();
+        }
+
+        // Run serve
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $cmd = "start /B php artisan serve --port={$port} > NUL 2>&1";
+            pclose(popen("cd /d " . escapeshellarg($projectPath) . " && " . $cmd, "r"));
+        } else {
+            $cmd = "php artisan serve --port={$port} > /dev/null 2>&1 &";
+            exec("cd " . escapeshellarg($projectPath) . " && " . $cmd);
+        }
+
+        Cache::put("preview_port_{$userId}_{$project}", $port, now()->addHours(2));
+
+        // Wait a little bit for server to hook the port
+        sleep(2);
+
+        return response()->json([
+            'success' => true,
+            'url'     => "http://127.0.0.1:{$port}"
+        ]);
+    }
+
+    public function stopPreview(Request $request, string $project)
+    {
+        $userId = Auth::id() ?? 1;
+        $port = Cache::get("preview_port_{$userId}_{$project}");
+
+        if ($port) {
+            $this->killProcessOnPort($port);
+            Cache::forget("preview_port_{$userId}_{$project}");
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+
+    private function killProcessOnPort($port)
+    {
+        if (!$port) return;
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $output = [];
+            exec("netstat -ano | findstr :$port", $output);
+            foreach ($output as $line) {
+                if (trim($line)) {
+                    $parts = preg_split('/\s+/', trim($line));
+                    $pid = end($parts);
+                    if (is_numeric($pid) && $pid > 0) {
+                        exec("taskkill /F /PID $pid");
+                    }
+                }
+            }
+        } else {
+            exec("lsof -t -i:$port", $pids);
+            foreach ($pids as $pid) {
+                if (is_numeric($pid)) {
+                    exec("kill -9 $pid");
+                }
+            }
+        }
     }
 }

@@ -1,120 +1,5 @@
 <x-app-layout>
-    {{-- Prism.js: VS Code Dark+ theme + all languages --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
     <style>
-        /* ===== Override Prism theme to closer match VS Code Dark+ ===== */
-        pre[class*="language-"] {
-            background: #1e1e1e !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            font-size: 13px !important;
-            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace !important;
-            line-height: 1.6 !important;
-            tab-size: 4;
-        }
-
-        code[class*="language-"] {
-            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace !important;
-            font-size: 13px !important;
-            line-height: 1.6 !important;
-        }
-
-        /* Line numbers */
-        .line-numbers .line-numbers-rows {
-            border-right: 1px solid #333 !important;
-            background: #1e1e1e !important;
-            width: 50px !important;
-            left: -60px !important;
-            top: 0;
-            padding-top: 24px;
-            padding-bottom: 24px;
-            height: calc(100% + 48px);
-            margin-top: -24px;
-        }
-
-        .line-numbers-rows>span:before {
-            color: #858585 !important;
-            padding-right: 10px;
-        }
-
-        /* ===== Editor overlay layout ===== */
-        #editor-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* The highlighted pre sits BEHIND the textarea */
-        #code-highlight {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            pointer-events: none;
-            padding: 24px 24px 24px 70px !important;
-            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            white-space: pre;
-            word-wrap: normal;
-            box-sizing: border-box;
-            background: #1e1e1e;
-        }
-
-        /* Transparent textarea sits ON TOP for interaction */
-        #code-viewer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 24px 24px 24px 70px !important;
-            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            white-space: pre;
-            word-wrap: normal;
-            box-sizing: border-box;
-            background: transparent;
-            color: transparent;
-            caret-color: #aeafad;
-            border: none;
-            outline: none;
-            resize: none;
-            tab-size: 4;
-            overflow: auto;
-            z-index: 2;
-            spellcheck: false;
-        }
-
-        /* Scrollbar style */
-        #code-viewer::-webkit-scrollbar,
-        #code-highlight::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        #code-viewer::-webkit-scrollbar-track,
-        #code-highlight::-webkit-scrollbar-track {
-            background: #1e1e1e;
-        }
-
-        #code-viewer::-webkit-scrollbar-thumb,
-        #code-highlight::-webkit-scrollbar-thumb {
-            background: #424242;
-            border-radius: 4px;
-        }
-
-        #code-viewer::-webkit-scrollbar-thumb:hover,
-        #code-highlight::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
         /* Tabs styling */
         #editor-tabs::-webkit-scrollbar {
             height: 4px;
@@ -310,6 +195,17 @@
                 {{ $projectName ?? 'Project Explorer' }}
             </h2>
             <div class="flex items-center gap-3">
+                <button id="preview-project-btn"
+                    class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1.5 rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg>
+                    Preview Web
+                </button>
                 <button id="generate-project-btn"
                     class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm px-4 py-1.5 rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,8 +262,8 @@
                 class="bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 sm:rounded-xl overflow-hidden h-full flex flex-col md:flex-row shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
 
                 <!-- LEFT PANE: Directory Tree -->
-                <div
-                    class="w-full md:w-1/4 lg:w-1/5 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden shrink-0">
+                <div id="explorer-left-pane"
+                    class="w-full md:w-1/4 lg:w-1/5 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden shrink-0 transition-all duration-300">
                     <div
                         class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 flex justify-between items-center">
                         <span
@@ -406,12 +302,21 @@
                     <!-- Editor Header / Tabs -->
                     <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
                         <!-- Left: Scrollable Tabs -->
-                        <div id="editor-tabs"
-                            class="flex-1 flex overflow-x-auto bg-[#1a1a1a] border-b border-[#2d2d2d] select-none">
-                            <!-- Fallback empty state -->
-                            <div id="tab-empty-state"
-                                class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No
-                                file open</div>
+                        <div class="flex-1 flex overflow-hidden bg-[#1a1a1a] border-b border-[#2d2d2d]">
+                            <button id="toggle-left-pane"
+                                class="px-3 hover:bg-[#2d2d2d] text-gray-400 hover:text-white border-r border-[#2d2d2d] flex items-center justify-center shrink-0 transition-colors"
+                                title="Toggle Explorer (Ctrl+B)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6h16M4 12h16M4 18h7"></path>
+                                </svg>
+                            </button>
+                            <div id="editor-tabs" class="flex-1 flex overflow-x-auto select-none">
+                                <!-- Fallback empty state -->
+                                <div id="tab-empty-state"
+                                    class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No
+                                    file open</div>
+                            </div>
                         </div>
 
                         <!-- Right: Auto Save & Controls -->
@@ -447,6 +352,19 @@
                                 <button id="reject-diff"
                                     class="text-xs bg-[#444] hover:bg-[#555] text-white px-3 py-1 rounded">Reject</button>
                             </div>
+
+                            <div class="h-4 w-px bg-[#444] mx-1"></div>
+
+                            <!-- Toggle Right Pane -->
+                            <button id="toggle-right-pane"
+                                class="p-1.5 hover:bg-[#444] text-gray-400 hover:text-white rounded flex items-center justify-center shrink-0 transition-colors"
+                                title="Toggle Gemini Chat (Ctrl+J)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                                    </path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
@@ -470,16 +388,9 @@
                             <div id="lint-error-list"></div>
                         </div>
 
-                        {{-- Original View Edit Panel --}}
+                        {{-- Monaco Editor Panel --}}
                         <div class="flex-1 h-full relative" id="original-view-pane">
-                            <div id="editor-wrapper">
-                                {{-- Highlighted code (background) --}}
-                                <pre id="code-highlight" class="line-numbers"
-                                    aria-hidden="true"><code id="code-highlight-inner" class="language-php"></code></pre>
-                                {{-- Transparent editable textarea (foreground) --}}
-                                <textarea id="code-viewer" spellcheck="false" autocorrect="off" autocapitalize="off"
-                                    autocomplete="off" placeholder="Select a file from the explorer..."></textarea>
-                            </div>
+                            <div id="monaco-editor-container" class="absolute inset-0 w-full h-full"></div>
                         </div>
 
                         <!-- Diff View (Modified) Hidden -->
@@ -503,7 +414,8 @@
                 </div>
 
                 <!-- RIGHT PANE: Gemini Agent -->
-                <div class="w-full md:w-1/4 lg:w-[300px] flex flex-col h-full bg-white dark:bg-gray-900 shrink-0">
+                <div id="explorer-right-pane"
+                    class="w-full md:w-1/4 lg:w-[300px] flex flex-col h-full bg-white dark:bg-gray-900 shrink-0 transition-all duration-300">
                     <div
                         class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 flex items-center gap-2">
                         <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
@@ -541,22 +453,144 @@
         </div>
     </div>
 
+    <!-- Preview Web Modal -->
+    <div id="preview-modal"
+        class="fixed inset-0 z-[10000] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none transition-opacity duration-300 opacity-0">
+        <div
+            class="bg-white dark:bg-gray-800 w-[95%] max-w-[1400px] h-[90vh] rounded-xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden transform scale-95 transition-transform duration-300">
+            <!-- Modal Header -->
+            <div
+                class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center relative">
+                <div
+                    class="flex items-center gap-2 pt-1 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 justify-between">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2 pb-1">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg>
+                        Project Preview
+                    </h3>
+                </div>
+
+                <div class="flex-1 flex justify-center px-4 absolute left-1/2 transform -translate-x-1/2 w-1/2">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md py-1 px-3 text-sm text-gray-500 dark:text-gray-400 font-mono flex items-center gap-2 cursor-pointer shadow-sm min-w-48 max-w-full hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                        id="preview-url-box" title="Click to copy URL">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4">
+                            </path>
+                        </svg>
+                        <span id="preview-url-text" class="truncate flex-1">Starting server...</span>
+                        <svg class="w-3.5 h-3.5 text-gray-400 border-l border-gray-300 dark:border-gray-600 pl-1 ml-1"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <a href="#" target="_blank" id="preview-open-new-btn"
+                        class="hidden text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-1 font-medium">
+                        Open in browser
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </a>
+                    <button class="bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-colors"
+                        onclick="stopAndClosePreview()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content (Iframe & Loading) -->
+            <div class="flex-1 relative bg-gray-100 dark:bg-gray-800" id="preview-body">
+                <!-- Loading State -->
+                <div id="preview-loading"
+                    class="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-900 z-10 transition-opacity duration-500">
+                    <div
+                        class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4">
+                    </div>
+                    <div class="text-gray-700 dark:text-gray-300 font-medium animate-pulse" id="preview-loading-text">
+                        Starting server and compiling assets...</div>
+                    <div class="text-xs text-gray-500 mt-2 italic">This may take a minute if it's the first time
+                        running.</div>
+                </div>
+                <!-- Iframe -->
+                <iframe id="preview-iframe" src="about:blank"
+                    class="w-full h-full border-none opacity-0 transition-opacity duration-500"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
     <script>
         window.ProjectConfig = {
             projectName: "{{ $projectName ?? '' }}",
             apiTreeUrl: "{{ route('project.explorer.tree', ['project' => $projectName ?? '']) }}",
             apiFileUrl: "{{ route('project.explorer.file', ['project' => $projectName ?? '']) }}",
             apiLintUrl: "{{ route('project.explorer.lint', ['project' => $projectName ?? '']) }}",
+            apiPreviewStartUrl: "{{ route('project.explorer.preview.start', ['project' => $projectName ?? '']) }}",
+            apiPreviewStopUrl: "{{ route('project.explorer.preview.stop', ['project' => $projectName ?? '']) }}",
             aiPrompt: {!! json_encode($aiPrompt ?? '') !!}
         };
 
+        let monacoEditor;
+
         document.addEventListener('DOMContentLoaded', () => {
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+            require(['vs/editor/editor.main'], function () {
+                monacoEditor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+                    value: "Select a file from the explorer...",
+                    language: "plaintext",
+                    theme: "vs-dark",
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 13,
+                    wordWrap: "off",
+                    readOnly: true,
+                    scrollBeyondLastLine: false,
+                    renderWhitespace: "selection"
+                });
+
+                // Set default blade formatting to use HTML syntax checking
+                monaco.languages.register({ id: 'blade' });
+
+                const uri = monaco.Uri.parse('a://b/blade.html');
+                monaco.editor.createModel('', 'html', uri); // trigger worker load
+
+                // Set HTML formatting/validation options to tolerate curly braces
+                setTimeout(() => {
+                    monaco.languages.html && monaco.languages.html.htmlDefaults && monaco.languages.html.htmlDefaults.setOptions({
+                        format: {
+                            templating: true,
+                            unformatted: 'template, a, span, img, code, pre, sub, sup, em, strong, b, i, u, strike, s, del, wbr'
+                        },
+                        suggest: {
+                            html5: true
+                        }
+                    });
+                }, 1000);
+
+                initializeApp();
+            });
+        });
+
+        function initializeApp() {
             let autoTriggerGenModal = false;
             const sessionKey = 'dijadiin_scaffold_triggered_' + window.ProjectConfig.projectName;
             const treeContainer = document.getElementById('file-tree-root');
             const treeLoading = document.getElementById('tree-loading');
-            const codeViewer = document.getElementById('code-viewer');
-            const codeHighlight = document.getElementById('code-highlight-inner');
             const codeLoading = document.getElementById('code-loading');
             const activeFileName = document.getElementById('active-file-name');
             const editorTabsContainer = document.getElementById('editor-tabs');
@@ -610,6 +644,9 @@
 
             function showFsHeader() {
                 if (!fsAppHeader) return;
+                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+                if (!isFs) return; // Jangan jalankan jika bukan fullscreen
+
                 fsAppHeader.style.transform = 'translateY(0)';
                 fsAppHeader.style.boxShadow = '0 8px 32px rgba(0,0,0,0.6)';
                 clearTimeout(fsHeaderTimer);
@@ -618,6 +655,9 @@
 
             function hideFsHeader() {
                 if (!fsAppHeader) return;
+                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+                if (!isFs) return; // Jangan jalankan jika bukan fullscreen
+
                 fsAppHeader.style.transform = 'translateY(-110%)';
                 fsAppHeader.style.boxShadow = '';
                 clearTimeout(fsHeaderTimer);
@@ -737,6 +777,41 @@
                 if (e.key === 'F11') {
                     e.preventDefault();
                     !!document.fullscreenElement ? exitFullscreen() : enterFullscreen();
+                }
+            });
+
+            // ── Pane Toggle Listeners ──
+            const leftPane = document.getElementById('explorer-left-pane');
+            const rightPane = document.getElementById('explorer-right-pane');
+            const toggleLeftBtn = document.getElementById('toggle-left-pane');
+            const toggleRightBtn = document.getElementById('toggle-right-pane');
+
+            function toggleLeftSidebar() {
+                if (!leftPane) return;
+                leftPane.classList.toggle('hidden');
+                toggleLeftBtn?.classList.toggle('text-indigo-400', !leftPane.classList.contains('hidden'));
+                toggleLeftBtn?.classList.toggle('text-gray-400', leftPane.classList.contains('hidden'));
+            }
+
+            function toggleRightSidebar() {
+                if (!rightPane) return;
+                rightPane.classList.toggle('hidden');
+                toggleRightBtn?.classList.toggle('text-indigo-400', !rightPane.classList.contains('hidden'));
+                toggleRightBtn?.classList.toggle('text-gray-400', rightPane.classList.contains('hidden'));
+            }
+
+            toggleLeftBtn?.addEventListener('click', toggleLeftSidebar);
+            toggleRightBtn?.addEventListener('click', toggleRightSidebar);
+
+            // Shortcuts (Ctrl+B / Cmd+B and Ctrl+J / Cmd+J)
+            document.addEventListener('keydown', function (e) {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+                    e.preventDefault();
+                    toggleLeftSidebar();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'j') {
+                    e.preventDefault();
+                    toggleRightSidebar();
                 }
             });
 
@@ -887,6 +962,20 @@
 
             function renderLintPanel(path) {
                 const errs = lintErrors[path] || [];
+                // Update Monaco markers
+                const model = monacoEditor.getModel();
+                if (model && activeFilePath === path) {
+                    const markers = errs.map(e => ({
+                        severity: monaco.MarkerSeverity.Error,
+                        message: e.message,
+                        startLineNumber: e.line || 1,
+                        startColumn: 1,
+                        endLineNumber: e.line || 1,
+                        endColumn: 1000
+                    }));
+                    monaco.editor.setModelMarkers(model, 'lint', markers);
+                }
+
                 if (errs.length === 0) {
                     lintErrorPanel.style.display = 'none';
                     lintErrorList.innerHTML = '';
@@ -910,53 +999,59 @@
             function detectLanguage(filename) {
                 const ext = filename.split('.').pop().toLowerCase();
                 const map = {
-                    'php': 'php', 'blade.php': 'php',
+                    'php': 'php', 'blade.php': 'html',
                     'js': 'javascript', 'mjs': 'javascript', 'cjs': 'javascript',
                     'ts': 'typescript',
                     'json': 'json', 'jsonc': 'json',
                     'css': 'css', 'scss': 'scss', 'sass': 'scss',
-                    'html': 'markup', 'htm': 'markup', 'xml': 'markup', 'svg': 'markup',
+                    'html': 'html', 'htm': 'html', 'xml': 'xml', 'svg': 'xml',
                     'md': 'markdown', 'markdown': 'markdown',
-                    'sh': 'bash', 'bash': 'bash', 'zsh': 'bash',
+                    'sh': 'shell', 'bash': 'shell', 'zsh': 'shell',
                     'sql': 'sql',
                     'yaml': 'yaml', 'yml': 'yaml',
-                    'env': 'bash', 'gitignore': 'bash',
-                    'vue': 'markup', 'jsx': 'jsx', 'tsx': 'typescript',
+                    'env': 'shell', 'gitignore': 'shell',
+                    'vue': 'html', 'jsx': 'javascript', 'tsx': 'typescript',
                 };
-                // Check for blade specifically
-                if (filename.endsWith('.blade.php')) return 'markup';
+                if (filename.endsWith('.blade.php')) return 'html';
                 return map[ext] || 'plaintext';
             }
 
-            // ===== Sync highlighting with textarea =====
+            // ===== Update Monaco text =====
+            let isApplyingModelContent = false;
             function updateHighlight(code, filename) {
                 const lang = detectLanguage(filename || 'file.php');
                 currentLanguage = lang;
-                codeHighlight.className = `language-${lang}`;
-                // Escape HTML entities
-                const escaped = code
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
-                codeHighlight.innerHTML = escaped;
-                Prism.highlightElement(codeHighlight);
+
+                isApplyingModelContent = true;
+                monacoEditor.setValue(code);
+
+                // If it's a blade file or html, force html language to get basic coloring 
+                // but use our overridden html options that allow template tags
+                if (lang === 'html' || filename.endsWith('.blade.php')) {
+                    monaco.editor.setModelLanguage(monacoEditor.getModel(), 'html');
+                } else {
+                    monaco.editor.setModelLanguage(monacoEditor.getModel(), lang);
+                }
+
+                monacoEditor.updateOptions({ readOnly: false });
+                isApplyingModelContent = false;
             }
 
-            // ===== Sync scroll between textarea and pre =====
-            codeViewer.addEventListener('scroll', () => {
-                document.getElementById('code-highlight').scrollTop = codeViewer.scrollTop;
-                document.getElementById('code-highlight').scrollLeft = codeViewer.scrollLeft;
-            });
+            // ===== Auto Save on input via Monaco =====
+            monacoEditor.onDidChangeModelContent(() => {
+                if (isApplyingModelContent) return;
 
-            // ===== Re-highlight & Auto Save on input =====
-            codeViewer.addEventListener('input', () => {
-                updateHighlight(codeViewer.value, activeFileName.textContent);
+                // Clear obsolete markers on edit
+                if (activeFilePath) {
+                    monaco.editor.setModelMarkers(monacoEditor.getModel(), 'lint', []);
+                    lintErrorPanel.style.display = 'none';
+                }
 
                 // Update current buffer
                 if (activeFilePath) {
                     const fileObj = openFiles.find(f => f.path === activeFilePath);
                     if (fileObj) {
-                        fileObj.content = codeViewer.value;
+                        fileObj.content = monacoEditor.getValue();
 
                         // Tab dot un-saved indicator
                         const tabEl = document.getElementById(`tab-${activeFilePath}`);
@@ -1060,8 +1155,12 @@
                 editorTabsContainer.innerHTML = '';
                 if (openFiles.length === 0) {
                     editorTabsContainer.innerHTML = `<div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>`;
-                    codeViewer.value = '';
-                    updateHighlight('', 'blank.txt');
+
+                    isApplyingModelContent = true;
+                    monacoEditor.setValue("Select a file from the explorer...");
+                    monacoEditor.updateOptions({ readOnly: true });
+                    isApplyingModelContent = false;
+
                     activeFilePath = null;
                     document.getElementById('active-file-path').value = '';
                     activeFileName.textContent = '';
@@ -1111,7 +1210,6 @@
                 document.getElementById('active-file-path').value = path;
                 activeFileName.textContent = fileObj.name;
 
-                codeViewer.value = fileObj.content;
                 updateHighlight(fileObj.content, fileObj.name);
 
                 renderTabs(); // visually update active tab
@@ -1162,8 +1260,8 @@
                     .then(data => {
                         codeLoading.style.display = 'none';
                         if (data.error) {
-                            codeViewer.value = `Error: ${data.error}`;
                             updateHighlight(`Error: ${data.error}`, 'error.txt');
+                            monacoEditor.updateOptions({ readOnly: true });
                             autoTriggerGemini = false;
                         } else {
                             openFiles.push({
@@ -1237,27 +1335,13 @@
                     .catch(() => showSaveStatus('Fail', 'text-red-400'));
             }
 
-            // Ctrl+S functionality
-            document.addEventListener('keydown', function (e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    if (activeFilePath) {
-                        const contentObj = openFiles.find(f => f.path === activeFilePath);
-                        if (contentObj) {
-                            saveFileContent(activeFilePath, contentObj.content, false);
-                        }
+            // Custom Save override for Ctrl+S using Monaco action
+            monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function () {
+                if (activeFilePath) {
+                    const contentObj = openFiles.find(f => f.path === activeFilePath);
+                    if (contentObj) {
+                        saveFileContent(activeFilePath, contentObj.content, false);
                     }
-                }
-            });
-
-            // Prevent Tab key from leaving the textarea natively, and indent instead
-            codeViewer.addEventListener('keydown', function (e) {
-                if (e.key == 'Tab') {
-                    e.preventDefault();
-                    var start = this.selectionStart;
-                    var end = this.selectionEnd;
-                    this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
-                    this.selectionStart = this.selectionEnd = start + 1;
                 }
             });
 
@@ -1301,7 +1385,7 @@
             chatSendBtn.addEventListener('click', () => {
                 const prompt = chatInput.value.trim();
                 const path = document.getElementById('active-file-path').value;
-                const currentContent = codeViewer.value;
+                const currentContent = activeFilePath ? monacoEditor.getValue() : '';
 
                 if (!prompt) return;
 
@@ -1356,7 +1440,6 @@
 
                                 // If it's the specific file currently in view
                                 if (activeFilePath === f.path) {
-                                    codeViewer.value = f.content;
                                     updateHighlight(f.content, activeFileName.textContent);
                                     affectedActive = true;
                                 }
@@ -1380,7 +1463,8 @@
 
             // Initial load
             loadTree();
-        });
+
+        } // End initializeApp()
     </script>
 
     <!-- Project Generation Modal -->
@@ -1440,18 +1524,9 @@
         </div>
     </div>
 
-    {{-- Prism.js core + autoloader (all languages) + line-numbers plugin --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-    <script>
-        // Set autoloader path so all language grammars are loaded on demand
-        if (typeof Prism !== 'undefined' && Prism.plugins?.autoloader) {
-            Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
-        }
+    <!-- Prism dependencies removed because Monaco Editor is used -->
 
+    <script>
         // Generation Modal Logic
         const genModal = document.getElementById('generate-modal');
         const openModalBtn = document.getElementById('generate-project-btn');
@@ -1537,5 +1612,115 @@
             startGenBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             startGenBtn.querySelector('span').textContent = 'Mulai Generate File Setup';
         }
+
+        // Preview Modal Logic
+        const previewModal = document.getElementById('preview-modal');
+        const previewBtn = document.getElementById('preview-project-btn');
+        const previewIframe = document.getElementById('preview-iframe');
+        const previewLoading = document.getElementById('preview-loading');
+        const previewLoadingText = document.getElementById('preview-loading-text');
+        const previewUrlText = document.getElementById('preview-url-text');
+        const previewOpenNewBtn = document.getElementById('preview-open-new-btn');
+        const previewUrlBox = document.getElementById('preview-url-box');
+
+        previewBtn?.addEventListener('click', async () => {
+            previewModal.classList.remove('hidden');
+            // Sedikit delay untuk animasi CSS
+            setTimeout(() => {
+                previewModal.classList.remove('pointer-events-none', 'opacity-0');
+                previewModal.firstElementChild.classList.remove('scale-95');
+                previewModal.firstElementChild.classList.add('scale-100');
+            }, 10);
+
+            previewIframe.src = 'about:blank';
+            previewIframe.classList.add('opacity-0');
+            previewLoading.classList.remove('opacity-0', 'pointer-events-none');
+            previewOpenNewBtn.classList.add('hidden');
+            previewUrlText.textContent = "Starting server and preparing project...";
+            previewLoadingText.textContent = "Starting PHP Server and compiling assets...";
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+                // Set Loading Status animation
+                let dots = 0;
+                const loadInterval = setInterval(() => {
+                    dots = (dots + 1) % 4;
+                    previewUrlText.textContent = "Starting server" + ".".repeat(dots);
+                }, 500);
+
+                const response = await fetch(window.ProjectConfig.apiPreviewStartUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken }
+                });
+
+                clearInterval(loadInterval);
+
+                const result = await response.json();
+                if (result.success) {
+                    previewUrlText.textContent = result.url;
+                    previewOpenNewBtn.href = result.url;
+                    previewOpenNewBtn.classList.remove('hidden');
+
+                    // Reload iframe dengan URL
+                    previewIframe.src = result.url;
+
+                    // Hilangkan loading block saaat iframe load complete
+                    previewIframe.onload = () => {
+                        previewLoading.classList.add('opacity-0', 'pointer-events-none');
+                        previewIframe.classList.remove('opacity-0');
+                    };
+
+                    // Timeout jika load gagal atau ter-hold (paksa show iframe)
+                    setTimeout(() => {
+                        previewLoading.classList.add('opacity-0', 'pointer-events-none');
+                        previewIframe.classList.remove('opacity-0');
+                    }, 5000);
+                } else {
+                    alert('Gagal start preview: ' + result.message);
+                    stopAndClosePreview();
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Gagal request preview.');
+                stopAndClosePreview();
+            }
+        });
+
+        async function stopAndClosePreview() {
+            previewModal.classList.add('pointer-events-none');
+            previewModal.firstElementChild.classList.remove('scale-100');
+            previewModal.firstElementChild.classList.add('scale-95');
+            previewModal.classList.add('opacity-0');
+
+            setTimeout(() => {
+                previewModal.classList.add('hidden');
+                previewIframe.src = 'about:blank';
+            }, 300);
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                await fetch(window.ProjectConfig.apiPreviewStopUrl, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken }
+                });
+            } catch (err) {
+                console.error('Failed to stop preview', err);
+            }
+        }
+
+        previewUrlBox?.addEventListener('click', () => {
+            const url = previewUrlText.textContent;
+            if (url && url.startsWith('http')) {
+                navigator.clipboard.writeText(url);
+                const old = previewUrlText.textContent;
+                previewUrlText.textContent = "Copied to clipboard!";
+                setTimeout(() => {
+                    if (previewUrlText.textContent === "Copied to clipboard!") {
+                        previewUrlText.textContent = old;
+                    }
+                }, 2000);
+            }
+        });
     </script>
 </x-app-layout>
