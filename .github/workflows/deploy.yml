@@ -54,7 +54,11 @@ jobs:
       run: |
         SHA_IMAGE="${{ env.IMAGE_NAME }}:${{ github.sha }}"
         sed -i "s|<username-dockerhub>/dijadiin:latest|${SHA_IMAGE}|g" server/deployment.yaml
-        # Hapus semua resource lama (--ignore-not-found supaya tidak error kalau belum ada)
+        # Hapus resource sample dari panitia yang konflik dengan ingress kita
+        kubectl --kubeconfig=server/kubeconfig.yaml delete deployment test-web -n poliwindra --ignore-not-found
+        kubectl --kubeconfig=server/kubeconfig.yaml delete service test-web-service -n poliwindra --ignore-not-found
+        kubectl --kubeconfig=server/kubeconfig.yaml delete ingress test-web-ingress -n poliwindra --ignore-not-found
+        # Hapus resource dijadiin lama
         kubectl --kubeconfig=server/kubeconfig.yaml delete deployment dijadiin-app -n poliwindra --ignore-not-found
         kubectl --kubeconfig=server/kubeconfig.yaml delete service dijadiin-service -n poliwindra --ignore-not-found
         kubectl --kubeconfig=server/kubeconfig.yaml delete ingress dijadiin-ingress -n poliwindra --ignore-not-found
