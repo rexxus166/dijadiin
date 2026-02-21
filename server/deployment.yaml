@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dijadiin-app
+  namespace: poliwindra
+  labels:
+    app: dijadiin-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dijadiin-app
+  template:
+    metadata:
+      labels:
+        app: dijadiin-app
+    spec:
+      containers:
+      - name: web
+        # Nanti ganti <username-dockerhub> dengan username-mu
+        image: <username-dockerhub>/dijadiin:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: APP_NAME
+          value: "dijadiin"
+        - name: APP_ENV
+          value: "production"
+        - name: APP_KEY
+          value: "base64:H6p8x2zY4sWKjeCVF8UPDQeZX9Z6yHIgvtSGunRr4/s="
+        - name: APP_DEBUG
+          value: "false"
+        - name: APP_URL
+          value: "https://poliwindra.hackathon.sev-2.com"
+        - name: DB_CONNECTION
+          value: "pgsql"
+        - name: DB_HOST
+          value: "103.185.52.138"
+        - name: DB_PORT
+          value: "1185"
+        - name: DB_DATABASE
+          value: "poliwindra"
+        - name: DB_USERNAME
+          value: "poliwindra"
+        - name: DB_PASSWORD
+          value: "x2519-_w6ZtV*>dPzKSC4XDn0-0u(#iH"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dijadiin-service
+  namespace: poliwindra
+spec:
+  selector:
+    app: dijadiin-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dijadiin-ingress
+  namespace: poliwindra
+spec:
+  rules:
+  - host: poliwindra.hackathon.sev-2.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dijadiin-service
+            port:
+              number: 80

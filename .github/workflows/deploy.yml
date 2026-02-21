@@ -1,0 +1,61 @@
+name: Auto Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main # Akan auto deploy setiap ada komit (push) ke branch main
+
+env:
+  # Ganti ghcr.io/<usernamemu> sesuai dengan akun GitHub/Dockerhub-mu.
+  # Misalnya pakai Dockerhub: username/dijadiin
+  # Jika pakai Github Container Registry (GHCR): ghcr.io/${{ github.repository }}
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Langkah login ke Registry. 
+    # Jika menggunakan Dockerhub, ganti registry ke 'docker.io'
+    # Pastikan kamu buat secret DOCKER_USERNAME dan DOCKER_PASSWORD di settings repo kamu,
+    # atau ubah ke Github Token (GHCR) seperti di bawah ini.
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ env.IMAGE_NAME }}:latest
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    # Kita menggunakan Kubeconfig yang ada di repositori sebagai secret!
+    # Tambahkan tulisan id dari kubeconfig.yaml milik tim mu ke menu Secrets -> Actions -> 'KUBECONFIG'
+    - name: Set Kubernetes Context
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
+    # Terapkan perubahan dan ganti image placeholder pakai image yang barusan di build
+    - name: Deploy to Kubernetes
+      run: |
+        sed -i 's|<username-dockerhub>/dijadiin:latest|${{ env.IMAGE_NAME }}:latest|g' server/deployment.yaml
+        kubectl apply -f server/deployment.yaml
+        kubectl rollout restart deployment/dijadiin-app -n poliwindra
