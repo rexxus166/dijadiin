@@ -124,7 +124,7 @@
 
                     <!-- Footer Text -->
                     <div class="text-sm text-slate-400">
-                        © 2023 Dijadiin Inc. All rights reserved.
+                        © {{ date('Y') }} Tim Poliwindra. All rights reserved.
                     </div>
                 </div>
             </div>

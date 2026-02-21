@@ -426,7 +426,7 @@
 
                         <!-- Footer text -->
                         <div class="absolute bottom-6 w-full text-center text-xs text-gray-500 font-light">
-                            &copy; 2024 DIJADIIN AI. &bull; Dibuat dengan <span class="text-red-500">❤️</span> untuk
+                            &copy; {{ date('Y') }} DIJADIIN AI. &bull; Dibuat dengan <span class="text-red-500">❤️</span> untuk
                             kreator.
                         </div>
                     </div>
