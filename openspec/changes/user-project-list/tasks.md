@@ -36,4 +36,4 @@
 
 ## 7. Sidebar Update
 
-- [ ] 7.1 Pastikan sidebar link "My Projects" mengarah ke route `dashboard` (`/projects`) — sudah ada, verifikasi saja
+- [x] 7.1 Pastikan sidebar link "My Projects" mengarah ke route `dashboard` (`/projects`) — sudah ada, verifikasi saja

@@ -114,6 +114,28 @@
         #code-highlight::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* Tabs styling */
+        #editor-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        #editor-tabs::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        #editor-tabs::-webkit-scrollbar-thumb {
+            background: #424242;
+        }
+
+        /* Auto Save Toggle animation */
+        input:checked~.toggle-bg {
+            background-color: #4ade80;
+        }
+
+        input:checked~.toggle-dot {
+            transform: translateX(100%);
+        }
     </style>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -124,14 +146,25 @@
                 </svg>
                 {{ $projectName ?? 'Project Explorer' }}
             </h2>
-            <a href="{{ route('project.generator.index') }}"
-                class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                Back to Generator
-            </a>
+            <div class="flex items-center gap-3">
+                <button id="generate-project-btn"
+                    class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm px-4 py-1.5 rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                        </path>
+                    </svg>
+                    Auto Generate App
+                </button>
+                <a href="{{ route('project.generator.index') }}"
+                    class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Dashboard
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -179,32 +212,49 @@
                 <!-- MIDDLE PANE: Code Preview -->
                 <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333]">
                     <!-- Editor Header / Tabs -->
-                    <div
-                        class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] overflow-x-auto justify-between pr-4">
-                        <div
-                            class="flex-1 py-2 px-4 bg-[#1e1e1e] text-[#cccccc] border-t-2 border-indigo-500 flex justify-between items-center text-sm font-sans min-w-max cursor-default">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                    </path>
-                                </svg>
-                                <span id="active-file-name">No file selected</span>
-                                <input type="hidden" id="active-file-path" value="">
-                            </div>
-                            <button id="save-file-btn"
-                                class="hidden bg-indigo-600/50 hover:bg-indigo-500 text-white text-[11px] px-2 py-0.5 rounded transition-all"
-                                title="Save File (Ctrl+S)">Save (Ctrl+S)</button>
+                    <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
+                        <!-- Left: Scrollable Tabs -->
+                        <div id="editor-tabs"
+                            class="flex-1 flex overflow-x-auto bg-[#1a1a1a] border-b border-[#2d2d2d] select-none">
+                            <!-- Fallback empty state -->
+                            <div id="tab-empty-state"
+                                class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No
+                                file open</div>
                         </div>
 
-                        <!-- Diff Controls (Hidden by default) -->
-                        <div id="diff-controls" class="hidden flex gap-2">
-                            <button id="accept-diff"
-                                class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded">Accept
-                                Changes</button>
-                            <button id="reject-diff"
-                                class="text-xs bg-[#444] hover:bg-[#555] text-white px-3 py-1 rounded">Reject</button>
+                        <!-- Right: Auto Save & Controls -->
+                        <div class="flex items-center gap-3 shrink-0 ml-4 py-1.5">
+                            <label class="flex items-center cursor-pointer group" title="Auto Save edited files">
+                                <span
+                                    class="text-xs text-gray-400 mr-2 group-hover:text-gray-300 transition-colors font-medium">Auto
+                                    Save</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="auto-save-toggle" class="sr-only" checked>
+                                    <div
+                                        class="w-8 h-4 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200">
+                                    </div>
+                                    <div
+                                        class="toggle-dot absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200">
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Save status indicator -->
+                            <span id="save-status-msg"
+                                class="text-[10px] text-gray-500 w-16 text-right transition-opacity duration-300 opacity-0">Saved</span>
+
+                            <!-- Hidden info for Active file, kept for compatibility -->
+                            <span id="active-file-name" class="hidden"></span>
+                            <input type="hidden" id="active-file-path" value="">
+
+                            <!-- Diff Controls (Hidden by default) -->
+                            <div id="diff-controls" class="hidden flex gap-2">
+                                <button id="accept-diff"
+                                    class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded">Accept
+                                    Changes</button>
+                                <button id="reject-diff"
+                                    class="text-xs bg-[#444] hover:bg-[#555] text-white px-3 py-1 rounded">Reject</button>
+                            </div>
                         </div>
                     </div>
 
@@ -285,17 +335,34 @@
         window.ProjectConfig = {
             projectName: "{{ $projectName ?? '' }}",
             apiTreeUrl: "{{ route('project.explorer.tree', ['project' => $projectName ?? '']) }}",
-            apiFileUrl: "{{ route('project.explorer.file', ['project' => $projectName ?? '']) }}"
+            apiFileUrl: "{{ route('project.explorer.file', ['project' => $projectName ?? '']) }}",
+            aiPrompt: {!! json_encode($aiPrompt ?? '') !!}
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            let autoTriggerGemini = false;
+            const sessionKey = 'dijadiin_gemini_triggered_' + window.ProjectConfig.projectName;
+
+            if (window.ProjectConfig.aiPrompt && !sessionStorage.getItem(sessionKey)) {
+                document.getElementById('chat-input').value = window.ProjectConfig.aiPrompt;
+                autoTriggerGemini = true;
+                sessionStorage.setItem(sessionKey, '1');
+            }
             const treeContainer = document.getElementById('file-tree-root');
             const treeLoading = document.getElementById('tree-loading');
             const codeViewer = document.getElementById('code-viewer');
             const codeHighlight = document.getElementById('code-highlight-inner');
             const codeLoading = document.getElementById('code-loading');
             const activeFileName = document.getElementById('active-file-name');
+            const editorTabsContainer = document.getElementById('editor-tabs');
+            const autoSaveToggle = document.getElementById('auto-save-toggle');
+            const saveStatusMsg = document.getElementById('save-status-msg');
             let currentLanguage = 'plaintext';
+
+            // State management
+            let openFiles = []; // Array of {path, name, content}
+            let activeFilePath = null;
+            let autoSaveTimeout = null;
 
             // ===== Detect language from filename extension =====
             function detectLanguage(filename) {
@@ -339,9 +406,28 @@
                 document.getElementById('code-highlight').scrollLeft = codeViewer.scrollLeft;
             });
 
-            // ===== Re-highlight on input =====
+            // ===== Re-highlight & Auto Save on input =====
             codeViewer.addEventListener('input', () => {
                 updateHighlight(codeViewer.value, activeFileName.textContent);
+
+                // Update current buffer
+                if (activeFilePath) {
+                    const fileObj = openFiles.find(f => f.path === activeFilePath);
+                    if (fileObj) {
+                        fileObj.content = codeViewer.value;
+
+                        // Tab dot un-saved indicator
+                        const tabEl = document.getElementById(`tab-${activeFilePath}`);
+                        if (tabEl) {
+                            tabEl.querySelector('.save-dot').classList.remove('opacity-0');
+                        }
+
+                        // Trigger auto save if enabled
+                        if (autoSaveToggle.checked) {
+                            scheduleAutoSave(activeFilePath);
+                        }
+                    }
+                }
             });
 
             if (!window.ProjectConfig.projectName) return;
@@ -359,6 +445,19 @@
                             return;
                         }
                         treeContainer.appendChild(buildTreeDom(data));
+
+                        // Auto-trigger Gemini logic
+                        if (autoTriggerGemini) {
+                            const fileItems = Array.from(document.querySelectorAll('.file-item'));
+                            const readmeNode = fileItems.find(el => el.dataset.path.endsWith('README.md'));
+                            if (readmeNode) {
+                                readmeNode.click();
+                            } else if (fileItems.length > 0) {
+                                fileItems[0].click(); // Fallback if no README
+                            } else {
+                                autoTriggerGemini = false;
+                            }
+                        }
                     })
                     .catch(e => {
                         treeLoading.style.display = 'none';
@@ -408,11 +507,98 @@
                 return ul;
             }
 
-            function loadFile(path, name) {
-                codeLoading.style.display = 'flex';
-                activeFileName.textContent = name;
-                document.getElementById('active-file-path').value = path;
+            function renderTabs() {
+                editorTabsContainer.innerHTML = '';
+                if (openFiles.length === 0) {
+                    editorTabsContainer.innerHTML = `<div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>`;
+                    codeViewer.value = '';
+                    updateHighlight('', 'blank.txt');
+                    activeFilePath = null;
+                    document.getElementById('active-file-path').value = '';
+                    activeFileName.textContent = '';
+                    return;
+                }
 
+                openFiles.forEach(fileObj => {
+                    const isActive = fileObj.path === activeFilePath;
+                    const tab = document.createElement('div');
+                    tab.id = `tab-${fileObj.path}`;
+                    tab.className = `px-3 py-1.5 flex items-center gap-2 cursor-pointer border-t-2 transition-colors duration-150 min-w-max group
+                        ${isActive ? 'border-indigo-500 bg-[#1e1e1e] text-white' : 'border-transparent bg-[#141414] text-[#888] hover:bg-[#1a1a1a] hover:text-[#ccc]'}`;
+
+                    // Tab content inner HTML
+                    tab.innerHTML = `
+                        <svg class="w-3.5 h-3.5 ${isActive ? 'text-emerald-400' : 'text-gray-500'} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-[12px] truncate max-w-[150px]">${fileObj.name}</span>
+                        <div class="h-2 w-2 rounded-full bg-white opacity-0 transition-opacity save-dot shrink-0" title="Unsaved changes"></div>
+                        <button type="button" class="ml-1 text-gray-500 hover:text-red-400 hover:bg-gray-700/50 rounded p-0.5 shrink-0 close-tab-btn opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? 'opacity-100' : ''}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    `;
+
+                    // Select tab
+                    tab.addEventListener('click', (e) => {
+                        if (e.target.closest('.close-tab-btn')) return; // Ignore close clicks
+                        switchTab(fileObj.path);
+                    });
+
+                    // Close tab
+                    tab.querySelector('.close-tab-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeTab(fileObj.path);
+                    });
+
+                    editorTabsContainer.appendChild(tab);
+                });
+            }
+
+            function switchTab(path) {
+                // If switching away, could do something. But state is already saved on input.
+                activeFilePath = path;
+                const fileObj = openFiles.find(f => f.path === path);
+
+                document.getElementById('active-file-path').value = path;
+                activeFileName.textContent = fileObj.name;
+
+                codeViewer.value = fileObj.content;
+                updateHighlight(fileObj.content, fileObj.name);
+
+                renderTabs(); // visually update active tab
+            }
+
+            function closeTab(path) {
+                const idx = openFiles.findIndex(f => f.path === path);
+                if (idx === -1) return;
+
+                // Fire a final manual save before closing just in case
+                if (autoSaveToggle.checked) {
+                    saveFileContent(path, openFiles[idx].content);
+                }
+
+                openFiles.splice(idx, 1);
+
+                if (openFiles.length === 0) {
+                    activeFilePath = null;
+                } else if (activeFilePath === path) {
+                    // Closed active tab, switch to another
+                    const nextIdx = idx >= openFiles.length ? openFiles.length - 1 : idx;
+                    activeFilePath = openFiles[nextIdx].path;
+                }
+
+                if (activeFilePath) switchTab(activeFilePath);
+                else renderTabs(); // triggers empty state
+            }
+
+            function loadFile(path, name) {
+                // Check if already open
+                if (openFiles.some(f => f.path === path)) {
+                    switchTab(path);
+                    return;
+                }
+
+                codeLoading.style.display = 'flex';
                 // Hide diff view if it was open
                 document.getElementById('diff-view-pane').classList.add('hidden');
                 document.getElementById('diff-controls').classList.add('hidden');
@@ -426,30 +612,58 @@
                         if (data.error) {
                             codeViewer.value = `Error: ${data.error}`;
                             updateHighlight(`Error: ${data.error}`, 'error.txt');
+                            autoTriggerGemini = false;
                         } else {
-                            codeViewer.value = data.content;
-                            // ✨ Apply syntax highlighting
-                            updateHighlight(data.content, name);
-                            document.getElementById('save-file-btn').classList.remove('hidden');
+                            openFiles.push({
+                                path: path,
+                                name: name,
+                                content: data.content
+                            });
+                            switchTab(path);
+
+                            if (autoTriggerGemini) {
+                                autoTriggerGemini = false;
+                                setTimeout(() => {
+                                    document.getElementById('chat-send').click();
+                                }, 600);
+                            }
                         }
                     })
-                    .catch(() => {
+                    .catch((err) => {
+                        console.error(err);
                         codeLoading.style.display = 'none';
-                        codeViewer.value = `Error failed to fetch file`;
-                        updateHighlight(`Error failed to fetch file`, 'error.txt');
+                        alert(`Error failed to fetch file`);
                     });
             }
 
-            // Manual Save Functionality
-            const saveFileBtn = document.getElementById('save-file-btn');
+            function showSaveStatus(text, colorClass = 'text-gray-500') {
+                saveStatusMsg.textContent = text;
+                saveStatusMsg.className = `text-[10px] w-16 text-right transition-opacity duration-300 opacity-100 ${colorClass}`;
+                setTimeout(() => {
+                    saveStatusMsg.classList.remove('opacity-100');
+                    saveStatusMsg.classList.add('opacity-0');
+                }, 2000);
+            }
 
-            function saveActiveFile() {
-                const path = document.getElementById('active-file-path').value;
-                const currentContent = codeViewer.value;
+            function scheduleAutoSave(path) {
+                if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+
+                // Set pending visually
+                saveStatusMsg.textContent = 'Saving...';
+                saveStatusMsg.className = "text-[10px] text-gray-400 w-16 text-right opacity-100";
+
+                autoSaveTimeout = setTimeout(() => {
+                    const contentObj = openFiles.find(f => f.path === path);
+                    if (contentObj) {
+                        saveFileContent(path, contentObj.content, true);
+                    }
+                }, 1000);
+            }
+
+            function saveFileContent(path, content, isAuto = false) {
                 if (!path) return;
 
-                saveFileBtn.textContent = 'Saving...';
-                saveFileBtn.classList.add('opacity-50', 'pointer-events-none');
+                if (!isAuto) showSaveStatus('Saving...');
 
                 fetch(`/ai-builder/explorer/${window.ProjectConfig.projectName}/save-file`, {
                     method: 'PUT',
@@ -457,26 +671,34 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ path, content: currentContent })
+                    body: JSON.stringify({ path, content: content })
                 })
                     .then(res => res.json())
                     .then(data => {
-                        saveFileBtn.textContent = data.success ? 'Saved!' : 'Error';
-                        setTimeout(() => {
-                            saveFileBtn.textContent = 'Save (Ctrl+S)';
-                            saveFileBtn.classList.remove('opacity-50', 'pointer-events-none');
-                        }, 2000);
-                    });
+                        if (data.success) {
+                            showSaveStatus('Saved', 'text-emerald-400');
+                            // Remove dirty dot from tab
+                            const tabEl = document.getElementById(`tab-${path}`);
+                            if (tabEl) {
+                                const dot = tabEl.querySelector('.save-dot');
+                                if (dot) dot.classList.add('opacity-0');
+                            }
+                        } else {
+                            showSaveStatus('Error', 'text-red-400');
+                        }
+                    })
+                    .catch(() => showSaveStatus('Fail', 'text-red-400'));
             }
-
-            saveFileBtn.addEventListener('click', saveActiveFile);
 
             // Ctrl+S functionality
             document.addEventListener('keydown', function (e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                     e.preventDefault();
-                    if (!saveFileBtn.classList.contains('hidden')) {
-                        saveActiveFile();
+                    if (activeFilePath) {
+                        const contentObj = openFiles.find(f => f.path === activeFilePath);
+                        if (contentObj) {
+                            saveFileContent(activeFilePath, contentObj.content, false);
+                        }
                     }
                 }
             });
@@ -575,7 +797,16 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            codeViewer.value = newContent; // visually update master
+                            // visually update master
+                            if (activeFilePath === path) {
+                                codeViewer.value = newContent;
+                                updateHighlight(newContent, activeFileName.textContent);
+                            }
+
+                            // save in buffer
+                            const f = openFiles.find(file => file.path === path);
+                            if (f) f.content = newContent;
+
                             document.getElementById('diff-view-pane').classList.add('hidden');
                             document.getElementById('diff-controls').classList.add('hidden');
                             addChatMessage('bot', 'Changes accepted and saved securely.');
@@ -596,6 +827,63 @@
         });
     </script>
 
+    <!-- Project Generation Modal -->
+    <div id="generate-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+        <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                    </path>
+                </svg>
+                AI Project Architect
+            </h3>
+            <p class="text-gray-400 text-sm mb-6">Ceritakan fitur apa saja yang ingin kamu buat. Gemini akan
+                meng-generate file Migration, Controller, Views (Blade), dan Routes secara otomatis.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Nama Aplikasi / Konsep</label>
+                    <input type="text" id="app-concept"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="e.g. Sistem Manajemen Gudang">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Daftar Fitur Utama</label>
+                    <textarea id="app-features" rows="4"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="e.g. 
+- CRUD Barang (Nama, Deskripsi, Harga, Stok)
+- CRUD Kategori (Nama)
+- Relasi Barang belongsTo Kategori"></textarea>
+                </div>
+                <div class="pt-2">
+                    <button id="start-generate-btn"
+                        class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2">
+                        <span>Mulai Generate File Setup</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generation Progress (Hidden initially) -->
+            <div id="generation-progress"
+                class="hidden mt-6 bg-black/30 rounded-lg p-4 font-mono text-xs text-emerald-400 h-48 overflow-y-auto">
+                <div>> Architect engine initialized...</div>
+            </div>
+        </div>
+    </div>
+
     {{-- Prism.js core + autoloader (all languages) + line-numbers plugin --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script
@@ -605,9 +893,93 @@
     <script>
         // Set autoloader path so all language grammars are loaded on demand
         if (typeof Prism !== 'undefined' && Prism.plugins?.autoloader) {
-            Prism.plugins.autoloader.languages_path =
-                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+            Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+        }
+
+        // Generation Modal Logic
+        const genModal = document.getElementById('generate-modal');
+        const openModalBtn = document.getElementById('generate-project-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const startGenBtn = document.getElementById('start-generate-btn');
+        const progressBox = document.getElementById('generation-progress');
+        let genEventSource = null;
+
+        openModalBtn.addEventListener('click', () => {
+            genModal.classList.remove('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            genModal.classList.add('hidden');
+            if (genEventSource) {
+                genEventSource.close();
+            }
+        });
+
+        function addLog(text, color = 'text-emerald-400') {
+            const div = document.createElement('div');
+            div.className = `mt-1 ${color}`;
+            div.textContent = `> ${text}`;
+            progressBox.appendChild(div);
+            progressBox.scrollTop = progressBox.scrollHeight;
+        }
+
+        startGenBtn.addEventListener('click', () => {
+            const concept = document.getElementById('app-concept').value.trim();
+            const features = document.getElementById('app-features').value.trim();
+
+            if (!concept || !features) {
+                alert('Tolong isi nama aplikasi dan fitur-fiturnya!');
+                return;
+            }
+
+            // Disable UI
+            startGenBtn.disabled = true;
+            startGenBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            startGenBtn.querySelector('span').textContent = 'Generating... Please Wait';
+
+            progressBox.classList.remove('hidden');
+            progressBox.innerHTML = '';
+            addLog(`Memulai AI Architect Pipeline untuk "${concept}"...`, 'text-blue-400 font-bold');
+
+            const payload = {
+                concept: concept,
+                features: features,
+                project: window.ProjectConfig.projectName
+            };
+
+            const queryParam = encodeURIComponent(JSON.stringify(payload));
+            genEventSource = new EventSource(`{{ route('project.generator.auto-scaffold') }}?payload=${queryParam}`);
+
+            genEventSource.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+
+                if (data.type === 'info') {
+                    addLog(data.message, 'text-gray-300');
+                } else if (data.type === 'success') {
+                    addLog(data.message, 'text-emerald-400 font-bold');
+                } else if (data.type === 'error') {
+                    addLog(`[ERROR] ${data.message}`, 'text-red-500 font-bold');
+                    genEventSource.close();
+                    resetBtnUI();
+                } else if (data.type === 'done') {
+                    addLog(`[SELESAI] Semua file telah di-generate!`, 'text-purple-400 font-bold');
+                    addLog(`Silakan refresh File Explorer (Icon Refresh) di sebelah kiri.`, 'text-white font-bold');
+                    genEventSource.close();
+                    resetBtnUI();
+                }
+            };
+
+            genEventSource.onerror = function (err) {
+                addLog(`[FATAL] Koneksi terputus dari server.`, 'text-red-500');
+                genEventSource.close();
+                resetBtnUI();
+            };
+        });
+
+        function resetBtnUI() {
+            startGenBtn.disabled = false;
+            startGenBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            startGenBtn.querySelector('span').textContent = 'Mulai Generate File Setup';
         }
     </script>
-
 </x-app-layout>

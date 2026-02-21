@@ -391,7 +391,7 @@
                                     <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TOTAL
                                         PROJECTS
                                         BUILT</span>
-                                    <div class="text-[32px] font-bold mt-1 text-white leading-none">42</div>
+                                    <div class="text-[32px] font-bold mt-1 text-white leading-none">{{ $user->generatedProjects()->count() }}</div>
                                 </div>
                                 <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800">
                                     <!-- Box Icon -->
@@ -413,11 +413,17 @@
                         <div class="bg-[#0d1015] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
                             <div class="flex justify-between items-start mb-6">
                                 <div>
-                                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">AI TOKENS
-                                        USED</span>
+                                    @php
+                                        // Simple quota metric
+                                        $aiUsage = $user->generatedProjects()->whereNotNull('ai_prompt')->count();
+                                        $aiQuota = 100; // Let's pretend 100 is the limit for now
+                                        $aiPercentage = $aiUsage > 0 ? min(round(($aiUsage / $aiQuota) * 100), 100) : 0;
+                                    @endphp
+                                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">AI PROJECTS
+                                        GENERATED</span>
                                     <div class="text-[32px] font-bold mt-1 flex items-baseline text-white leading-none">
-                                        750 <span class="text-sm font-normal text-gray-500 ml-1.5 align-baseline">/
-                                            1k</span>
+                                        {{ $aiUsage }} <span class="text-sm font-normal text-gray-500 ml-1.5 align-baseline">/
+                                            {{ $aiQuota }}</span>
                                     </div>
                                 </div>
                                 <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800 gap-2">
@@ -431,10 +437,10 @@
                             </div>
                             <div class="mt-auto">
                                 <div class="w-full bg-[#1e2532] rounded-full h-1.5 mb-2 overflow-hidden">
-                                    <div class="bg-blue-500 h-full rounded-full" style="width: 75%"></div>
+                                    <div class="bg-blue-500 h-full rounded-full" style="width: {{ $aiPercentage }}%"></div>
                                 </div>
                                 <div class="text-[9px] text-gray-500 font-bold text-right uppercase tracking-[0.15em]">
-                                    75% OF MONTHLY QUOTA CONSUMED
+                                    {{ $aiPercentage }}% OF MONTHLY QUOTA CONSUMED
                                 </div>
                             </div>
                         </div>
