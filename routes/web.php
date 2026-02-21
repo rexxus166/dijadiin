@@ -152,6 +152,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/ai-builder/explorer/{project}/file', [ProjectExplorerController::class, 'file'])->name('project.explorer.file');
     Route::put('/ai-builder/explorer/{project}/save-file', [ProjectExplorerController::class, 'saveFile'])->name('project.explorer.saveFile');
     Route::get('/ai-builder/explorer/{project}/download', [ProjectExplorerController::class, 'download'])->name('project.explorer.download');
+    Route::get('/ai-builder/explorer/{project}/lint', [ProjectExplorerController::class, 'lint'])->name('project.explorer.lint');
     Route::get('/ai-builder/auto-scaffold', [AutoScaffoldController::class, 'stream'])->name('project.generator.auto-scaffold');
 
     // Gemini Chat API

@@ -160,4 +160,119 @@ class ProjectExplorerController extends Controller
 
         return response()->download($zipFilePath)->deleteFileAfterSend(true);
     }
+
+    public function lint(Request $request, string $project)
+    {
+        $filePathQuery = $request->query('path');
+        if (!$filePathQuery) {
+            return response()->json(['errors' => [], 'ok' => true]);
+        }
+
+        $basePath    = $this->basePath();
+        $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $project);
+
+        if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {
+            return response()->json(['errors' => [], 'ok' => true]);
+        }
+
+        $requestedFile = realpath($projectPath . DIRECTORY_SEPARATOR . str_replace(['../', '..\\'], '', $filePathQuery));
+
+        if (!$requestedFile || !str_starts_with($requestedFile, $projectPath) || !is_file($requestedFile)) {
+            return response()->json(['errors' => [], 'ok' => true]);
+        }
+
+        $ext    = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
+        $errors = [];
+
+        // ── PHP / Blade ──────────────────────────────────────────────────────────
+        if ($ext === 'php') {
+            $output   = [];
+            $exitCode = 0;
+            exec('php -l ' . escapeshellarg($requestedFile) . ' 2>&1', $output, $exitCode);
+
+            if ($exitCode !== 0) {
+                // Parse: "Parse error: ... in /path/file.php on line 42"
+                foreach ($output as $line) {
+                    if (preg_match('/^(Parse error|Fatal error|syntax error)[^\n]*on line (\d+)/i', $line, $m)) {
+                        $errors[] = ['line' => (int) $m[2], 'message' => trim($line)];
+                    } elseif (!empty($line) && !str_starts_with($line, 'No syntax')) {
+                        // Include raw line if it's an error but doesn't match pattern
+                        $errors[] = ['line' => null, 'message' => trim($line)];
+                    }
+                }
+                if (empty($errors)) {
+                    $errors[] = ['line' => null, 'message' => implode(' ', $output)];
+                }
+            }
+        }
+
+        // ── JSON ─────────────────────────────────────────────────────────────────
+        elseif ($ext === 'json') {
+            $content = file_get_contents($requestedFile);
+            json_decode($content);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // Attempt to find the error line
+                $lines   = explode("\n", $content);
+                $errLine = null;
+                $pos     = 0;
+                $needle  = json_last_error_msg();
+                // Rough line estimation: find first invalid char after progressive decode attempts
+                foreach ($lines as $i => $ln) {
+                    $pos += strlen($ln) + 1;
+                }
+                $errors[] = ['line' => null, 'message' => 'JSON Error: ' . json_last_error_msg()];
+            }
+        }
+
+        // ── JavaScript ───────────────────────────────────────────────────────────
+        elseif ($ext === 'js' || $ext === 'mjs' || $ext === 'cjs') {
+            // Try node --check if available
+            $output   = [];
+            $exitCode = 0;
+            exec('node --check ' . escapeshellarg($requestedFile) . ' 2>&1', $output, $exitCode);
+            if ($exitCode !== 0 && !empty($output)) {
+                foreach ($output as $line) {
+                    if (preg_match('/^[^\n]*:(\d+)/', $line, $m)) {
+                        $errors[] = ['line' => (int) $m[1], 'message' => trim($line)];
+                    } elseif (!empty(trim($line))) {
+                        $errors[] = ['line' => null, 'message' => trim($line)];
+                    }
+                }
+            }
+        }
+
+        // ── HTML / Blade ─────────────────────────────────────────────────────────
+        elseif (in_array($ext, ['html', 'htm', 'blade'])) {
+            $content = file_get_contents($requestedFile);
+            $lines   = explode("\n", $content);
+
+            // Simple unmatched tag check using a small heuristic
+            $openTags  = [];
+            $voidTags  = ['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'];
+            foreach ($lines as $lineNum => $ln) {
+                // Find all tags in line
+                preg_match_all('/<\/?([a-zA-Z][a-zA-Z0-9]*)[^>]*\/?>/u', $ln, $matches, PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    $tag  = strtolower($match[1]);
+                    $full = $match[0];
+                    if (in_array($tag, $voidTags)) continue;
+                    if (str_starts_with($full, '</')) {
+                        // Closing tag
+                        $last = end($openTags);
+                        if ($last && $last['tag'] === $tag) {
+                            array_pop($openTags);
+                        }
+                        // Don't flag mismatches as they're too noisy with templates
+                    } elseif (!str_ends_with(rtrim($full), '/>')) {
+                        $openTags[] = ['tag' => $tag, 'line' => $lineNum + 1];
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'ok'     => empty($errors),
+            'errors' => $errors,
+        ]);
+    }
 }

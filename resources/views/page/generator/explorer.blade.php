@@ -136,6 +136,169 @@
         input:checked~.toggle-dot {
             transform: translateX(100%);
         }
+
+        /* ===== Lint Error Banner ===== */
+        #lint-error-panel {
+            background: #1a1200;
+            border-bottom: 1px solid #7c5a00;
+            padding: 6px 12px;
+            font-family: 'Consolas', 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .lint-error-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 2px 0;
+            color: #facc15;
+        }
+
+        .lint-error-row .lint-line-badge {
+            background: #7c5a00;
+            color: #fde68a;
+            border-radius: 3px;
+            padding: 0 5px;
+            font-size: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            line-height: 1.7;
+        }
+
+        .lint-error-row .lint-msg {
+            color: #fde68a;
+            word-break: break-all;
+        }
+
+        /* File tree items with error — red tint */
+        .file-item.has-lint-error {
+            color: #f87171 !important;
+        }
+
+        .file-item.has-lint-error .lint-badge {
+            display: inline-flex;
+        }
+
+        .lint-badge {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ef4444;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-left: 2px;
+        }
+
+        /* ===== Fullscreen Mode ===== */
+        body.explorer-fullscreen {
+            overflow: hidden;
+        }
+
+        body.explorer-fullscreen nav,
+        body.explorer-fullscreen header,
+        body.explorer-fullscreen aside,
+        body.explorer-fullscreen footer,
+        body.explorer-fullscreen #mobile-nav,
+        body.explorer-fullscreen>div>nav {
+            display: none !important;
+        }
+
+        body.explorer-fullscreen #explorer-root {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            border-radius: 0;
+            height: 100vh !important;
+            padding: 0 !important;
+        }
+
+        body.explorer-fullscreen #explorer-root>div {
+            border-radius: 0;
+            height: 100vh !important;
+        }
+
+        /* Tree file rows */
+        .tree-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 12.5px;
+            white-space: nowrap;
+            transition: background 0.1s;
+        }
+
+        .tree-row:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tree-row.active-file {
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        .tree-chevron {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            transition: transform 0.15s;
+            color: #6b7280;
+        }
+
+        .tree-chevron.open {
+            transform: rotate(90deg);
+        }
+
+        /* ===== Fullscreen Header Auto-hide ===== */
+        :fullscreen header,
+        :-webkit-full-screen header,
+        :-moz-full-screen header {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000;
+            transform: translateY(-110%);
+            transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.22s ease;
+            will-change: transform;
+        }
+
+        :fullscreen header.fs-visible,
+        :-webkit-full-screen header.fs-visible,
+        :-moz-full-screen header.fs-visible {
+            transform: translateY(0);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Hover trigger strip — strip 8px transparan di atas layar */
+        #fs-hover-trigger {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            z-index: 10001;
+            cursor: default;
+        }
+
+        :fullscreen #fs-hover-trigger,
+        :-webkit-full-screen #fs-hover-trigger,
+        :-moz-full-screen #fs-hover-trigger {
+            display: block;
+        }
     </style>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -173,11 +336,31 @@
                     </svg>
                     Back to Dashboard
                 </a>
+                <!-- Fullscreen Toggle -->
+                <button id="fullscreen-btn" title="Full Screen (F11)"
+                    class="bg-[#1e1e2e] hover:bg-[#2d2d3f] text-gray-300 hover:text-white text-sm px-3 py-1.5 rounded-lg border border-gray-600 flex items-center gap-2 transition-all">
+                    <svg id="fullscreen-icon-expand" class="w-4 h-4" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
+                        </path>
+                    </svg>
+                    <svg id="fullscreen-icon-shrink" class="w-4 h-4 hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25">
+                        </path>
+                    </svg>
+                    <span id="fullscreen-label" class="text-xs font-medium">Fullscreen</span>
+                </button>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-6 h-[calc(100vh-100px)]">
+    {{-- Hover trigger strip: muncul saat fullscreen, gerakkan mouse ke atas untuk tampilkan header --}}
+    <div id="fs-hover-trigger"></div>
+
+    <div id="explorer-root" class="py-6 h-[calc(100vh-100px)]">
         <div class="max-w-8xl mx-auto sm:px-6 lg:px-8 h-full">
             <div
                 class="bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 sm:rounded-xl overflow-hidden h-full flex flex-col md:flex-row shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
@@ -268,7 +451,25 @@
                     </div>
 
                     {{-- Editor Content Container --}}
-                    <div class="flex-1 relative overflow-hidden flex" id="editor-container">
+                    <div class="flex-1 relative overflow-hidden flex flex-col" id="editor-container">
+
+                        {{-- Lint Error Banner --}}
+                        <div id="lint-error-panel">
+                            <div class="flex items-center gap-2 mb-1">
+                                <svg class="w-3.5 h-3.5 text-yellow-400 shrink-0" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-yellow-400 font-semibold text-[11px] uppercase tracking-wider">Syntax
+                                    Errors Detected</span>
+                                <button onclick="document.getElementById('lint-error-panel').style.display='none'"
+                                    class="ml-auto text-yellow-600 hover:text-yellow-400 text-xs">✕ Dismiss</button>
+                            </div>
+                            <div id="lint-error-list"></div>
+                        </div>
+
                         {{-- Original View Edit Panel --}}
                         <div class="flex-1 h-full relative" id="original-view-pane">
                             <div id="editor-wrapper">
@@ -345,6 +546,7 @@
             projectName: "{{ $projectName ?? '' }}",
             apiTreeUrl: "{{ route('project.explorer.tree', ['project' => $projectName ?? '']) }}",
             apiFileUrl: "{{ route('project.explorer.file', ['project' => $projectName ?? '']) }}",
+            apiLintUrl: "{{ route('project.explorer.lint', ['project' => $projectName ?? '']) }}",
             aiPrompt: {!! json_encode($aiPrompt ?? '') !!}
         };
 
@@ -361,6 +563,343 @@
             const autoSaveToggle = document.getElementById('auto-save-toggle');
             const saveStatusMsg = document.getElementById('save-status-msg');
             let currentLanguage = 'plaintext';
+            const lintErrorPanel = document.getElementById('lint-error-panel');
+            const lintErrorList = document.getElementById('lint-error-list');
+
+            // ===== Fullscreen Toggle (Native Browser Fullscreen API) =====
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const fsIconExpand = document.getElementById('fullscreen-icon-expand');
+            const fsIconShrink = document.getElementById('fullscreen-icon-shrink');
+            const fsLabel = document.getElementById('fullscreen-label');
+
+            function enterFullscreen() {
+                const el = document.documentElement;
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+                else if (el.msRequestFullscreen) el.msRequestFullscreen();
+            }
+
+            function exitFullscreen() {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+
+            function updateFsUI(isFs) {
+                fsIconExpand.classList.toggle('hidden', isFs);
+                fsIconShrink.classList.toggle('hidden', !isFs);
+                fsLabel.textContent = isFs ? 'Exit Fullscreen' : 'Fullscreen';
+            }
+
+            fullscreenBtn?.addEventListener('click', () => {
+                !!document.fullscreenElement ? exitFullscreen() : enterFullscreen();
+            });
+
+            // ── Header auto-hide dalam fullscreen ──────────────────────────────
+            const fsAppHeader = document.querySelector('header');
+            const fsHoverTrigger = document.getElementById('fs-hover-trigger');
+            let fsHeaderTimer = null;
+
+            // Siapkan transition style sekali
+            if (fsAppHeader) {
+                fsAppHeader.style.transition = 'transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s ease';
+                fsAppHeader.style.willChange = 'transform';
+            }
+
+            function showFsHeader() {
+                if (!fsAppHeader) return;
+                fsAppHeader.style.transform = 'translateY(0)';
+                fsAppHeader.style.boxShadow = '0 8px 32px rgba(0,0,0,0.6)';
+                clearTimeout(fsHeaderTimer);
+                fsHeaderTimer = setTimeout(hideFsHeader, 2500);
+            }
+
+            function hideFsHeader() {
+                if (!fsAppHeader) return;
+                fsAppHeader.style.transform = 'translateY(-110%)';
+                fsAppHeader.style.boxShadow = '';
+                clearTimeout(fsHeaderTimer);
+            }
+
+
+            function applyFullscreenHeader(isFs) {
+                if (!fsAppHeader) return;
+
+                // Elemen layout yang perlu di-adjust
+                const explorerRoot = document.getElementById('explorer-root');
+                const innerWrap = explorerRoot?.firstElementChild;          // max-w-8xl div
+                const editorPanel = innerWrap?.firstElementChild;             // the card flex row
+
+                if (isFs) {
+                    // ── Header: position fixed, siap untuk slide ke atas ──
+                    fsAppHeader.style.position = 'fixed';
+                    fsAppHeader.style.top = '0';
+                    fsAppHeader.style.left = '0';
+                    fsAppHeader.style.right = '0';
+                    fsAppHeader.style.zIndex = '10000';
+                    // Tunda agar browser sempat paint, lalu slide ke atas
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => hideFsHeader());
+                    });
+                    if (fsHoverTrigger) fsHoverTrigger.style.display = 'block';
+
+                    // ── Sidebar: sembunyikan ──
+                    document.querySelectorAll('nav, aside').forEach(el => {
+                        el.dataset.fsDisplay = el.style.display || '';
+                        el.style.display = 'none';
+                    });
+
+                    // ── Explorer root: fixed full viewport ──
+                    if (explorerRoot) {
+                        explorerRoot.style.position = 'fixed';
+                        explorerRoot.style.inset = '0';
+                        explorerRoot.style.height = '100vh';
+                        explorerRoot.style.padding = '0';
+                        explorerRoot.style.zIndex = '9000';
+                    }
+                    if (innerWrap) {
+                        innerWrap.style.height = '100%';
+                        innerWrap.style.maxWidth = 'none';
+                        innerWrap.style.padding = '0';
+                        innerWrap.style.margin = '0';
+                    }
+                    if (editorPanel) {
+                        editorPanel.style.height = '100%';
+                        editorPanel.style.borderRadius = '0';
+                        editorPanel.style.border = 'none';
+                    }
+
+                } else {
+                    // ── Reset semua ──
+                    clearTimeout(fsHeaderTimer);
+                    fsAppHeader.style.position = '';
+                    fsAppHeader.style.top = '';
+                    fsAppHeader.style.left = '';
+                    fsAppHeader.style.right = '';
+                    fsAppHeader.style.zIndex = '';
+                    fsAppHeader.style.transform = '';
+                    fsAppHeader.style.boxShadow = '';
+                    if (fsHoverTrigger) fsHoverTrigger.style.display = 'none';
+
+                    if (explorerRoot) {
+                        explorerRoot.style.position = '';
+                        explorerRoot.style.inset = '';
+                        explorerRoot.style.height = '';
+                        explorerRoot.style.padding = '';
+                        explorerRoot.style.zIndex = '';
+                    }
+                    if (innerWrap) {
+                        innerWrap.style.height = '';
+                        innerWrap.style.maxWidth = '';
+                        innerWrap.style.padding = '';
+                        innerWrap.style.margin = '';
+                    }
+                    if (editorPanel) {
+                        editorPanel.style.height = '';
+                        editorPanel.style.borderRadius = '';
+                        editorPanel.style.border = '';
+                    }
+
+                    // ── Sidebar: tampilkan kembali ──
+                    document.querySelectorAll('nav, aside').forEach(el => {
+                        el.style.display = el.dataset.fsDisplay || '';
+                        delete el.dataset.fsDisplay;
+                    });
+                }
+            }
+
+            // Mouse masuk hover strip → tampilkan header
+            fsHoverTrigger?.addEventListener('mouseenter', showFsHeader);
+
+            // Mouse di atas header → batalkan auto-hide timer
+            fsAppHeader?.addEventListener('mouseenter', () => {
+                clearTimeout(fsHeaderTimer);
+                showFsHeader();
+            });
+
+            // Mouse keluar header → hide setelah 500ms
+            fsAppHeader?.addEventListener('mouseleave', () => {
+                clearTimeout(fsHeaderTimer);
+                fsHeaderTimer = setTimeout(hideFsHeader, 500);
+            });
+
+            ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(ev => {
+                document.addEventListener(ev, () => {
+                    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+                    updateFsUI(isFs);
+                    applyFullscreenHeader(isFs);
+                });
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'F11') {
+                    e.preventDefault();
+                    !!document.fullscreenElement ? exitFullscreen() : enterFullscreen();
+                }
+            });
+
+            // ===== Colorful Folder Icons by name =====
+            function getFolderIcon(name) {
+                const n = name.toLowerCase();
+                const colors = {
+                    'app': ['#60a5fa', '#3b82f6'],  // blue
+                    'controllers': ['#818cf8', '#6366f1'],  // indigo
+                    'models': ['#4ade80', '#22c55e'],  // green
+                    'views': ['#f472b6', '#ec4899'],  // pink
+                    'routes': ['#fb923c', '#f97316'],  // orange
+                    'database': ['#a78bfa', '#8b5cf6'],  // purple
+                    'migrations': ['#c084fc', '#a855f7'],  // violet
+                    'seeders': ['#86efac', '#4ade80'],  // light green
+                    'public': ['#67e8f9', '#22d3ee'],  // cyan
+                    'storage': ['#fcd34d', '#f59e0b'],  // amber
+                    'resources': ['#f9a8d4', '#f472b6'],  // rose
+                    'config': ['#94a3b8', '#64748b'],  // slate
+                    'lang': ['#fde68a', '#fbbf24'],  // yellow
+                    'tests': ['#6ee7b7', '#34d399'],  // emerald
+                    'bootstrap': ['#fca5a1', '#f87171'],  // red
+                    'vendor': ['#9ca3af', '#6b7280'],  // gray
+                    'node_modules': ['#6b7280', '#4b5563'],  // dark gray
+                    'js': ['#fde68a', '#f59e0b'],  // yellow
+                    'css': ['#93c5fd', '#3b82f6'],  // blue
+                    'images': ['#86efac', '#22c55e'],  // green
+                    'http': ['#fb923c', '#f97316'],  // orange
+                    'middleware': ['#c4b5fd', '#a78bfa'],  // purple
+                    'requests': ['#fda4af', '#fb7185'],  // rose
+                    'services': ['#67e8f9', '#06b6d4'],  // cyan
+                    'providers': ['#a5b4fc', '#818cf8'],  // indigo
+                    'console': ['#6ee7b7', '#10b981'],  // emerald
+                    'exceptions': ['#fca5a1', '#ef4444'],  // red
+                    'mail': ['#fde68a', '#f59e0b'],  // yellow
+                    'events': ['#c084fc', '#9333ea'],  // purple
+                    'listeners': ['#86efac', '#16a34a'],  // green
+                    'jobs': ['#fb923c', '#ea580c'],  // orange
+                    'factories': ['#a78bfa', '#7c3aed'],  // violet
+                    'policies': ['#fda4af', '#e11d48'],  // rose
+                    'helpers': ['#7dd3fc', '#0284c7'],  // light blue
+                    'traits': ['#bfdbfe', '#2563eb'],  // blue
+                    'interfaces': ['#d9f99d', '#65a30d'],  // lime
+                    'components': ['#fed7aa', '#f97316'],  // orange
+                    'layouts': ['#fce7f3', '#db2777'],  // pink
+                    'partials': ['#e9d5ff', '#7c3aed'],  // purple
+                    'pages': ['#cffafe', '#0891b2'],  // cyan
+                    'page': ['#cffafe', '#0891b2'],  // cyan
+                    'api': ['#dcfce7', '#16a34a'],  // green
+                    'auth': ['#fee2e2', '#dc2626'],  // red
+                };
+                const [topColor, botColor] = colors[n] || ['#6b7280', '#4b5563'];
+                return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+                    <path d="M2 6a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" fill="${topColor}"/>
+                    <path d="M2 9h20v8a2 2 0 01-2 2H4a2 2 0 01-2-2V9z" fill="${botColor}"/>
+                </svg>`;
+            }
+
+            // ===== File Icons by extension =====
+            function getFileIcon(filename) {
+                const lower = filename.toLowerCase();
+                const ext = lower.split('.').pop();
+
+                // Detect blade.php
+                if (lower.endsWith('.blade.php')) {
+                    return `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#ff2d20"/><text x="4" y="22" font-size="11" fill="white" font-family="monospace" font-weight="bold">BL</text></svg>`;
+                }
+
+                const icons = {
+                    // PHP
+                    'php': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#4F5B93"/><text x="4" y="22" font-size="11" fill="white" font-family="monospace" font-weight="bold">PHP</text></svg>`,
+                    // JS
+                    'js': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#f7df1e"/><text x="5" y="22" font-size="11" fill="#000" font-family="monospace" font-weight="bold">JS</text></svg>`,
+                    'mjs': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#f7df1e"/><text x="3" y="22" font-size="10" fill="#000" font-family="monospace" font-weight="bold">MJS</text></svg>`,
+                    // TS
+                    'ts': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#3178c6"/><text x="5" y="22" font-size="11" fill="white" font-family="monospace" font-weight="bold">TS</text></svg>`,
+                    // CSS
+                    'css': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#2965f1"/><text x="3" y="22" font-size="11" fill="white" font-family="monospace" font-weight="bold">CSS</text></svg>`,
+                    'scss': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#cc6699"/><text x="2" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">SCSS</text></svg>`,
+                    // HTML
+                    'html': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#e44d26"/><text x="2" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">HTM</text></svg>`,
+                    'htm': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#e44d26"/><text x="2" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">HTM</text></svg>`,
+                    // JSON
+                    'json': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#fbbf24"/><text x="2" y="22" font-size="9" fill="#1a1a1a" font-family="monospace" font-weight="bold">JSON</text></svg>`,
+                    // MD
+                    'md': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#083fa1"/><text x="5" y="22" font-size="11" fill="white" font-family="monospace" font-weight="bold">MD</text></svg>`,
+                    // SQL
+                    'sql': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#00758f"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">SQL</text></svg>`,
+                    // YAML
+                    'yaml': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#cb171e"/><text x="2" y="22" font-size="9" fill="white" font-family="monospace" font-weight="bold">YAML</text></svg>`,
+                    'yml': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#cb171e"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">YML</text></svg>`,
+                    // ENV
+                    'env': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#ecd53f"/><text x="2" y="22" font-size="9" fill="#1a1a1a" font-family="monospace" font-weight="bold">ENV</text></svg>`,
+                    // Bash / sh
+                    'sh': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#4eaa25"/><text x="5" y="22" font-size="11" fill="white" font-family="monospace" font-weight="bold">SH</text></svg>`,
+                    // Vue
+                    'vue': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#41b883"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">VUE</text></svg>`,
+                    // XML / SVG
+                    'xml': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#f16529"/><text x="2" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">XML</text></svg>`,
+                    'svg': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#ffb13b"/><text x="3" y="22" font-size="10" fill="#1a1a1a" font-family="monospace" font-weight="bold">SVG</text></svg>`,
+                    // Images
+                    'png': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#10b981"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">IMG</text></svg>`,
+                    'jpg': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#10b981"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">IMG</text></svg>`,
+                    'gif': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#10b981"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">GIF</text></svg>`,
+                    // Lock / gitignore
+                    'lock': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#6b7280"/><text x="2" y="22" font-size="9" fill="white" font-family="monospace" font-weight="bold">LOCK</text></svg>`,
+                    'txt': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#6b7280"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">TXT</text></svg>`,
+                };
+
+                return icons[ext] || `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#374151"/><text x="5" y="22" font-size="11" fill="#9ca3af" font-family="monospace">\u2609</text></svg>`;
+            }
+
+
+            // ── Per-file lint error state ────────────────────────────────
+            const lintErrors = {}; // { path: [{line, message}, ...] }
+
+            function lintFile(path) {
+                const url = window.ProjectConfig.apiLintUrl + `?path=${encodeURIComponent(path)}`;
+                fetch(url)
+                    .then(r => r.json())
+                    .then(data => {
+                        lintErrors[path] = data.errors || [];
+                        renderLintPanel(path);
+                        // Update tree node appearance
+                        const treeEl = document.querySelector(`.file-item[data-path="${CSS.escape(path)}"]`);
+                        if (treeEl) {
+                            if (lintErrors[path].length > 0) {
+                                treeEl.classList.add('has-lint-error');
+                                const badge = treeEl.querySelector('.lint-badge');
+                                if (badge) badge.textContent = lintErrors[path].length > 9 ? '!' : lintErrors[path].length;
+                            } else {
+                                treeEl.classList.remove('has-lint-error');
+                                const badge = treeEl.querySelector('.lint-badge');
+                                if (badge) badge.textContent = '';
+                            }
+                        }
+                        // Re-render tab
+                        const tabEl = document.getElementById(`tab-${path}`);
+                        if (tabEl) {
+                            const nameSpan = tabEl.querySelector('span');
+                            if (nameSpan) {
+                                nameSpan.style.color = lintErrors[path].length > 0 ? '#f87171' : '';
+                            }
+                        }
+                    })
+                    .catch(() => { }); // silent fail
+            }
+
+            function renderLintPanel(path) {
+                const errs = lintErrors[path] || [];
+                if (errs.length === 0) {
+                    lintErrorPanel.style.display = 'none';
+                    lintErrorList.innerHTML = '';
+                    return;
+                }
+                lintErrorPanel.style.display = 'block';
+                lintErrorList.innerHTML = errs.map(e => `
+                    <div class="lint-error-row">
+                        ${e.line ? `<span class="lint-line-badge">Line ${e.line}</span>` : `<span class="lint-line-badge">—</span>`}
+                        <span class="lint-msg">${e.message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                    </div>
+                `).join('');
+            }
 
             // State management
             let openFiles = []; // Array of {path, name, content}
@@ -474,33 +1013,42 @@
                     const li = document.createElement('li');
 
                     if (item.type === 'directory') {
-                        // Dir HTML
-                        li.innerHTML = `<div class="cursor-pointer flex items-center gap-2 hover:bg-gray-200 dark:hover:bg-gray-700 py-1 px-2 rounded group">
-                                            <svg class="w-4 h-4 text-gray-400 group-hover:text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
-                                            ${item.name}
-                                        </div>`;
-                        const childrenUl = buildTreeDom(item.children);
-                        childrenUl.style.display = 'none'; // closed by default
-                        li.appendChild(childrenUl);
+                        const chevron = `<svg class="tree-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+                        const folderIcon = getFolderIcon(item.name);
 
-                        // Toggle dir
-                        li.firstElementChild.addEventListener('click', (e) => {
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'tree-row';
+                        rowDiv.innerHTML = `${chevron}${folderIcon}<span class="text-gray-300 font-medium">${item.name}</span>`;
+
+                        const childrenUl = buildTreeDom(item.children);
+                        childrenUl.style.display = 'none';
+                        childrenUl.classList.add('pl-3', 'border-l', 'border-[#2d2d2d]', 'ml-2');
+
+                        rowDiv.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            childrenUl.style.display = childrenUl.style.display === 'none' ? 'block' : 'none';
+                            const isOpen = childrenUl.style.display !== 'none';
+                            childrenUl.style.display = isOpen ? 'none' : 'block';
+                            rowDiv.querySelector('.tree-chevron').classList.toggle('open', !isOpen);
                         });
+
+                        li.appendChild(rowDiv);
+                        li.appendChild(childrenUl);
                     } else {
                         // File HTML
-                        li.innerHTML = `<div class="cursor-pointer file-item flex items-center gap-2 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 py-1 px-2 rounded" data-path="${item.path}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                            ${item.name}
-                                        </div>`;
+                        const fileIcon = getFileIcon(item.name);
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'tree-row file-item';
+                        rowDiv.dataset.path = item.path;
+                        rowDiv.innerHTML = `${fileIcon}<span class="truncate text-[#cccccc]" style="max-width:120px">${item.name}</span><span class="lint-badge" title="Syntax errors">!</span>`;
 
-                        li.firstElementChild.addEventListener('click', (e) => {
+                        rowDiv.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('bg-indigo-100', 'dark:bg-indigo-800'));
-                            li.firstElementChild.classList.add('bg-indigo-100', 'dark:bg-indigo-800');
+                            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active-file'));
+                            rowDiv.classList.add('active-file');
                             loadFile(item.path, item.name);
                         });
+
+                        li.appendChild(rowDiv);
                     }
 
                     ul.appendChild(li);
@@ -567,6 +1115,9 @@
                 updateHighlight(fileObj.content, fileObj.name);
 
                 renderTabs(); // visually update active tab
+
+                // Show lint panel for this tab (from cached state)
+                renderLintPanel(path);
             }
 
             function closeTab(path) {
@@ -621,8 +1172,8 @@
                                 content: data.content
                             });
                             switchTab(path);
-
-                            // (AutoTrigger removed from chat here)
+                            // Run lint check after file is loaded
+                            lintFile(path);
                         }
                     })
                     .catch((err) => {
