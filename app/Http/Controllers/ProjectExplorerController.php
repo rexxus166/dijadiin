@@ -8,7 +8,12 @@ class ProjectExplorerController extends Controller
 {
     public function index(string $project)
     {
-        return view('page.generator.explorer', ['projectName' => $project]);
+        $projectData = \App\Models\GeneratedProject::where('name', $project)->first();
+        
+        return view('page.generator.explorer', [
+            'projectName' => $project,
+            'aiPrompt' => $projectData ? $projectData->ai_prompt : ''
+        ]);
     }
 
     public function tree(Request $request, string $project)
