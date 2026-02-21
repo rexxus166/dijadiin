@@ -309,10 +309,19 @@
         window.ProjectConfig = {
             projectName: "{{ $projectName ?? '' }}",
             apiTreeUrl: "{{ route('project.explorer.tree', ['project' => $projectName ?? '']) }}",
-            apiFileUrl: "{{ route('project.explorer.file', ['project' => $projectName ?? '']) }}"
+            apiFileUrl: "{{ route('project.explorer.file', ['project' => $projectName ?? '']) }}",
+            aiPrompt: {!! json_encode($aiPrompt ?? '') !!}
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            let autoTriggerGemini = false;
+            const sessionKey = 'dijadiin_gemini_triggered_' + window.ProjectConfig.projectName;
+
+            if (window.ProjectConfig.aiPrompt && !sessionStorage.getItem(sessionKey)) {
+                document.getElementById('chat-input').value = 'Buatkan proposal pengembangan rancangan arsitektur dan timeline kerja di file README ini secara detail berdasarkan ide berikut:\n\n' + window.ProjectConfig.aiPrompt;
+                autoTriggerGemini = true;
+                sessionStorage.setItem(sessionKey, '1');
+            }
             const treeContainer = document.getElementById('file-tree-root');
             const treeLoading = document.getElementById('tree-loading');
             const codeViewer = document.getElementById('code-viewer');
@@ -410,6 +419,19 @@
                             return;
                         }
                         treeContainer.appendChild(buildTreeDom(data));
+
+                        // Auto-trigger Gemini logic
+                        if (autoTriggerGemini) {
+                            const fileItems = Array.from(document.querySelectorAll('.file-item'));
+                            const readmeNode = fileItems.find(el => el.dataset.path.endsWith('README.md'));
+                            if (readmeNode) {
+                                readmeNode.click();
+                            } else if (fileItems.length > 0) {
+                                fileItems[0].click(); // Fallback if no README
+                            } else {
+                                autoTriggerGemini = false;
+                            }
+                        }
                     })
                     .catch(e => {
                         treeLoading.style.display = 'none';
@@ -562,14 +584,21 @@
                     .then(data => {
                         codeLoading.style.display = 'none';
                         if (data.error) {
-                            alert(`Error: ${data.error}`);
+                            codeViewer.value = `Error: ${data.error}`;
+                            updateHighlight(`Error: ${data.error}`, 'error.txt');
+                            autoTriggerGemini = false;
                         } else {
-                            openFiles.push({
-                                path: path,
-                                name: name,
-                                content: data.content
-                            });
-                            switchTab(path);
+                            codeViewer.value = data.content;
+                            // ✨ Apply syntax highlighting
+                            updateHighlight(data.content, name);
+                            document.getElementById('save-file-btn').classList.remove('hidden');
+
+                            if (autoTriggerGemini) {
+                                autoTriggerGemini = false;
+                                setTimeout(() => {
+                                    document.getElementById('chat-send').click();
+                                }, 600);
+                            }
                         }
                     })
                     .catch(() => {
