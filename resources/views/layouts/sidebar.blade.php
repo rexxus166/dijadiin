@@ -59,6 +59,21 @@
                 </span>
             </a>
 
+            {{-- Templates Management --}}
+            <a href="{{ route('admin.templates.index') }}"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.templates.*') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}"
+                :title="!sidebarOpen ? 'Templates' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M3 9h18M9 21V9" />
+                </svg>
+                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="whitespace-nowrap">Templates</span>
+            </a>
+
             {{-- AI Logs (coming soon) --}}
             <a href="#"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none"
@@ -131,10 +146,10 @@
                     x-transition:leave-end="opacity-0" class="whitespace-nowrap">My Projects</span>
             </a>
 
-            {{-- Templates (coming soon) --}}
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none"
-                :title="!sidebarOpen ? 'Templates (Soon)' : ''">
+            {{-- Templates --}}
+            <a href="{{ route('templates.index') }}"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('templates.*') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}"
+                :title="!sidebarOpen ? 'Templates' : ''">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
                     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -143,10 +158,7 @@
                 <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="whitespace-nowrap flex items-center gap-2">
-                    Templates
-                    <span class="text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
-                </span>
+                    x-transition:leave-end="opacity-0" class="whitespace-nowrap">Templates</span>
             </a>
 
             {{-- API Keys --}}

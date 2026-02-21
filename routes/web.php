@@ -9,6 +9,8 @@ use App\Http\Controllers\ProjectStreamController;
 use App\Http\Controllers\GeminiChatController;
 use App\Http\Controllers\AutoScaffoldController;
 use App\Http\Controllers\ApiKeyController;
+use App\Http\Controllers\TemplateUserController;
+use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -178,6 +180,18 @@ Route::middleware('auth')->group(function () {
 
     // Project management
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    // Templates Marketplace (User)
+    Route::get('/templates', [TemplateUserController::class, 'index'])->name('templates.index');
+    Route::post('/templates/{template}/use', [TemplateUserController::class, 'use'])->name('templates.use');
+
+    // Admin Templates Management (role check done in controller)
+    Route::get('/admin/templates', [AdminTemplateController::class, 'index'])->name('admin.templates.index');
+    Route::get('/admin/templates/create', [AdminTemplateController::class, 'create'])->name('admin.templates.create');
+    Route::post('/admin/templates', [AdminTemplateController::class, 'store'])->name('admin.templates.store');
+    Route::get('/admin/templates/{template}/edit', [AdminTemplateController::class, 'edit'])->name('admin.templates.edit');
+    Route::put('/admin/templates/{template}', [AdminTemplateController::class, 'update'])->name('admin.templates.update');
+    Route::delete('/admin/templates/{template}', [AdminTemplateController::class, 'destroy'])->name('admin.templates.destroy');
 });
 
 require __DIR__ . '/auth.php';
