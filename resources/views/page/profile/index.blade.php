@@ -10,17 +10,39 @@
             </div>
 
             <!-- Personal Information Section -->
+            <!-- Personal Information Section -->
             <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"
                 class="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden mb-8" x-data="{
                     showModal: false,
                     avatarPreview: '{{ $user->avatar ? asset($user->avatar) : asset('assets/avatar/avatar-1.png') }}',
                     avatarPath: '{{ $user->avatar ?? '' }}',
                 
+                    // State Tracking Variable
+                    isDirty: false,
+                
+                    // Original State Values
+                    originalAvatarPath: '{{ $user->avatar ?? '' }}',
+                    originalName: '{{ addslashes($user->name) }}',
+                    originalBio: '{{ addslashes($user->bio) }}',
+                
+                    checkIsDirty() {
+                        const currentName = $refs.nameInput.value;
+                        const currentBio = $refs.bioInput.value;
+                
+                        this.isDirty = (
+                            this.avatarPath !== this.originalAvatarPath ||
+                            currentName !== this.originalName ||
+                            currentBio !== this.originalBio ||
+                            $refs.avatarFileInput.files.length > 0
+                        );
+                    },
+                
                     selectAvatar(path) {
                         this.avatarPreview = '{{ asset('') }}' + path;
                         this.avatarPath = path;
                         this.showModal = false;
                         $refs.avatarFileInput.value = '';
+                        this.checkIsDirty();
                     },
                     handleFileUpload(event) {
                         const file = event.target.files[0];
@@ -28,6 +50,7 @@
                             this.avatarPreview = URL.createObjectURL(file);
                             this.avatarPath = '';
                             this.showModal = false;
+                            this.checkIsDirty();
                         }
                     },
                     triggerCamera() {
@@ -68,7 +91,8 @@
                             form.submit();
                         }
                     }
-                }">
+                }"
+                x-init="checkIsDirty">
                 @csrf
                 @method('PATCH')
 
@@ -118,7 +142,8 @@
                                     <label
                                         class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">FULL
                                         NAME</label>
-                                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required
+                                    <input type="text" name="name" x-ref="nameInput" @input="checkIsDirty"
+                                        value="{{ old('name', $user->name) }}" required
                                         class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
                                 </div>
                                 <div>
@@ -134,15 +159,18 @@
                                 <label
                                     class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">PROFESSIONAL
                                     BIO</label>
-                                <textarea name="bio" rows="3"
+                                <textarea name="bio" rows="3" x-ref="bioInput" @input="checkIsDirty"
                                     class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none leading-relaxed">{{ old('bio', $user->bio) }}</textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="bg-[#12151a] px-6 py-4 border-t border-gray-800 flex justify-end">
-                    <button type="submit"
-                        class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-[1.125rem] rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                    <button type="submit" :disabled="!isDirty"
+                        :class="isDirty ?
+                            'bg-blue-500 hover:bg-blue-600 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.2)]' :
+                            'bg-gray-700 text-gray-400 cursor-not-allowed opacity-50'"
+                        class="text-white font-medium py-2 px-[1.125rem] rounded-lg text-sm transition-colors">
                         Save Changes
                     </button>
                 </div>
@@ -155,7 +183,7 @@
                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;"
                     @click.self="showModal = false">
 
-                    <div class="bg-[#161b22] border border-gray-800 rounded-2xl p-6 shadow-2xl max-w-xs w-full"
+                    <div class="bg-[#161b22] border border-gray-800 rounded-2xl p-6 shadow-2xl max-w-md w-full"
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -179,9 +207,10 @@
                             <div class="mb-4">
                                 <h4 class="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">Your Custom
                                     Avatars</h4>
-                                <div class="grid grid-cols-3 gap-4">
+                                <div class="flex flex-wrap gap-4">
                                     @foreach ($user->custom_avatars as $index => $customAvatar)
-                                        <div class="relative cursor-pointer group flex flex-col items-center gap-1.5">
+                                        <div
+                                            class="relative cursor-pointer group flex flex-col items-center gap-1.5 shrink-0">
                                             <div @click="selectAvatar('{{ $customAvatar }}')"
                                                 class="w-14 h-14 rounded-full border-2 border-transparent group-hover:border-blue-500 overflow-hidden transition-all bg-[#0d1015]">
                                                 <img src="{{ asset($customAvatar) }}" class="w-full h-full object-cover">
@@ -205,7 +234,7 @@
                             </div>
                         @endif
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between gap-2">
                             <!-- Avatar 1 -->
                             <div @click="selectAvatar('assets/avatar/avatar-1.png')"
                                 class="cursor-pointer group flex flex-col items-center gap-2">
@@ -262,7 +291,7 @@
             </form>
 
             <!-- Account Security Section -->
-            <div class="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden mb-8">
+            <div class="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden mb-8" x-data="{ showNewPassword: false, showConfirmPassword: false }">
                 <div class="p-6">
                     <div class="flex items-center mb-6">
                         <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -278,23 +307,57 @@
                         <div>
                             <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">CURRENT
                                 PASSWORD</label>
-                            <input type="password" value="********"
+                            <input type="password"
                                 class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-2.5 text-sm text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder-gray-600"
                                 placeholder="••••••••">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">NEW
                                 PASSWORD</label>
-                            <input type="password"
-                                class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder-gray-600"
-                                placeholder="8+ characters">
+                            <div class="relative">
+                                <input :type="showNewPassword ? 'text' : 'password'"
+                                    class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-2.5 pr-10 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder-gray-600"
+                                    placeholder="8+ characters">
+                                <button type="button" @click="showNewPassword = !showNewPassword"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 focus:outline-none">
+                                    <svg x-show="showNewPassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" style="display: none;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg x-show="!showNewPassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 014.182-5.415m4.35-1.125a3 3 0 00-3.692 3.692M3 3l18 18" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">CONFIRM
                                 NEW PASSWORD</label>
-                            <input type="password"
-                                class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder-gray-600"
-                                placeholder="Match new password">
+                            <div class="relative">
+                                <input :type="showConfirmPassword ? 'text' : 'password'"
+                                    class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-2.5 pr-10 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors placeholder-gray-600"
+                                    placeholder="Match new password">
+                                <button type="button" @click="showConfirmPassword = !showConfirmPassword"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 focus:outline-none">
+                                    <svg x-show="showConfirmPassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" style="display: none;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg x-show="!showConfirmPassword" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 014.182-5.415m4.35-1.125a3 3 0 00-3.692 3.692M3 3l18 18" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -376,18 +439,94 @@
             </div>
 
             <!-- Danger Zone -->
-            <div
-                class="bg-[#160e10] rounded-xl border border-red-900/40 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div>
-                    <h2 class="text-lg font-semibold text-red-500 mb-1">Danger Zone</h2>
-                    <p class="text-sm text-gray-400">Permanently delete your account and all associated projects. This
-                        action cannot be undone.</p>
+            <div x-data="{ showDeleteModal: false, showDeletePassword: false }">
+                <div
+                    class="bg-[#160e10] rounded-xl border border-red-900/40 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-red-500 mb-1">Danger Zone</h2>
+                        <p class="text-sm text-gray-400">Permanently delete your account and all associated projects. This
+                            action cannot be undone.</p>
+                    </div>
+                    <button type="button" @click="showDeleteModal = true"
+                        class="bg-[#e53e3e] hover:bg-red-700 text-white font-medium py-2 pb-2.5 px-6 rounded-lg text-sm shrink-0 transition-colors flex flex-col items-center justify-center leading-tight shadow-[0_0_15px_rgba(229,62,62,0.15)] h-auto">
+                        <span>Delete</span>
+                        <span>Account</span>
+                    </button>
                 </div>
-                <button
-                    class="bg-[#e53e3e] hover:bg-red-700 text-white font-medium py-2 pb-2.5 px-6 rounded-lg text-sm shrink-0 transition-colors flex flex-col items-center justify-center leading-tight shadow-[0_0_15px_rgba(229,62,62,0.15)] h-auto">
-                    <span>Delete</span>
-                    <span>Account</span>
-                </button>
+
+                <!-- Delete Account Modal -->
+                <div x-show="showDeleteModal" style="display: none;"
+                    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
+                    <div class="bg-[#12151a] border border-red-900/40 rounded-2xl p-6 shadow-2xl max-w-md w-full"
+                        @click.away="showDeleteModal = false" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
+                        <div class="flex items-center gap-3 mb-4 text-red-500">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <h2 class="text-xl font-bold">Delete Account</h2>
+                        </div>
+
+                        <p class="text-sm text-gray-300 mb-6 leading-relaxed">
+                            Once your account is deleted, all of its resources and data will be permanently deleted. Please
+                            enter your password to confirm you would like to permanently delete your account.
+                        </p>
+
+                        <form method="post" action="{{ route('profile.destroy') }}">
+                            @csrf
+                            @method('delete')
+
+                            <div class="mb-6 relative">
+                                <input :type="showDeletePassword ? 'text' : 'password'" name="password" required
+                                    class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors placeholder-gray-600"
+                                    placeholder="Enter your password">
+
+                                <button type="button" @click="showDeletePassword = !showDeletePassword"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 focus:outline-none">
+                                    <svg x-show="showDeletePassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" style="display: none;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg x-show="!showDeletePassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 014.182-5.415m4.35-1.125a3 3 0 00-3.692 3.692M3 3l18 18" />
+                                    </svg>
+                                </button>
+
+                                @if ($errors->userDeletion->has('password'))
+                                    <span class="text-xs text-red-500 font-medium mt-2 block">
+                                        {{ $errors->userDeletion->first('password') }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-end gap-3 mt-6">
+                                <button type="button" @click="showDeleteModal = false"
+                                    class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-5 rounded-lg text-sm transition-colors shadow-lg">
+                                    Delete Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <!-- Footer -->
