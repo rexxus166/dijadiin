@@ -16,6 +16,8 @@ Route::get('/projects', [ProjectController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::redirect('/dashboard', '/projects');
+
 Route::get('/admin/dashboard', function (\Illuminate\Http\Request $request) {
     if ($request->user()->role !== 'admin') {
         return redirect()->route('dashboard');
