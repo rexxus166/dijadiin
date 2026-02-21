@@ -103,9 +103,7 @@
                 <div class="relative z-10 flex flex-col h-full justify-between">
                     <!-- Logo Area -->
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
-                            <span class="material-symbols-outlined text-[24px]">terminal</span>
-                        </div>
+                        <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="h-10 w-10 rounded-lg" />
                         <span class="text-2xl font-bold tracking-tight text-white">DIJADIIN</span>
                     </div>
 
@@ -137,9 +135,7 @@
                 <div class="w-full max-w-[440px] flex flex-col gap-8">
                     <!-- Mobile Logo (Visible only on small screens) -->
                     <div class="lg:hidden flex items-center gap-2 mb-4 self-center">
-                        <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
-                            <span class="material-symbols-outlined text-[20px]">terminal</span>
-                        </div>
+                        <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="h-8 w-8 rounded" />
                         <span class="text-xl font-bold tracking-tight dark:text-white">DIJADIIN</span>
                     </div>
 
