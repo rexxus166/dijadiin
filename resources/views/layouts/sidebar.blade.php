@@ -1,8 +1,10 @@
-<aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 hidden sm:block shrink-0">
+<aside
+    class="w-64 bg-white dark:bg-[#161b22] border-r border-gray-100 dark:border-gray-800 z-10 hidden sm:block shrink-0 sticky top-0 h-screen">
     <div class="h-full flex flex-col">
         <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-700">
-            <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-3">
+        <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800">
+            <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
+                class="flex items-center gap-3">
                 <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="block h-9 w-auto" />
                 <span class="font-bold text-xl text-gray-800 dark:text-gray-200">Dijadiin</span>
             </a>
@@ -46,41 +48,41 @@
         </div>
 
         <!-- User Profile & Logout -->
-        <div class="border-t border-gray-100 dark:border-gray-700 p-4 shrink-0">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center overflow-hidden">
-                    <div
-                        class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
-                    <div class="ml-3 truncate">
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+        <div class="border-t border-gray-100 dark:border-gray-800 p-3 shrink-0">
+            <div class="flex flex-col gap-3">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                    <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/avatar/avatar-1.png') }}"
+                        alt="{{ Auth::user()->name }}"
+                        class="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-200 dark:border-gray-600">
+                    <div class="flex flex-col truncate">
+                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">
                             {{ Auth::user()->name }}
-                        </p>
-                        <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                        </span>
+                        <span class="text-[10px] text-gray-500 truncate leading-tight">{{ Auth::user()->email }}</span>
                     </div>
                 </div>
+                <form method="POST" action="{{ route('logout') }}" class="w-full m-0">
+                    @csrf
+                    <button type="submit"
+                        class="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 border border-transparent rounded-lg shadow-sm text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40 focus:outline-none transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
+                        </svg>
+                        {{ __('Log Out') }}
+                    </button>
+                </form>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit"
-                    class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/30 dark:hover:bg-red-900/50 focus:outline-none transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                        </path>
-                    </svg>
-                    {{ __('Log Out') }}
-                </button>
-            </form>
         </div>
     </div>
 </aside>
 
 <!-- Mobile Header -->
 <div
-    class="sm:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shrink-0">
-    <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-2">
+    class="sm:hidden flex items-center justify-between p-4 bg-white dark:bg-[#161b22] border-b border-gray-100 dark:border-gray-800 shrink-0">
+    <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
+        class="flex items-center gap-2">
         <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="block h-8 w-auto" />
         <span class="font-bold text-lg text-gray-800 dark:text-gray-200">Dijadiin</span>
     </a>
@@ -97,7 +99,7 @@
         </button>
 
         <div x-show="open" @click.away="open = false" style="display: none;"
-            class="absolute top-16 right-0 w-full bg-white dark:bg-gray-800 shadow-lg border-b border-gray-100 dark:border-gray-700 z-50">
+            class="absolute top-16 right-0 w-full bg-white dark:bg-[#161b22] shadow-lg border-b border-gray-100 dark:border-gray-800 z-50">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 @if(Auth::user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}"
@@ -110,21 +112,26 @@
                     class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('profile.edit') ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' }}">{{ __('Settings') }}</a>
 
                 <form method="POST" action="{{ route('logout') }}"
-                    class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                    class="mt-4 border-t border-gray-200 dark:border-gray-800 pt-4">
                     @csrf
-                    <div class="px-3 mb-2 flex items-center">
-                        <div
-                            class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold mr-3">
-                            {{ substr(Auth::user()->name, 0, 1) }}
-                        </div>
-                        <div>
-                            <div class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}
-                            </div>
-                            <div class="text-xs text-gray-500">{{ Auth::user()->email }}</div>
+                    <div class="px-3 mb-4 flex items-center gap-3 overflow-hidden">
+                        <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/avatar/avatar-1.png') }}"
+                            alt="{{ Auth::user()->name }}"
+                            class="w-10 h-10 rounded-full object-cover shrink-0 border border-gray-200 dark:border-gray-600">
+                        <div class="flex flex-col truncate">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                                {{ Auth::user()->name }}
+                            </span>
+                            <span class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</span>
                         </div>
                     </div>
                     <button type="submit"
-                        class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30">
+                        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
+                        </svg>
                         {{ __('Log Out') }}
                     </button>
                 </form>

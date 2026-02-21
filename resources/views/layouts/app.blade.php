@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
 <head>
     <meta charset="utf-8">
@@ -17,13 +17,13 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col sm:flex-row">
+    <div class="min-h-screen bg-gray-100 dark:bg-[#0f1115] flex flex-col sm:flex-row w-full">
         @include('layouts.sidebar')
 
         <div class="flex-1 flex flex-col min-w-0">
             <!-- Page Heading -->
             @if(isset($header) || View::hasSection('header'))
-                <header class="bg-white dark:bg-gray-800 shadow">
+                <header class="bg-white dark:bg-[#161b22] shadow dark:shadow-none dark:border-b dark:border-gray-800">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header ?? '' }}
                         @yield('header')
