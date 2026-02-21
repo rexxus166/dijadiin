@@ -19,15 +19,15 @@ class DatabaseSeeder extends Seeder
         // Admin User - pakai create() langsung, tidak butuh Faker
         User::create([
             'name' => 'Admin Poliwindra',
-            'email' => 'admin@dijadiin.com',
+            'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
 
         // Regular User
         User::create([
-            'name' => 'User Poliwindra',
-            'email' => 'user@dijadiin.com',
+            'name' => 'Poliwindra',
+            'email' => 'refactory@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'user',
         ]);
