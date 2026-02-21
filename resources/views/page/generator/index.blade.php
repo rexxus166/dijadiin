@@ -153,8 +153,8 @@
                             <div>
                                 <label for="ai_prompt"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tell Gemini
-                                    what you want this project to be (Optional)</label>
-                                <textarea name="ai_prompt" id="ai_prompt" rows="4"
+                                    what you want this project to be <span class="text-red-500">*</span></label>
+                                <textarea name="ai_prompt" id="ai_prompt" rows="4" required
                                     placeholder="e.g. I want to build a pos application with a dashboard for admin and pos for user..."
                                     class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm transition-colors"></textarea>
                                 <p class="mt-2 text-xs text-gray-500">The context prompt and gemini token will be
