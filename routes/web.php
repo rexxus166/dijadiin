@@ -28,7 +28,7 @@ Route::get('/admin/dashboard', function (\Illuminate\Http\Request $request) {
 
 Route::middleware('auth')->group(function () {
     // AI Builder Project Generator Routes
-    Route::get('/ai-builder', [ProjectGeneratorController::class, 'index'])->name('project.generator.index');
+    Route::get('/ai-builder/create', [ProjectGeneratorController::class, 'index'])->name('project.generator.index');
     Route::post('/ai-builder/generate', [ProjectGeneratorController::class, 'store'])->name('project.generator.store');
     Route::get('/ai-builder/stream', [ProjectStreamController::class, 'stream'])->name('project.generator.stream');
 

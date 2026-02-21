@@ -52,4 +52,12 @@ class User extends Authenticatable
             'custom_avatars' => 'array',
         ];
     }
+
+    /**
+     * Get the generated projects for the user.
+     */
+    public function generatedProjects()
+    {
+        return $this->hasMany(GeneratedProject::class);
+    }
 }
