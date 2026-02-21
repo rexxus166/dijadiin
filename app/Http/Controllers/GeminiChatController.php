@@ -36,20 +36,17 @@ class GeminiChatController extends Controller
         $systemInstruction = <<<PROMPT
 You are an expert Senior Laravel Architect AI. The user will provide a prompt and optionally their currently opened file. 
 You are fully capable of modifying the current file or creating/modifying multiple files (like CRUD, Auth, Controllers, Models, etc.) across the project.
-You MUST respond IN STRICT JSON FORMAT ONLY. Do not use markdown blocks like ```json.
+You MUST respond using EXACTLY this XML-like format. Do NOT use JSON or markdown code blocks:
 {$contextString}
-The JSON must follow this precise schema:
-{
-  "message": "A friendly short message describing what you did.",
-  "files": [
-    {
-      "path": "app/Http/Controllers/ExampleController.php",
-      "content": "<?php\\n\\nnamespace App\\\\Http\\\\Controllers;\\n..."
-    }
-  ]
-}
+<file path="app/Http/Controllers/ExampleController.php">
+<?php
+
+namespace App\Http\Controllers;
+...
+</file>
+
 If the user's request pertains to the opened file, ensure 'path' is the same relative path.
-For multiple files, provide each in the 'files' array. Remember this is a fresh Laravel 10 project using Tailwind.
+For multiple files, provide each in a separate <file> tag. Remember this is a fresh Laravel 10 project using Tailwind.
 PROMPT;
 
         $userPrompt = "CURRENT OPENED FILE:\n{$fileContent}\n\nUSER REQUEST: {$prompt}";
@@ -64,27 +61,28 @@ PROMPT;
         $rawText  = $result['text'];
         $keyUsed  = $result['key_used'];
 
-        // Extract JSON block (robust against conversational noise)
-        $jsonStart = strpos($rawText, '{');
-        $jsonEnd   = strrpos($rawText, '}');
-
-        if ($jsonStart !== false && $jsonEnd !== false && $jsonEnd >= $jsonStart) {
-            $possibleJson = substr($rawText, $jsonStart, $jsonEnd - $jsonStart + 1);
-            $jsonResponse = json_decode($possibleJson, true);
-        } else {
-            $jsonResponse = json_decode($rawText, true);
+        // Parse XML-like format (robust against code escaping issues)
+        $files = [];
+        // Use non-greedy match for file content, handle possible whitespace around tags
+        if (preg_match_all('/<file\s+path="([^"]+)">\s*(.*?)\s*<\/file>/is', $rawText, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $files[] = [
+                    'path'    => trim($match[1]),
+                    'content' => trim($match[2]),
+                ];
+            }
         }
 
-        if (json_last_error() !== JSON_ERROR_NONE || !isset($jsonResponse['files'])) {
-            Log::error("Gemini JSON Parse Error [{$keyUsed}]. Raw: " . $rawText);
+        if (empty($files)) {
+            Log::error("Gemini Parse Error [{$keyUsed}]. Raw: " . $rawText);
             return response()->json([
-                'error'     => 'The AI returned an invalid response format. Please try again.',
+                'error'     => 'The AI returned an invalid response format or no files were generated. Please try again.',
                 'debug_raw' => $rawText,
             ], 500);
         }
 
         // Write all files immediately to disk
-        foreach ($jsonResponse['files'] as $fileObj) {
+        foreach ($files as $fileObj) {
             $filePath = ltrim(str_replace(['../', '..\\'], '', $fileObj['path']), '/\\');
             $absPath  = $projectPath . DIRECTORY_SEPARATOR . $filePath;
             $dir      = dirname($absPath);
@@ -98,8 +96,8 @@ PROMPT;
 
         return response()->json([
             'success' => true,
-            'message' => $jsonResponse['message'] ?? 'Actions executed successfully.',
-            'files'   => $jsonResponse['files'],
+            'message' => 'Actions executed successfully.',
+            'files'   => $files,
         ]);
     }
 }

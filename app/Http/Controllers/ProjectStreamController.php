@@ -108,7 +108,7 @@ Design the database schema properly and make sure the controllers use standard C
 PROMPT;
 
                         $userPromptPlan = "Concept/Features: {$aiPrompt}\nGenerate the JSON plan based on these requirements.";
-                        
+
                         $planJson = GeminiService::callRaw($userId, $systemPromptPlan, $userPromptPlan, 120);
                         if ($planJson) {
                             $planData = json_decode($planJson, true);
@@ -137,7 +137,7 @@ PROMPT;
                                     $sendStatus(sprintf("AI Architect: (%d/%d) Menulis %s", $index + 1, $totalFiles, $filePath), 'info');
 
                                     $userPromptFile = "{$fileContextStr}\n\nPlease generate ONLY the raw code content for this file:\nPath: {$filePath}\nType: {$fileObj['type']}";
-                                    
+
                                     $code = GeminiService::callRaw($userId, $systemPromptFile, $userPromptFile, 120);
                                     if ($code) {
                                         $absPath = rtrim($projectPath, '/\\') . DIRECTORY_SEPARATOR . $filePath;
