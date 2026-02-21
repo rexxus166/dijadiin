@@ -62,7 +62,8 @@
                     </div>
                     <div class="mt-2 text-left">
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</h3>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">12,450</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ number_format($totalUsers) }}
+                        </p>
                     </div>
                     <div class="w-full bg-gray-100 dark:bg-gray-800/80 h-1 rounded-full mt-6 overflow-hidden">
                         <div class="bg-[#10b981] h-full rounded-full" style="width: 70%"></div>
@@ -91,7 +92,8 @@
                     </div>
                     <div class="mt-2 text-left">
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Projects</h3>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">8,320</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ number_format($totalProjects) }}
+                        </p>
                     </div>
                     <div class="w-full bg-gray-100 dark:bg-gray-800/80 h-1.5 rounded-full mt-6 overflow-hidden">
                         <div class="bg-[#3b82f6] h-full rounded-full" style="width: 55%"></div>
@@ -326,31 +328,50 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-800 text-gray-700 dark:text-gray-300">
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
-                                <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">E-commerce Dashboard</td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-100 dark:bg-[#1f2838] text-gray-600 dark:text-[#6e8fd4]">
-                                        Inventory
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=e2e8f0&color=64748b&rounded=true"
-                                            class="w-7 h-7 rounded-full bg-gray-200 border border-gray-200 dark:border-gray-700"
-                                            alt="John Doe">
-                                        <span class="font-medium text-gray-900 dark:text-gray-400">John Doe</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2 text-[#10b981] dark:text-[#10b981] font-medium">
+                            @forelse($recentProjects as $project)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
+                                    <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">{{ $project->name }}
+                                    </td>
+                                    <td class="px-6 py-4">
                                         <span
-                                            class="w-1.5 h-1.5 rounded-full bg-[#10b981] shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
-                                        Completed
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-right text-gray-500 dark:text-gray-500">2 mins ago</td>
-                            </tr>
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-100 dark:bg-[#1f2838] text-gray-600 dark:text-[#6e8fd4] uppercase">
+                                            {{ $project->db_type ?? 'Generic' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            @if ($project->user)
+                                                <img src="{{ $project->user->avatar ? asset($project->user->avatar) : asset('assets/avatar/avatar-1.png') }}"
+                                                    class="w-7 h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                                                    alt="{{ $project->user->name }}">
+                                                <span
+                                                    class="font-medium text-gray-900 dark:text-gray-400">{{ $project->user->name }}</span>
+                                            @else
+                                                <div
+                                                    class="w-7 h-7 rounded-full bg-gray-200 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-xs text-gray-500">
+                                                    ?</div>
+                                                <span class="font-medium text-gray-900 dark:text-gray-400">Unknown
+                                                    User</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div
+                                            class="flex items-center gap-2 text-[#10b981] dark:text-[#10b981] font-medium">
+                                            <span
+                                                class="w-1.5 h-1.5 rounded-full bg-[#10b981] shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+                                            Completed
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-gray-500 dark:text-gray-500">
+                                        {{ $project->created_at->diffForHumans() }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">No
+                                        project requests found.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

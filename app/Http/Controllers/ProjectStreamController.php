@@ -24,7 +24,8 @@ class ProjectStreamController extends Controller
 
         $data = json_decode($payloadRaw, true);
         $projectName = $data['project_name'] ?? 'ai-project';
-        $basePath = storage_path('app/generated_projects/' . Auth::id());
+        $userName = \Illuminate\Support\Str::slug(\Illuminate\Support\Facades\Auth::user()->name);
+        $basePath = storage_path('app/generated_projects/' . $userName);
 
         // Prepare SSE Response
         $response = new StreamedResponse(function () use ($projectName, $basePath, $data, $scaffoldService, $envService) {

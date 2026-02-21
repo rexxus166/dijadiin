@@ -22,10 +22,11 @@ class AutoScaffoldController extends Controller
         $features = $data['features'] ?? '';
 
         if (!$projectName) {
-             return response()->json(['error' => 'No active project found'], 400);
+            return response()->json(['error' => 'No active project found'], 400);
         }
 
-        $basePath = storage_path('app/generated_projects/' . \Illuminate\Support\Facades\Auth::id());
+        $userName = \Illuminate\Support\Str::slug(\Illuminate\Support\Facades\Auth::user()->name);
+        $basePath = storage_path('app/generated_projects/' . $userName);
         $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $projectName);
 
         if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {
@@ -103,11 +104,11 @@ PROMPT;
             foreach ($filesGen as $index => $fileObj) {
                 $filePath = ltrim(str_replace(['../', '..\\'], '', $fileObj['path']), '/\\');
                 $isAppend = !empty($fileObj['append']);
-                
+
                 $sendStatus(sprintf("[%d/%d] Generating %s...", $index + 1, $totalFiles, $filePath), 'info');
 
                 $userPromptFile = "{$fileContextStr}\n\nPlease generate ONLY the raw code content for this file:\nPath: {$filePath}\nType: {$fileObj['type']}";
-                
+
                 $code = $this->callGemini($apiKey, $systemPromptFile, $userPromptFile);
                 if (!$code) {
                     $sendStatus("Gagal generate kode untuk {$filePath}.", 'error');
@@ -125,14 +126,14 @@ PROMPT;
                 }
 
                 if ($isAppend && file_exists($absPath)) {
-                   $existingCont = file_get_contents($absPath);
-                   // Specifically for web.php, let's append nicely
-                   $appendContent = "\n// --- AI Generated Routes for {$concept} ---\n" . $code . "\n";
-                   file_put_contents($absPath, $existingCont . $appendContent);
-                   $sendStatus("Berhasil modifikasi {$filePath}", 'success');
+                    $existingCont = file_get_contents($absPath);
+                    // Specifically for web.php, let's append nicely
+                    $appendContent = "\n// --- AI Generated Routes for {$concept} ---\n" . $code . "\n";
+                    file_put_contents($absPath, $existingCont . $appendContent);
+                    $sendStatus("Berhasil modifikasi {$filePath}", 'success');
                 } else {
-                   file_put_contents($absPath, $code);
-                   $sendStatus("Berhasil membuat {$filePath}", 'success');
+                    file_put_contents($absPath, $code);
+                    $sendStatus("Berhasil membuat {$filePath}", 'success');
                 }
             }
 

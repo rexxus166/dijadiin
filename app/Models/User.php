@@ -53,11 +53,24 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the generated projects for the user.
-     */
     public function generatedProjects()
     {
         return $this->hasMany(GeneratedProject::class);
+    }
+
+    public function isOnline()
+    {
+        return \Illuminate\Support\Facades\DB::table('sessions')
+            ->where('user_id', $this->id)
+            ->where('last_activity', '>=', now()->subMinutes(5)->timestamp)
+            ->exists();
+    }
+
+    public function getComputedStatusAttribute()
+    {
+        if (strtolower($this->status) === 'suspended') {
+            return 'Suspended';
+        }
+        return $this->isOnline() ? 'Online' : 'Offline';
     }
 }
