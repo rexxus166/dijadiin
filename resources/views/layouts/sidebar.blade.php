@@ -3,7 +3,7 @@
         <!-- Logo -->
         <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-700">
             <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-3">
-                <x-application-logo class="block h-9 w-auto fill-current text-indigo-600 dark:text-indigo-400" />
+                <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="block h-9 w-auto" />
                 <span class="font-bold text-xl text-gray-800 dark:text-gray-200">Dijadiin</span>
             </a>
         </div>
@@ -81,7 +81,7 @@
 <div
     class="sm:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shrink-0">
     <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-2">
-        <x-application-logo class="block h-8 w-auto fill-current text-indigo-600 dark:text-indigo-400" />
+        <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="block h-8 w-auto" />
         <span class="font-bold text-lg text-gray-800 dark:text-gray-200">Dijadiin</span>
     </a>
 
