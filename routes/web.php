@@ -7,13 +7,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+Route::get('/projects', function (\Illuminate\Http\Request $request) {
     if ($request->user()->role === 'admin') {
-        return view('admin.dashboard.index');
+        return redirect()->route('admin.dashboard');
     }
 
-    return view('page.dashboard.index');
+    return view('page.projects.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/admin/dashboard', function (\Illuminate\Http\Request $request) {
+    if ($request->user()->role !== 'admin') {
+        return redirect()->route('dashboard');
+    }
+
+    return view('admin.dashboard.index');
+})->middleware(['auth', 'verified'])->name('admin.dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
