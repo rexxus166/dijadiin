@@ -1,4 +1,86 @@
 <x-app-layout>
+    {{-- Prism.js: VS Code Dark+ theme + all languages --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+    <style>
+        /* ===== Override Prism theme to closer match VS Code Dark+ ===== */
+        pre[class*="language-"] {
+            background: #1e1e1e !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            font-size: 13px !important;
+            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace !important;
+            line-height: 1.6 !important;
+            tab-size: 4;
+        }
+        code[class*="language-"] {
+            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace !important;
+            font-size: 13px !important;
+            line-height: 1.6 !important;
+        }
+        /* Line numbers */
+        .line-numbers .line-numbers-rows {
+            border-right: 1px solid #333 !important;
+            background: #1e1e1e !important;
+        }
+        .line-numbers-rows > span:before { color: #4a4a4a !important; }
+
+        /* ===== Editor overlay layout ===== */
+        #editor-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        /* The highlighted pre sits BEHIND the textarea */
+        #code-highlight {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            pointer-events: none;
+            padding: 24px;
+            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre;
+            word-wrap: normal;
+            box-sizing: border-box;
+            background: #1e1e1e;
+        }
+        /* Transparent textarea sits ON TOP for interaction */
+        #code-viewer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 24px;
+            font-family: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre;
+            word-wrap: normal;
+            box-sizing: border-box;
+            background: transparent;
+            color: transparent;
+            caret-color: #aeafad;
+            border: none;
+            outline: none;
+            resize: none;
+            tab-size: 4;
+            overflow: auto;
+            z-index: 2;
+            spellcheck: false;
+        }
+        /* Scrollbar style */
+        #code-viewer::-webkit-scrollbar,
+        #code-highlight::-webkit-scrollbar { width: 10px; height: 10px; }
+        #code-viewer::-webkit-scrollbar-track,
+        #code-highlight::-webkit-scrollbar-track { background: #1e1e1e; }
+        #code-viewer::-webkit-scrollbar-thumb,
+        #code-highlight::-webkit-scrollbar-thumb { background: #424242; border-radius: 4px; }
+        #code-viewer::-webkit-scrollbar-thumb:hover,
+        #code-highlight::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight flex items-center gap-2">
@@ -57,11 +139,17 @@
                         </div>
                     </div>
 
-                    <!-- Editor Content Container -->
+                    {{-- Editor Content Container --}}
                     <div class="flex-1 relative overflow-hidden flex" id="editor-container">
-                        <!-- Original View Edit Panel -->
+                        {{-- Original View Edit Panel --}}
                         <div class="flex-1 h-full relative" id="original-view-pane">
-                            <textarea class="w-full h-full p-6 m-0 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-sm overflow-auto focus:outline-none resize-none leading-relaxed" id="code-viewer" spellcheck="false" placeholder="Select a file from the explorer to preview/edit contents."></textarea>
+                            <div id="editor-wrapper">
+                                {{-- Highlighted code (background) --}}
+                                <pre id="code-highlight" class="line-numbers" aria-hidden="true"><code id="code-highlight-inner" class="language-php"></code></pre>
+                                {{-- Transparent editable textarea (foreground) --}}
+                                <textarea id="code-viewer" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off"
+                                    placeholder="Select a file from the explorer..."></textarea>
+                            </div>
                         </div>
 
                         <!-- Diff View (Modified) Hidden -->
@@ -116,8 +204,57 @@
             const treeContainer = document.getElementById('file-tree-root');
             const treeLoading = document.getElementById('tree-loading');
             const codeViewer = document.getElementById('code-viewer');
+            const codeHighlight = document.getElementById('code-highlight-inner');
             const codeLoading = document.getElementById('code-loading');
             const activeFileName = document.getElementById('active-file-name');
+            let currentLanguage = 'plaintext';
+
+            // ===== Detect language from filename extension =====
+            function detectLanguage(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                const map = {
+                    'php': 'php', 'blade.php': 'php',
+                    'js': 'javascript', 'mjs': 'javascript', 'cjs': 'javascript',
+                    'ts': 'typescript',
+                    'json': 'json', 'jsonc': 'json',
+                    'css': 'css', 'scss': 'scss', 'sass': 'scss',
+                    'html': 'markup', 'htm': 'markup', 'xml': 'markup', 'svg': 'markup',
+                    'md': 'markdown', 'markdown': 'markdown',
+                    'sh': 'bash', 'bash': 'bash', 'zsh': 'bash',
+                    'sql': 'sql',
+                    'yaml': 'yaml', 'yml': 'yaml',
+                    'env': 'bash', 'gitignore': 'bash',
+                    'vue': 'markup', 'jsx': 'jsx', 'tsx': 'typescript',
+                };
+                // Check for blade specifically
+                if (filename.endsWith('.blade.php')) return 'markup';
+                return map[ext] || 'plaintext';
+            }
+
+            // ===== Sync highlighting with textarea =====
+            function updateHighlight(code, filename) {
+                const lang = detectLanguage(filename || 'file.php');
+                currentLanguage = lang;
+                codeHighlight.className = `language-${lang}`;
+                // Escape HTML entities
+                const escaped = code
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                codeHighlight.innerHTML = escaped;
+                Prism.highlightElement(codeHighlight);
+            }
+
+            // ===== Sync scroll between textarea and pre =====
+            codeViewer.addEventListener('scroll', () => {
+                document.getElementById('code-highlight').scrollTop = codeViewer.scrollTop;
+                document.getElementById('code-highlight').scrollLeft = codeViewer.scrollLeft;
+            });
+
+            // ===== Re-highlight on input =====
+            codeViewer.addEventListener('input', () => {
+                updateHighlight(codeViewer.value, activeFileName.textContent);
+            });
 
             if(!window.ProjectConfig.projectName) return;
 
@@ -192,7 +329,6 @@
                 document.getElementById('diff-view-pane').classList.add('hidden');
                 document.getElementById('diff-controls').classList.add('hidden');
                 
-                // For simplicity, we create a URL with query param
                 const url = window.ProjectConfig.apiFileUrl + `?path=${encodeURIComponent(path)}`;
                 
                 fetch(url)
@@ -201,14 +337,18 @@
                         codeLoading.style.display = 'none';
                         if(data.error) {
                             codeViewer.value = `Error: ${data.error}`;
+                            updateHighlight(`Error: ${data.error}`, 'error.txt');
                         } else {
                             codeViewer.value = data.content;
+                            // ✨ Apply syntax highlighting
+                            updateHighlight(data.content, name);
                             document.getElementById('save-file-btn').classList.remove('hidden');
                         }
                     })
                     .catch(() => {
                         codeLoading.style.display = 'none';
-                        codeViewer.value = `Error failed to fetch file bounds`;
+                        codeViewer.value = `Error failed to fetch file`;
+                        updateHighlight(`Error failed to fetch file`, 'error.txt');
                     });
             }
 
@@ -367,4 +507,17 @@
             loadTree();
         });
     </script>
+
+    {{-- Prism.js core + autoloader (all languages) + line-numbers plugin --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script>
+        // Set autoloader path so all language grammars are loaded on demand
+        if (typeof Prism !== 'undefined' && Prism.plugins?.autoloader) {
+            Prism.plugins.autoloader.languages_path =
+                'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+        }
+    </script>
+
 </x-app-layout>
