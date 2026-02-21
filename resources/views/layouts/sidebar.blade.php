@@ -1,140 +1,149 @@
-<aside
-    class="w-64 bg-white dark:bg-[#161b22] border-r border-gray-100 dark:border-gray-800 z-10 hidden sm:block shrink-0 sticky top-0 h-screen">
-    <div class="h-full flex flex-col">
-        <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800">
-            <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
-                class="flex items-center gap-3">
-                <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="block h-9 w-auto" />
-                <span class="font-bold text-xl text-gray-800 dark:text-gray-200">Dijadiin</span>
-            </a>
-        </div>
+<aside class="w-64 bg-[#0d1117] border-r border-[#21262d] z-10 hidden sm:flex flex-col shrink-0 sticky top-0 h-screen">
 
-        <!-- Navigation Links -->
-        <div class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            @if(Auth::user()->role === 'admin')
-                <a href="{{ route('admin.dashboard') }}"
-                    class="flex items-center px-4 py-3 rounded-lg w-full transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                    {{ __('Admin Dashboard') }}
-                </a>
-            @else
-                <a href="{{ route('dashboard') }}"
-                    class="flex items-center px-4 py-3 rounded-lg w-full transition-colors {{ request()->routeIs('dashboard') ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                        </path>
-                    </svg>
-                    {{ __('My Projects') }}
-                </a>
-            @endif
-
-            <a href="{{ route('profile.edit') }}"
-                class="flex items-center px-4 py-3 rounded-lg w-full transition-colors {{ request()->routeIs('profile.edit') ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                    </path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                {{ __('Settings') }}
-            </a>
-        </div>
-
-        <!-- User Profile & Logout -->
-        <div class="border-t border-gray-100 dark:border-gray-800 p-3 shrink-0">
-            <div class="flex flex-col gap-3">
-                <div class="flex items-center gap-2.5 overflow-hidden">
-                    <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/avatar/avatar-1.png') }}"
-                        alt="{{ Auth::user()->name }}"
-                        class="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-200 dark:border-gray-600">
-                    <div class="flex flex-col truncate">
-                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">
-                            {{ Auth::user()->name }}
-                        </span>
-                        <span class="text-[10px] text-gray-500 truncate leading-tight">{{ Auth::user()->email }}</span>
-                    </div>
-                </div>
-                <form method="POST" action="{{ route('logout') }}" class="w-full m-0">
-                    @csrf
-                    <button type="submit"
-                        class="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 border border-transparent rounded-lg shadow-sm text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40 focus:outline-none transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                            </path>
-                        </svg>
-                        {{ __('Log Out') }}
-                    </button>
-                </form>
+    {{-- Logo --}}
+    <div class="px-5 py-5 border-b border-[#21262d]">
+        <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
+           class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="w-6 h-6 object-contain" />
             </div>
+            <div>
+                <p class="font-bold text-sm text-white leading-tight">DIJADIIN</p>
+                <p class="text-[10px] text-blue-400 font-medium leading-tight">AI App Generator</p>
+            </div>
+        </a>
+    </div>
+
+    {{-- Nav --}}
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+
+        @php
+            $navItem = fn($label, $icon, $active) =>
+                '<a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ' .
+                ($active ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300') .
+                '">' . $icon . $label . '</a>';
+        @endphp
+
+        @if(Auth::user()->role === 'admin')
+            <a href="{{ route('admin.dashboard') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Admin Dashboard
+            </a>
+        @else
+            <a href="{{ route('dashboard') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('dashboard') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                My Projects
+            </a>
+
+            {{-- Templates (coming soon) --}}
+            <a href="#"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                Templates
+                <span class="ml-auto text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
+            </a>
+
+            {{-- API Keys (coming soon) --}}
+            <a href="#"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                API Keys
+                <span class="ml-auto text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
+            </a>
+
+            {{-- Settings --}}
+            <a href="{{ route('profile.edit') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('profile.edit') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Settings
+            </a>
+        @endif
+
+        {{-- Divider --}}
+        <div class="pt-2 mt-2 border-t border-[#21262d]">
+            <a href="#"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-400 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Documentation
+            </a>
+        </div>
+
+    </nav>
+
+    {{-- User Profile --}}
+    <div class="border-t border-[#21262d] p-3">
+        <div class="flex items-center gap-2.5">
+            <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/avatar/avatar-1.png') }}"
+                 alt="{{ Auth::user()->name }}"
+                 class="w-9 h-9 rounded-full object-cover shrink-0 border border-[#30363d]">
+            <div class="flex flex-col truncate flex-1 min-w-0">
+                <span class="text-xs font-semibold text-gray-200 truncate leading-tight">{{ Auth::user()->name }}</span>
+                <span class="text-[10px] text-gray-500 truncate leading-tight">{{ Auth::user()->email }}</span>
+            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" title="Log Out"
+                        class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </form>
         </div>
     </div>
+
 </aside>
 
-<!-- Mobile Header -->
-<div
-    class="sm:hidden flex items-center justify-between p-4 bg-white dark:bg-[#161b22] border-b border-gray-100 dark:border-gray-800 shrink-0">
+
+{{-- Mobile Header --}}
+<div class="sm:hidden flex items-center justify-between p-4 bg-[#0d1117] border-b border-[#21262d] shrink-0">
     <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
-        class="flex items-center gap-2">
-        <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="block h-8 w-auto" />
-        <span class="font-bold text-lg text-gray-800 dark:text-gray-200">Dijadiin</span>
+       class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+            <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="w-5 h-5 object-contain" />
+        </div>
+        <span class="font-bold text-sm text-white">DIJADIIN</span>
     </a>
 
     <div x-data="{ open: false }">
         <button @click="open = !open"
-            class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none transition">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16"></path>
-                <path x-show="open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"></path>
+            class="p-2 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#161b22] focus:outline-none transition">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                <path x-show="open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
 
         <div x-show="open" @click.away="open = false" style="display: none;"
-            class="absolute top-16 right-0 w-full bg-white dark:bg-[#161b22] shadow-lg border-b border-gray-100 dark:border-gray-800 z-50">
-            <div class="px-2 pt-2 pb-3 space-y-1">
+            class="absolute top-16 right-0 w-full bg-[#0d1117] shadow-xl border-b border-[#21262d] z-50">
+            <div class="px-3 py-3 space-y-1">
                 @if(Auth::user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}"
-                        class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' }}">{{ __('Admin Dashboard') }}</a>
+                       class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-400 hover:bg-[#161b22]' }}">Admin Dashboard</a>
                 @else
                     <a href="{{ route('dashboard') }}"
-                        class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' }}">{{ __('My Projects') }}</a>
+                       class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-400 hover:bg-[#161b22]' }}">My Projects</a>
                 @endif
                 <a href="{{ route('profile.edit') }}"
-                    class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('profile.edit') ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' }}">{{ __('Settings') }}</a>
+                   class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('profile.edit') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-400 hover:bg-[#161b22]' }}">Settings</a>
 
-                <form method="POST" action="{{ route('logout') }}"
-                    class="mt-4 border-t border-gray-200 dark:border-gray-800 pt-4">
-                    @csrf
-                    <div class="px-3 mb-4 flex items-center gap-3 overflow-hidden">
+                <div class="mt-3 pt-3 border-t border-[#21262d]">
+                    <div class="flex items-center gap-3 px-3 mb-3">
                         <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/avatar/avatar-1.png') }}"
-                            alt="{{ Auth::user()->name }}"
-                            class="w-10 h-10 rounded-full object-cover shrink-0 border border-gray-200 dark:border-gray-600">
-                        <div class="flex flex-col truncate">
-                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-                                {{ Auth::user()->name }}
-                            </span>
-                            <span class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</span>
+                             alt="{{ Auth::user()->name }}"
+                             class="w-8 h-8 rounded-full object-cover border border-[#30363d]">
+                        <div>
+                            <div class="text-sm font-semibold text-gray-200">{{ Auth::user()->name }}</div>
+                            <div class="text-xs text-gray-500">{{ Auth::user()->email }}</div>
                         </div>
                     </div>
-                    <button type="submit"
-                        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                            </path>
-                        </svg>
-                        {{ __('Log Out') }}
-                    </button>
-                </form>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors">
+                            Log Out
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
