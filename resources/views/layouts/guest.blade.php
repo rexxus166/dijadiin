@@ -87,7 +87,7 @@
     @hasSection('full-layout')
         @yield('full-layout')
     @else
-        <div class="flex w-full h-screen overflow-hidden bg-background-light dark:bg-background-dark">
+        <div class="flex w-full min-h-screen lg:h-screen lg:overflow-hidden bg-background-light dark:bg-background-dark">
             <!-- Left Side: Hero Section -->
             <div class="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden bg-slate-900">
                 <!-- Background Image with Overlay -->
@@ -133,10 +133,10 @@
 
             <!-- Right Side: Content Area -->
             <div
-                class="flex w-full lg:w-1/2 flex-col justify-center items-center bg-background-light dark:bg-background-dark px-6 py-12 lg:px-20 overflow-y-auto w-full">
-                <div class="w-full max-w-[440px] flex flex-col gap-8">
+                class="flex w-full lg:w-1/2 flex-col justify-center items-center bg-background-light dark:bg-background-dark py-8 px-4 sm:px-6 lg:px-20 lg:overflow-y-auto">
+                <div class="w-full max-w-[420px] flex flex-col gap-5">
                     <!-- Mobile Logo (Visible only on small screens) -->
-                    <div class="lg:hidden flex items-center gap-2 mb-4 self-center">
+                    <div class="lg:hidden flex items-center gap-2 mb-2 self-center">
                         <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
                             <span class="material-symbols-outlined text-[20px]">terminal</span>
                         </div>
