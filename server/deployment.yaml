@@ -15,6 +15,24 @@ spec:
       labels:
         app: dijadiin-app
     spec:
+      initContainers:
+      - name: run-migrations
+        image: <username-dockerhub>/dijadiin:latest
+        imagePullPolicy: Always
+        command: ["php", "artisan", "migrate", "--force"]
+        env:
+        - name: DB_CONNECTION
+          value: "pgsql"
+        - name: DB_HOST
+          value: "103.185.52.138"
+        - name: DB_PORT
+          value: "1185"
+        - name: DB_DATABASE
+          value: "poliwindra"
+        - name: DB_USERNAME
+          value: "poliwindra"
+        - name: DB_PASSWORD
+          value: "x2519-_w6ZtV*>dPzKSC4XDn0-0u(#iH"
       containers:
       - name: web
         # Nanti ganti <username-dockerhub> dengan username-mu
