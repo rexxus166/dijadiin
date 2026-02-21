@@ -40,6 +40,9 @@ RUN npm run build
 # Set permissions for Laravel storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Buat symlink storage → public/storage (supaya file yang diupload bisa diakses via URL)
+RUN php artisan storage:link
+
 # Allow Apache to run in the foreground
 EXPOSE 80
 CMD ["apache2-foreground"]

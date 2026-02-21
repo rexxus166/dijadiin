@@ -1,0 +1,38 @@
+name: Database Seed (Manual)
+
+# Workflow ini hanya bisa dijalankan MANUAL dari tab Actions di GitHub
+# Klik "Run workflow" untuk menjalankannya
+on:
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    # Jalankan migrate:fresh --seed langsung di dalam pod yang sedang berjalan
+    - name: Run migrate:fresh --seed
+      run: |
+        # Cari nama pod yang sedang berjalan
+        POD=$(kubectl --kubeconfig=server/kubeconfig.yaml get pods -n poliwindra \
+          -l app=dijadiin-app \
+          -o jsonpath='{.items[0].metadata.name}')
+        
+        echo "Menjalankan migrate:fresh --seed di pod: $POD"
+        kubectl --kubeconfig=server/kubeconfig.yaml exec -n poliwindra $POD \
+          -- php artisan migrate:fresh --seed --force
+        echo "✅ Selesai! Database sudah di-seed ulang."
