@@ -370,164 +370,170 @@
                 </div>
             </div>
 
-            <!-- Usage Stats Section -->
-            <div class="bg-[#161b22] rounded-xl border border-gray-800 p-6 mb-8">
-                <div class="flex items-center mb-6">
-                    <!-- Chart icon matching the image -->
-                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-                    </svg>
-                    <h2 class="text-lg font-semibold text-white">Usage Stats</h2>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative">
-                    <!-- Stat Card 1 -->
-                    <div class="bg-[#0d1015] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TOTAL PROJECTS
-                                    BUILT</span>
-                                <div class="text-[32px] font-bold mt-1 text-white leading-none">42</div>
-                            </div>
-                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800">
-                                <!-- Box Icon -->
-                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
-                                    </path>
-                                </svg>
-                            </div>
-                        </div>
-                        <a href="#"
-                            class="text-[11px] text-blue-500 font-bold hover:text-blue-400 uppercase flex items-center mt-2 tracking-widest mt-auto">
-                            VIEW ALL PROJECTS <span class="ml-1.5 text-sm leading-none">&rarr;</span>
-                        </a>
+            @if (auth()->user()->role !== 'admin')
+                <!-- Usage Stats Section -->
+                <div class="bg-[#161b22] rounded-xl border border-gray-800 p-6 mb-8">
+                    <div class="flex items-center mb-6">
+                        <!-- Chart icon matching the image -->
+                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                        <h2 class="text-lg font-semibold text-white">Usage Stats</h2>
                     </div>
 
-                    <!-- Stat Card 2 -->
-                    <div class="bg-[#0d1015] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">AI TOKENS
-                                    USED</span>
-                                <div class="text-[32px] font-bold mt-1 flex items-baseline text-white leading-none">
-                                    750 <span class="text-sm font-normal text-gray-500 ml-1.5 align-baseline">/ 1k</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative">
+                        <!-- Stat Card 1 -->
+                        <div class="bg-[#0d1015] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TOTAL
+                                        PROJECTS
+                                        BUILT</span>
+                                    <div class="text-[32px] font-bold mt-1 text-white leading-none">42</div>
+                                </div>
+                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800">
+                                    <!-- Box Icon -->
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
+                                        </path>
+                                    </svg>
                                 </div>
                             </div>
-                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800 gap-2">
-                                <!-- Lightning Icon -->
-                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <a href="#"
+                                class="text-[11px] text-blue-500 font-bold hover:text-blue-400 uppercase flex items-center mt-2 tracking-widest mt-auto">
+                                VIEW ALL PROJECTS <span class="ml-1.5 text-sm leading-none">&rarr;</span>
+                            </a>
+                        </div>
+
+                        <!-- Stat Card 2 -->
+                        <div class="bg-[#0d1015] border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">AI TOKENS
+                                        USED</span>
+                                    <div class="text-[32px] font-bold mt-1 flex items-baseline text-white leading-none">
+                                        750 <span class="text-sm font-normal text-gray-500 ml-1.5 align-baseline">/
+                                            1k</span>
+                                    </div>
+                                </div>
+                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800 gap-2">
+                                    <!-- Lightning Icon -->
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="w-full bg-[#1e2532] rounded-full h-1.5 mb-2 overflow-hidden">
+                                    <div class="bg-blue-500 h-full rounded-full" style="width: 75%"></div>
+                                </div>
+                                <div class="text-[9px] text-gray-500 font-bold text-right uppercase tracking-[0.15em]">
+                                    75% OF MONTHLY QUOTA CONSUMED
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div x-data="{ showDeleteModal: false, showDeletePassword: false }">
+                    <div
+                        class="bg-[#160e10] rounded-xl border border-red-900/40 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                        <div>
+                            <h2 class="text-lg font-semibold text-red-500 mb-1">Danger Zone</h2>
+                            <p class="text-sm text-gray-400">Permanently delete your account and all associated projects.
+                                This
+                                action cannot be undone.</p>
+                        </div>
+                        <button type="button" @click="showDeleteModal = true"
+                            class="bg-[#e53e3e] hover:bg-red-700 text-white font-medium py-2 pb-2.5 px-6 rounded-lg text-sm shrink-0 transition-colors flex flex-col items-center justify-center leading-tight shadow-[0_0_15px_rgba(229,62,62,0.15)] h-auto">
+                            <span>Delete</span>
+                            <span>Account</span>
+                        </button>
+                    </div>
+
+                    <!-- Delete Account Modal -->
+                    <div x-show="showDeleteModal" style="display: none;"
+                        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
+                        <div class="bg-[#12151a] border border-red-900/40 rounded-2xl p-6 shadow-2xl max-w-md w-full"
+                            @click.away="showDeleteModal = false" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
+                            <div class="flex items-center gap-3 mb-4 text-red-500">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
+                                <h2 class="text-xl font-bold">Delete Account</h2>
                             </div>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="w-full bg-[#1e2532] rounded-full h-1.5 mb-2 overflow-hidden">
-                                <div class="bg-blue-500 h-full rounded-full" style="width: 75%"></div>
-                            </div>
-                            <div class="text-[9px] text-gray-500 font-bold text-right uppercase tracking-[0.15em]">
-                                75% OF MONTHLY QUOTA CONSUMED
-                            </div>
+
+                            <p class="text-sm text-gray-300 mb-6 leading-relaxed">
+                                Once your account is deleted, all of its resources and data will be permanently deleted.
+                                Please
+                                enter your password to confirm you would like to permanently delete your account.
+                            </p>
+
+                            <form method="post" action="{{ route('profile.destroy') }}">
+                                @csrf
+                                @method('delete')
+
+                                <div class="mb-6 relative">
+                                    <input :type="showDeletePassword ? 'text' : 'password'" name="password" required
+                                        class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors placeholder-gray-600"
+                                        placeholder="Enter your password">
+
+                                    <button type="button" @click="showDeletePassword = !showDeletePassword"
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 focus:outline-none">
+                                        <svg x-show="showDeletePassword" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <svg x-show="!showDeletePassword" class="h-4 w-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 014.182-5.415m4.35-1.125a3 3 0 00-3.692 3.692M3 3l18 18" />
+                                        </svg>
+                                    </button>
+
+                                    @if ($errors->userDeletion->has('password'))
+                                        <span class="text-xs text-red-500 font-medium mt-2 block">
+                                            {{ $errors->userDeletion->first('password') }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="flex items-center justify-end gap-3 mt-6">
+                                    <button type="button" @click="showDeleteModal = false"
+                                        class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                        class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-5 rounded-lg text-sm transition-colors shadow-lg">
+                                        Delete Account
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Danger Zone -->
-            <div x-data="{ showDeleteModal: false, showDeletePassword: false }">
-                <div
-                    class="bg-[#160e10] rounded-xl border border-red-900/40 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-red-500 mb-1">Danger Zone</h2>
-                        <p class="text-sm text-gray-400">Permanently delete your account and all associated projects. This
-                            action cannot be undone.</p>
-                    </div>
-                    <button type="button" @click="showDeleteModal = true"
-                        class="bg-[#e53e3e] hover:bg-red-700 text-white font-medium py-2 pb-2.5 px-6 rounded-lg text-sm shrink-0 transition-colors flex flex-col items-center justify-center leading-tight shadow-[0_0_15px_rgba(229,62,62,0.15)] h-auto">
-                        <span>Delete</span>
-                        <span>Account</span>
-                    </button>
-                </div>
-
-                <!-- Delete Account Modal -->
-                <div x-show="showDeleteModal" style="display: none;"
-                    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-
-                    <div class="bg-[#12151a] border border-red-900/40 rounded-2xl p-6 shadow-2xl max-w-md w-full"
-                        @click.away="showDeleteModal = false" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-
-                        <div class="flex items-center gap-3 mb-4 text-red-500">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <h2 class="text-xl font-bold">Delete Account</h2>
-                        </div>
-
-                        <p class="text-sm text-gray-300 mb-6 leading-relaxed">
-                            Once your account is deleted, all of its resources and data will be permanently deleted. Please
-                            enter your password to confirm you would like to permanently delete your account.
-                        </p>
-
-                        <form method="post" action="{{ route('profile.destroy') }}">
-                            @csrf
-                            @method('delete')
-
-                            <div class="mb-6 relative">
-                                <input :type="showDeletePassword ? 'text' : 'password'" name="password" required
-                                    class="w-full bg-[#0d1015] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors placeholder-gray-600"
-                                    placeholder="Enter your password">
-
-                                <button type="button" @click="showDeletePassword = !showDeletePassword"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 focus:outline-none">
-                                    <svg x-show="showDeletePassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" style="display: none;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    <svg x-show="!showDeletePassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 014.182-5.415m4.35-1.125a3 3 0 00-3.692 3.692M3 3l18 18" />
-                                    </svg>
-                                </button>
-
-                                @if ($errors->userDeletion->has('password'))
-                                    <span class="text-xs text-red-500 font-medium mt-2 block">
-                                        {{ $errors->userDeletion->first('password') }}
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div class="flex items-center justify-end gap-3 mt-6">
-                                <button type="button" @click="showDeleteModal = false"
-                                    class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                                    Cancel
-                                </button>
-                                <button type="submit"
-                                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-5 rounded-lg text-sm transition-colors shadow-lg">
-                                    Delete Account
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            @endif
 
             <!-- Footer -->
             <div
