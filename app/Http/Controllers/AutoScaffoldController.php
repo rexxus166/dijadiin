@@ -25,7 +25,7 @@ class AutoScaffoldController extends Controller
              return response()->json(['error' => 'No active project found'], 400);
         }
 
-        $basePath = storage_path('app/generated_projects');
+        $basePath = storage_path('app/generated_projects/' . \Illuminate\Support\Facades\Auth::id());
         $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $projectName);
 
         if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {

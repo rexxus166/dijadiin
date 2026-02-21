@@ -18,7 +18,7 @@ class ProjectExplorerController extends Controller
 
     public function tree(Request $request, string $project)
     {
-        $basePath = storage_path('app/generated_projects');
+        $basePath = storage_path('app/generated_projects/' . \Illuminate\Support\Facades\Auth::id());
         $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $project);
 
         // Security check
@@ -71,7 +71,7 @@ class ProjectExplorerController extends Controller
             return response()->json(['error' => 'Path is required'], 400);
         }
 
-        $basePath = storage_path('app/generated_projects');
+        $basePath = storage_path('app/generated_projects/' . \Illuminate\Support\Facades\Auth::id());
         $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $project);
 
         if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {
@@ -102,7 +102,7 @@ class ProjectExplorerController extends Controller
             return response()->json(['error' => 'Path and content are required'], 400);
         }
 
-        $basePath = storage_path('app/generated_projects');
+        $basePath = storage_path('app/generated_projects/' . \Illuminate\Support\Facades\Auth::id());
         $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $project);
 
         if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {

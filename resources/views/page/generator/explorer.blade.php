@@ -323,12 +323,11 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            let autoTriggerGemini = false;
-            const sessionKey = 'dijadiin_gemini_triggered_' + window.ProjectConfig.projectName;
+            let autoTriggerGenModal = false;
+            const sessionKey = 'dijadiin_scaffold_triggered_' + window.ProjectConfig.projectName;
 
             if (window.ProjectConfig.aiPrompt && !sessionStorage.getItem(sessionKey)) {
-                document.getElementById('chat-input').value = 'Buatkan proposal pengembangan rancangan arsitektur dan timeline kerja di file README ini secara detail berdasarkan ide berikut:\n\n' + window.ProjectConfig.aiPrompt;
-                autoTriggerGemini = true;
+                autoTriggerGenModal = true;
                 sessionStorage.setItem(sessionKey, '1');
             }
             const treeContainer = document.getElementById('file-tree-root');
@@ -429,17 +428,15 @@
                         }
                         treeContainer.appendChild(buildTreeDom(data));
 
-                        // Auto-trigger Gemini logic
-                        if (autoTriggerGemini) {
-                            const fileItems = Array.from(document.querySelectorAll('.file-item'));
-                            const readmeNode = fileItems.find(el => el.dataset.path.endsWith('README.md'));
-                            if (readmeNode) {
-                                readmeNode.click();
-                            } else if (fileItems.length > 0) {
-                                fileItems[0].click(); // Fallback if no README
-                            } else {
-                                autoTriggerGemini = false;
-                            }
+                        // Auto-trigger Gen Modal
+                        if (autoTriggerGenModal) {
+                            autoTriggerGenModal = false;
+                            setTimeout(() => {
+                                document.getElementById('generate-project-btn').click();
+                                setTimeout(() => {
+                                    document.getElementById('start-generate-btn').click();
+                                }, 500);
+                            }, 500);
                         }
                     })
                     .catch(e => {
@@ -604,12 +601,7 @@
                             });
                             switchTab(path);
 
-                            if (autoTriggerGemini) {
-                                autoTriggerGemini = false;
-                                setTimeout(() => {
-                                    document.getElementById('chat-send').click();
-                                }, 600);
-                            }
+                            // (AutoTrigger removed from chat here)
                         }
                     })
                     .catch((err) => {
@@ -869,6 +861,16 @@
 
         openModalBtn.addEventListener('click', () => {
              genModal.classList.remove('hidden');
+             const conceptInput = document.getElementById('app-concept');
+             const featuresInput = document.getElementById('app-features');
+             
+             // Pre-fill with project name and AI prompt if available
+             if (!conceptInput.value && window.ProjectConfig.projectName) {
+                 conceptInput.value = window.ProjectConfig.projectName;
+             }
+             if (!featuresInput.value && window.ProjectConfig.aiPrompt) {
+                 featuresInput.value = window.ProjectConfig.aiPrompt;
+             }
         });
 
         closeModalBtn.addEventListener('click', () => {
