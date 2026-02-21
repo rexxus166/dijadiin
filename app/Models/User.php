@@ -26,6 +26,7 @@ class User extends Authenticatable
         'status',
         'bio',
         'avatar',
+        'custom_avatars',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'custom_avatars' => 'array',
         ];
     }
 }
