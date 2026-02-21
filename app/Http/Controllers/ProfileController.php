@@ -18,12 +18,6 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role === 'admin') {
-            return view('admin.user.index', [
-                'user' => $user,
-            ]);
-        }
-
         return view('page.profile.index', [
             'user' => $user,
         ]);
