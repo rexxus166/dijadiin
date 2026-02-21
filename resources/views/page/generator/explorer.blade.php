@@ -114,6 +114,21 @@
         #code-highlight::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* Tabs styling */
+        #editor-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        #editor-tabs::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        #editor-tabs::-webkit-scrollbar-thumb {
+            background: #424242;
+        }
+        
+        /* Auto Save Toggle animation */
+        input:checked ~ .toggle-bg { background-color: #4ade80; }
+        input:checked ~ .toggle-dot { transform: translateX(100%); }
     </style>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -180,31 +195,40 @@
                 <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333]">
                     <!-- Editor Header / Tabs -->
                     <div
-                        class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] overflow-x-auto justify-between pr-4">
-                        <div
-                            class="flex-1 py-2 px-4 bg-[#1e1e1e] text-[#cccccc] border-t-2 border-indigo-500 flex justify-between items-center text-sm font-sans min-w-max cursor-default">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                    </path>
-                                </svg>
-                                <span id="active-file-name">No file selected</span>
-                                <input type="hidden" id="active-file-path" value="">
-                            </div>
-                            <button id="save-file-btn"
-                                class="hidden bg-indigo-600/50 hover:bg-indigo-500 text-white text-[11px] px-2 py-0.5 rounded transition-all"
-                                title="Save File (Ctrl+S)">Save (Ctrl+S)</button>
+                        class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
+                        <!-- Left: Scrollable Tabs -->
+                        <div id="editor-tabs"
+                            class="flex-1 flex overflow-x-auto bg-[#1a1a1a] border-b border-[#2d2d2d] select-none">
+                            <!-- Fallback empty state -->
+                            <div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>
                         </div>
 
-                        <!-- Diff Controls (Hidden by default) -->
-                        <div id="diff-controls" class="hidden flex gap-2">
-                            <button id="accept-diff"
-                                class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded">Accept
-                                Changes</button>
-                            <button id="reject-diff"
-                                class="text-xs bg-[#444] hover:bg-[#555] text-white px-3 py-1 rounded">Reject</button>
+                        <!-- Right: Auto Save & Controls -->
+                        <div class="flex items-center gap-3 shrink-0 ml-4 py-1.5">
+                            <label class="flex items-center cursor-pointer group" title="Auto Save edited files">
+                                <span class="text-xs text-gray-400 mr-2 group-hover:text-gray-300 transition-colors font-medium">Auto Save</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="auto-save-toggle" class="sr-only" checked>
+                                    <div class="w-8 h-4 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200"></div>
+                                    <div class="toggle-dot absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200"></div>
+                                </div>
+                            </label>
+                            
+                            <!-- Save status indicator -->
+                            <span id="save-status-msg" class="text-[10px] text-gray-500 w-16 text-right transition-opacity duration-300 opacity-0">Saved</span>
+                            
+                            <!-- Hidden info for Active file, kept for compatibility -->
+                            <span id="active-file-name" class="hidden"></span>
+                            <input type="hidden" id="active-file-path" value="">
+
+                            <!-- Diff Controls (Hidden by default) -->
+                            <div id="diff-controls" class="hidden flex gap-2">
+                                <button id="accept-diff"
+                                    class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded">Accept
+                                    Changes</button>
+                                <button id="reject-diff"
+                                    class="text-xs bg-[#444] hover:bg-[#555] text-white px-3 py-1 rounded">Reject</button>
+                            </div>
                         </div>
                     </div>
 
@@ -295,7 +319,15 @@
             const codeHighlight = document.getElementById('code-highlight-inner');
             const codeLoading = document.getElementById('code-loading');
             const activeFileName = document.getElementById('active-file-name');
+            const editorTabsContainer = document.getElementById('editor-tabs');
+            const autoSaveToggle = document.getElementById('auto-save-toggle');
+            const saveStatusMsg = document.getElementById('save-status-msg');
             let currentLanguage = 'plaintext';
+
+            // State management
+            let openFiles = []; // Array of {path, name, content}
+            let activeFilePath = null;
+            let autoSaveTimeout = null;
 
             // ===== Detect language from filename extension =====
             function detectLanguage(filename) {
@@ -339,9 +371,28 @@
                 document.getElementById('code-highlight').scrollLeft = codeViewer.scrollLeft;
             });
 
-            // ===== Re-highlight on input =====
+            // ===== Re-highlight & Auto Save on input =====
             codeViewer.addEventListener('input', () => {
                 updateHighlight(codeViewer.value, activeFileName.textContent);
+                
+                // Update current buffer
+                if (activeFilePath) {
+                    const fileObj = openFiles.find(f => f.path === activeFilePath);
+                    if (fileObj) {
+                        fileObj.content = codeViewer.value;
+                        
+                        // Tab dot un-saved indicator
+                        const tabEl = document.getElementById(`tab-${activeFilePath}`);
+                        if (tabEl) {
+                            tabEl.querySelector('.save-dot').classList.remove('opacity-0');
+                        }
+
+                        // Trigger auto save if enabled
+                        if (autoSaveToggle.checked) {
+                            scheduleAutoSave(activeFilePath);
+                        }
+                    }
+                }
             });
 
             if (!window.ProjectConfig.projectName) return;
@@ -408,11 +459,98 @@
                 return ul;
             }
 
-            function loadFile(path, name) {
-                codeLoading.style.display = 'flex';
-                activeFileName.textContent = name;
-                document.getElementById('active-file-path').value = path;
+            function renderTabs() {
+                editorTabsContainer.innerHTML = '';
+                if (openFiles.length === 0) {
+                    editorTabsContainer.innerHTML = `<div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>`;
+                    codeViewer.value = '';
+                    updateHighlight('', 'blank.txt');
+                    activeFilePath = null;
+                    document.getElementById('active-file-path').value = '';
+                    activeFileName.textContent = '';
+                    return;
+                }
 
+                openFiles.forEach(fileObj => {
+                    const isActive = fileObj.path === activeFilePath;
+                    const tab = document.createElement('div');
+                    tab.id = `tab-${fileObj.path}`;
+                    tab.className = `px-3 py-1.5 flex items-center gap-2 cursor-pointer border-t-2 transition-colors duration-150 min-w-max group
+                        ${isActive ? 'border-indigo-500 bg-[#1e1e1e] text-white' : 'border-transparent bg-[#141414] text-[#888] hover:bg-[#1a1a1a] hover:text-[#ccc]'}`;
+                    
+                    // Tab content inner HTML
+                    tab.innerHTML = `
+                        <svg class="w-3.5 h-3.5 ${isActive ? 'text-emerald-400' : 'text-gray-500'} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-[12px] truncate max-w-[150px]">${fileObj.name}</span>
+                        <div class="h-2 w-2 rounded-full bg-white opacity-0 transition-opacity save-dot shrink-0" title="Unsaved changes"></div>
+                        <button type="button" class="ml-1 text-gray-500 hover:text-red-400 hover:bg-gray-700/50 rounded p-0.5 shrink-0 close-tab-btn opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? 'opacity-100' : ''}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    `;
+
+                    // Select tab
+                    tab.addEventListener('click', (e) => {
+                        if (e.target.closest('.close-tab-btn')) return; // Ignore close clicks
+                        switchTab(fileObj.path);
+                    });
+
+                    // Close tab
+                    tab.querySelector('.close-tab-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeTab(fileObj.path);
+                    });
+
+                    editorTabsContainer.appendChild(tab);
+                });
+            }
+
+            function switchTab(path) {
+                // If switching away, could do something. But state is already saved on input.
+                activeFilePath = path;
+                const fileObj = openFiles.find(f => f.path === path);
+                
+                document.getElementById('active-file-path').value = path;
+                activeFileName.textContent = fileObj.name;
+                
+                codeViewer.value = fileObj.content;
+                updateHighlight(fileObj.content, fileObj.name);
+
+                renderTabs(); // visually update active tab
+            }
+
+            function closeTab(path) {
+                const idx = openFiles.findIndex(f => f.path === path);
+                if (idx === -1) return;
+
+                // Fire a final manual save before closing just in case
+                if (autoSaveToggle.checked) {
+                    saveFileContent(path, openFiles[idx].content);
+                }
+
+                openFiles.splice(idx, 1);
+
+                if (openFiles.length === 0) {
+                    activeFilePath = null;
+                } else if (activeFilePath === path) {
+                    // Closed active tab, switch to another
+                    const nextIdx = idx >= openFiles.length ? openFiles.length - 1 : idx;
+                    activeFilePath = openFiles[nextIdx].path;
+                }
+                
+                if (activeFilePath) switchTab(activeFilePath);
+                else renderTabs(); // triggers empty state
+            }
+
+            function loadFile(path, name) {
+                // Check if already open
+                if (openFiles.some(f => f.path === path)) {
+                    switchTab(path);
+                    return;
+                }
+
+                codeLoading.style.display = 'flex';
                 // Hide diff view if it was open
                 document.getElementById('diff-view-pane').classList.add('hidden');
                 document.getElementById('diff-controls').classList.add('hidden');
@@ -424,32 +562,50 @@
                     .then(data => {
                         codeLoading.style.display = 'none';
                         if (data.error) {
-                            codeViewer.value = `Error: ${data.error}`;
-                            updateHighlight(`Error: ${data.error}`, 'error.txt');
+                            alert(`Error: ${data.error}`);
                         } else {
-                            codeViewer.value = data.content;
-                            // ✨ Apply syntax highlighting
-                            updateHighlight(data.content, name);
-                            document.getElementById('save-file-btn').classList.remove('hidden');
+                            openFiles.push({
+                                path: path,
+                                name: name,
+                                content: data.content
+                            });
+                            switchTab(path);
                         }
                     })
                     .catch(() => {
                         codeLoading.style.display = 'none';
-                        codeViewer.value = `Error failed to fetch file`;
-                        updateHighlight(`Error failed to fetch file`, 'error.txt');
+                        alert(`Error failed to fetch file`);
                     });
             }
 
-            // Manual Save Functionality
-            const saveFileBtn = document.getElementById('save-file-btn');
+            function showSaveStatus(text, colorClass = 'text-gray-500') {
+                saveStatusMsg.textContent = text;
+                saveStatusMsg.className = `text-[10px] w-16 text-right transition-opacity duration-300 opacity-100 ${colorClass}`;
+                setTimeout(() => {
+                    saveStatusMsg.classList.remove('opacity-100');
+                    saveStatusMsg.classList.add('opacity-0');
+                }, 2000);
+            }
 
-            function saveActiveFile() {
-                const path = document.getElementById('active-file-path').value;
-                const currentContent = codeViewer.value;
+            function scheduleAutoSave(path) {
+                if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+                
+                // Set pending visually
+                saveStatusMsg.textContent = 'Saving...';
+                saveStatusMsg.className = "text-[10px] text-gray-400 w-16 text-right opacity-100";
+                
+                autoSaveTimeout = setTimeout(() => {
+                    const contentObj = openFiles.find(f => f.path === path);
+                    if (contentObj) {
+                        saveFileContent(path, contentObj.content, true);
+                    }
+                }, 1000);
+            }
+
+            function saveFileContent(path, content, isAuto = false) {
                 if (!path) return;
 
-                saveFileBtn.textContent = 'Saving...';
-                saveFileBtn.classList.add('opacity-50', 'pointer-events-none');
+                if (!isAuto) showSaveStatus('Saving...');
 
                 fetch(`/ai-builder/explorer/${window.ProjectConfig.projectName}/save-file`, {
                     method: 'PUT',
@@ -457,26 +613,34 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ path, content: currentContent })
+                    body: JSON.stringify({ path, content: content })
                 })
-                    .then(res => res.json())
-                    .then(data => {
-                        saveFileBtn.textContent = data.success ? 'Saved!' : 'Error';
-                        setTimeout(() => {
-                            saveFileBtn.textContent = 'Save (Ctrl+S)';
-                            saveFileBtn.classList.remove('opacity-50', 'pointer-events-none');
-                        }, 2000);
-                    });
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        showSaveStatus('Saved', 'text-emerald-400');
+                        // Remove dirty dot from tab
+                        const tabEl = document.getElementById(`tab-${path}`);
+                        if (tabEl) {
+                            const dot = tabEl.querySelector('.save-dot');
+                            if(dot) dot.classList.add('opacity-0');
+                        }
+                    } else {
+                        showSaveStatus('Error', 'text-red-400');
+                    }
+                })
+                .catch(() => showSaveStatus('Fail', 'text-red-400'));
             }
-
-            saveFileBtn.addEventListener('click', saveActiveFile);
 
             // Ctrl+S functionality
             document.addEventListener('keydown', function (e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                     e.preventDefault();
-                    if (!saveFileBtn.classList.contains('hidden')) {
-                        saveActiveFile();
+                    if (activeFilePath) {
+                        const contentObj = openFiles.find(f => f.path === activeFilePath);
+                        if (contentObj) {
+                            saveFileContent(activeFilePath, contentObj.content, false);
+                        }
                     }
                 }
             });
@@ -575,7 +739,16 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            codeViewer.value = newContent; // visually update master
+                            // visually update master
+                            if (activeFilePath === path) {
+                                codeViewer.value = newContent;
+                                updateHighlight(newContent, activeFileName.textContent);
+                            }
+                            
+                            // save in buffer
+                            const f = openFiles.find(file => file.path === path);
+                            if (f) f.content = newContent;
+
                             document.getElementById('diff-view-pane').classList.add('hidden');
                             document.getElementById('diff-controls').classList.add('hidden');
                             addChatMessage('bot', 'Changes accepted and saved securely.');
