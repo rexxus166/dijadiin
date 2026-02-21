@@ -119,16 +119,23 @@
         #editor-tabs::-webkit-scrollbar {
             height: 4px;
         }
+
         #editor-tabs::-webkit-scrollbar-track {
             background: #1e1e1e;
         }
+
         #editor-tabs::-webkit-scrollbar-thumb {
             background: #424242;
         }
-        
+
         /* Auto Save Toggle animation */
-        input:checked ~ .toggle-bg { background-color: #4ade80; }
-        input:checked ~ .toggle-dot { transform: translateX(100%); }
+        input:checked~.toggle-bg {
+            background-color: #4ade80;
+        }
+
+        input:checked~.toggle-dot {
+            transform: translateX(100%);
+        }
     </style>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -143,7 +150,9 @@
                 <button id="generate-project-btn"
                     class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm px-4 py-1.5 rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                        </path>
                     </svg>
                     Auto Generate App
                 </button>
@@ -203,29 +212,37 @@
                 <!-- MIDDLE PANE: Code Preview -->
                 <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333]">
                     <!-- Editor Header / Tabs -->
-                    <div
-                        class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
+                    <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
                         <!-- Left: Scrollable Tabs -->
                         <div id="editor-tabs"
                             class="flex-1 flex overflow-x-auto bg-[#1a1a1a] border-b border-[#2d2d2d] select-none">
                             <!-- Fallback empty state -->
-                            <div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>
+                            <div id="tab-empty-state"
+                                class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No
+                                file open</div>
                         </div>
 
                         <!-- Right: Auto Save & Controls -->
                         <div class="flex items-center gap-3 shrink-0 ml-4 py-1.5">
                             <label class="flex items-center cursor-pointer group" title="Auto Save edited files">
-                                <span class="text-xs text-gray-400 mr-2 group-hover:text-gray-300 transition-colors font-medium">Auto Save</span>
+                                <span
+                                    class="text-xs text-gray-400 mr-2 group-hover:text-gray-300 transition-colors font-medium">Auto
+                                    Save</span>
                                 <div class="relative">
                                     <input type="checkbox" id="auto-save-toggle" class="sr-only" checked>
-                                    <div class="w-8 h-4 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200"></div>
-                                    <div class="toggle-dot absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200"></div>
+                                    <div
+                                        class="w-8 h-4 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200">
+                                    </div>
+                                    <div
+                                        class="toggle-dot absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200">
+                                    </div>
                                 </div>
                             </label>
-                            
+
                             <!-- Save status indicator -->
-                            <span id="save-status-msg" class="text-[10px] text-gray-500 w-16 text-right transition-opacity duration-300 opacity-0">Saved</span>
-                            
+                            <span id="save-status-msg"
+                                class="text-[10px] text-gray-500 w-16 text-right transition-opacity duration-300 opacity-0">Saved</span>
+
                             <!-- Hidden info for Active file, kept for compatibility -->
                             <span id="active-file-name" class="hidden"></span>
                             <input type="hidden" id="active-file-path" value="">
@@ -327,7 +344,7 @@
             const sessionKey = 'dijadiin_gemini_triggered_' + window.ProjectConfig.projectName;
 
             if (window.ProjectConfig.aiPrompt && !sessionStorage.getItem(sessionKey)) {
-                document.getElementById('chat-input').value = 'Buatkan proposal pengembangan rancangan arsitektur dan timeline kerja di file README ini secara detail berdasarkan ide berikut:\n\n' + window.ProjectConfig.aiPrompt;
+                document.getElementById('chat-input').value = window.ProjectConfig.aiPrompt;
                 autoTriggerGemini = true;
                 sessionStorage.setItem(sessionKey, '1');
             }
@@ -392,13 +409,13 @@
             // ===== Re-highlight & Auto Save on input =====
             codeViewer.addEventListener('input', () => {
                 updateHighlight(codeViewer.value, activeFileName.textContent);
-                
+
                 // Update current buffer
                 if (activeFilePath) {
                     const fileObj = openFiles.find(f => f.path === activeFilePath);
                     if (fileObj) {
                         fileObj.content = codeViewer.value;
-                        
+
                         // Tab dot un-saved indicator
                         const tabEl = document.getElementById(`tab-${activeFilePath}`);
                         if (tabEl) {
@@ -508,7 +525,7 @@
                     tab.id = `tab-${fileObj.path}`;
                     tab.className = `px-3 py-1.5 flex items-center gap-2 cursor-pointer border-t-2 transition-colors duration-150 min-w-max group
                         ${isActive ? 'border-indigo-500 bg-[#1e1e1e] text-white' : 'border-transparent bg-[#141414] text-[#888] hover:bg-[#1a1a1a] hover:text-[#ccc]'}`;
-                    
+
                     // Tab content inner HTML
                     tab.innerHTML = `
                         <svg class="w-3.5 h-3.5 ${isActive ? 'text-emerald-400' : 'text-gray-500'} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -541,10 +558,10 @@
                 // If switching away, could do something. But state is already saved on input.
                 activeFilePath = path;
                 const fileObj = openFiles.find(f => f.path === path);
-                
+
                 document.getElementById('active-file-path').value = path;
                 activeFileName.textContent = fileObj.name;
-                
+
                 codeViewer.value = fileObj.content;
                 updateHighlight(fileObj.content, fileObj.name);
 
@@ -569,7 +586,7 @@
                     const nextIdx = idx >= openFiles.length ? openFiles.length - 1 : idx;
                     activeFilePath = openFiles[nextIdx].path;
                 }
-                
+
                 if (activeFilePath) switchTab(activeFilePath);
                 else renderTabs(); // triggers empty state
             }
@@ -630,11 +647,11 @@
 
             function scheduleAutoSave(path) {
                 if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
-                
+
                 // Set pending visually
                 saveStatusMsg.textContent = 'Saving...';
                 saveStatusMsg.className = "text-[10px] text-gray-400 w-16 text-right opacity-100";
-                
+
                 autoSaveTimeout = setTimeout(() => {
                     const contentObj = openFiles.find(f => f.path === path);
                     if (contentObj) {
@@ -656,21 +673,21 @@
                     },
                     body: JSON.stringify({ path, content: content })
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        showSaveStatus('Saved', 'text-emerald-400');
-                        // Remove dirty dot from tab
-                        const tabEl = document.getElementById(`tab-${path}`);
-                        if (tabEl) {
-                            const dot = tabEl.querySelector('.save-dot');
-                            if(dot) dot.classList.add('opacity-0');
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSaveStatus('Saved', 'text-emerald-400');
+                            // Remove dirty dot from tab
+                            const tabEl = document.getElementById(`tab-${path}`);
+                            if (tabEl) {
+                                const dot = tabEl.querySelector('.save-dot');
+                                if (dot) dot.classList.add('opacity-0');
+                            }
+                        } else {
+                            showSaveStatus('Error', 'text-red-400');
                         }
-                    } else {
-                        showSaveStatus('Error', 'text-red-400');
-                    }
-                })
-                .catch(() => showSaveStatus('Fail', 'text-red-400'));
+                    })
+                    .catch(() => showSaveStatus('Fail', 'text-red-400'));
             }
 
             // Ctrl+S functionality
@@ -785,7 +802,7 @@
                                 codeViewer.value = newContent;
                                 updateHighlight(newContent, activeFileName.textContent);
                             }
-                            
+
                             // save in buffer
                             const f = openFiles.find(file => file.path === path);
                             if (f) f.content = newContent;
@@ -811,39 +828,57 @@
     </script>
 
     <!-- Project Generation Modal -->
-    <div id="generate-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+    <div id="generate-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
         <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
             </button>
             <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                    </path>
+                </svg>
                 AI Project Architect
             </h3>
-            <p class="text-gray-400 text-sm mb-6">Ceritakan fitur apa saja yang ingin kamu buat. Gemini akan meng-generate file Migration, Controller, Views (Blade), dan Routes secara otomatis.</p>
-            
+            <p class="text-gray-400 text-sm mb-6">Ceritakan fitur apa saja yang ingin kamu buat. Gemini akan
+                meng-generate file Migration, Controller, Views (Blade), dan Routes secara otomatis.</p>
+
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Nama Aplikasi / Konsep</label>
-                    <input type="text" id="app-concept" class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Sistem Manajemen Gudang">
+                    <input type="text" id="app-concept"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="e.g. Sistem Manajemen Gudang">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Daftar Fitur Utama</label>
-                    <textarea id="app-features" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. 
+                    <textarea id="app-features" rows="4"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="e.g. 
 - CRUD Barang (Nama, Deskripsi, Harga, Stok)
 - CRUD Kategori (Nama)
 - Relasi Barang belongsTo Kategori"></textarea>
                 </div>
                 <div class="pt-2">
-                    <button id="start-generate-btn" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2">
+                    <button id="start-generate-btn"
+                        class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2">
                         <span>Mulai Generate File Setup</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
-            
+
             <!-- Generation Progress (Hidden initially) -->
-            <div id="generation-progress" class="hidden mt-6 bg-black/30 rounded-lg p-4 font-mono text-xs text-emerald-400 h-48 overflow-y-auto">
+            <div id="generation-progress"
+                class="hidden mt-6 bg-black/30 rounded-lg p-4 font-mono text-xs text-emerald-400 h-48 overflow-y-auto">
                 <div>> Architect engine initialized...</div>
             </div>
         </div>
@@ -851,8 +886,10 @@
 
     {{-- Prism.js core + autoloader (all languages) + line-numbers plugin --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script>
         // Set autoloader path so all language grammars are loaded on demand
         if (typeof Prism !== 'undefined' && Prism.plugins?.autoloader) {
@@ -868,28 +905,28 @@
         let genEventSource = null;
 
         openModalBtn.addEventListener('click', () => {
-             genModal.classList.remove('hidden');
+            genModal.classList.remove('hidden');
         });
 
         closeModalBtn.addEventListener('click', () => {
-             genModal.classList.add('hidden');
-             if (genEventSource) {
-                 genEventSource.close();
-             }
+            genModal.classList.add('hidden');
+            if (genEventSource) {
+                genEventSource.close();
+            }
         });
 
         function addLog(text, color = 'text-emerald-400') {
-             const div = document.createElement('div');
-             div.className = `mt-1 ${color}`;
-             div.textContent = `> ${text}`;
-             progressBox.appendChild(div);
-             progressBox.scrollTop = progressBox.scrollHeight;
+            const div = document.createElement('div');
+            div.className = `mt-1 ${color}`;
+            div.textContent = `> ${text}`;
+            progressBox.appendChild(div);
+            progressBox.scrollTop = progressBox.scrollHeight;
         }
 
         startGenBtn.addEventListener('click', () => {
             const concept = document.getElementById('app-concept').value.trim();
             const features = document.getElementById('app-features').value.trim();
-            
+
             if (!concept || !features) {
                 alert('Tolong isi nama aplikasi dan fitur-fiturnya!');
                 return;
@@ -899,7 +936,7 @@
             startGenBtn.disabled = true;
             startGenBtn.classList.add('opacity-50', 'cursor-not-allowed');
             startGenBtn.querySelector('span').textContent = 'Generating... Please Wait';
-            
+
             progressBox.classList.remove('hidden');
             progressBox.innerHTML = '';
             addLog(`Memulai AI Architect Pipeline untuk "${concept}"...`, 'text-blue-400 font-bold');
@@ -909,13 +946,13 @@
                 features: features,
                 project: window.ProjectConfig.projectName
             };
-            
+
             const queryParam = encodeURIComponent(JSON.stringify(payload));
             genEventSource = new EventSource(`{{ route('project.generator.auto-scaffold') }}?payload=${queryParam}`);
 
-            genEventSource.onmessage = function(event) {
+            genEventSource.onmessage = function (event) {
                 const data = JSON.parse(event.data);
-                
+
                 if (data.type === 'info') {
                     addLog(data.message, 'text-gray-300');
                 } else if (data.type === 'success') {
@@ -932,10 +969,10 @@
                 }
             };
 
-            genEventSource.onerror = function(err) {
-                 addLog(`[FATAL] Koneksi terputus dari server.`, 'text-red-500');
-                 genEventSource.close();
-                 resetBtnUI();
+            genEventSource.onerror = function (err) {
+                addLog(`[FATAL] Koneksi terputus dari server.`, 'text-red-500');
+                genEventSource.close();
+                resetBtnUI();
             };
         });
 
