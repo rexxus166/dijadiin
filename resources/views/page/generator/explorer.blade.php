@@ -156,6 +156,15 @@
                     </svg>
                     Auto Generate App
                 </button>
+                <a href="{{ route('project.explorer.download', ['project' => $projectName]) }}"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-1.5 rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                        </path>
+                    </svg>
+                    Download Project
+                </a>
                 <a href="{{ route('project.generator.index') }}"
                     class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,12 +351,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             let autoTriggerGenModal = false;
             const sessionKey = 'dijadiin_scaffold_triggered_' + window.ProjectConfig.projectName;
-
-            if (window.ProjectConfig.aiPrompt && !sessionStorage.getItem(sessionKey)) {
-                document.getElementById('chat-input').value = window.ProjectConfig.aiPrompt;
-                autoTriggerGemini = true;
-                sessionStorage.setItem(sessionKey, '1');
-            }
             const treeContainer = document.getElementById('file-tree-root');
             const treeLoading = document.getElementById('tree-loading');
             const codeViewer = document.getElementById('code-viewer');
@@ -737,12 +740,19 @@
                 diffControls.classList.remove('hidden');
             }
 
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatSendBtn.click();
+                }
+            });
+
             chatSendBtn.addEventListener('click', () => {
                 const prompt = chatInput.value.trim();
                 const path = document.getElementById('active-file-path').value;
                 const currentContent = codeViewer.value;
 
-                if (!prompt || !path) return;
+                if (!prompt) return;
 
                 addChatMessage('user', prompt);
                 chatInput.value = '';
@@ -755,64 +765,66 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ prompt, file_content: currentContent })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        loadMsg.remove();
-                        if (data.error) {
-                            addChatMessage('bot', `Error: ${data.error}`);
-                        } else {
-                            addChatMessage('bot', `I have proposed a change. Review the diff panel!`);
-                            setDiffMode(data.code);
-                        }
+                    body: JSON.stringify({
+                        prompt,
+                        file_content: currentContent,
+                        project: window.ProjectConfig.projectName
                     })
-                    .catch(() => {
-                        loadMsg.remove();
-                        addChatMessage('bot', `Communication failed.`);
-                    });
-            });
-
-            // Accept / Reject Handlers
-            document.getElementById('accept-diff').addEventListener('click', () => {
-                const path = document.getElementById('active-file-path').value;
-                const codeNode = document.getElementById('diff-viewer').querySelector('code');
-                const newContent = codeNode ? codeNode.textContent : '';
-
-                fetch(`/ai-builder/explorer/${window.ProjectConfig.projectName}/save-file`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ path, content: newContent })
                 })
-                    .then(res => res.json())
+                    .then(async res => {
+                        if (!res.ok && res.status !== 422 && res.status !== 500) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return res.json();
+                    })
                     .then(data => {
-                        if (data.success) {
-                            // visually update master
-                            if (activeFilePath === path) {
-                                codeViewer.value = newContent;
-                                updateHighlight(newContent, activeFileName.textContent);
+                        loadMsg.remove();
+                        if (data.errors) {
+                            let msgs = Object.values(data.errors).flat().join(' ');
+                            addChatMessage('bot', `Peringatan: ${msgs}`);
+                        } else if (data.error) {
+                            addChatMessage('bot', `Error: ${data.error}`);
+                        } else if (data.success && data.files) {
+                            addChatMessage('bot', `I have successfully applied the changes. ${data.message || ''}`);
+
+                            // Re-load the tree to pick up any newly generated files
+                            loadTree();
+
+                            // Update active editor buffers if affected
+                            let affectedActive = false;
+
+                            data.files.forEach(f => {
+                                // If this file is currently open in a tab, update the buffer
+                                const existingTab = openFiles.find(tabFile => tabFile.path === f.path);
+                                if (existingTab) {
+                                    existingTab.content = f.content;
+                                    // Remove unsaved dot since AI just saved it strictly to disk
+                                    const dot = document.getElementById(`tab-${f.path}`)?.querySelector('.save-dot');
+                                    if (dot) dot.classList.add('opacity-0');
+                                }
+
+                                // If it's the specific file currently in view
+                                if (activeFilePath === f.path) {
+                                    codeViewer.value = f.content;
+                                    updateHighlight(f.content, activeFileName.textContent);
+                                    affectedActive = true;
+                                }
+                            });
+
+                            // If they just created new files but weren't looking at them, we could optionally open the first one
+                            // Check if current file was one of the edited
+                            if (!affectedActive && data.files.length > 0) {
+                                // Just visual hint that files were saved
                             }
 
-                            // save in buffer
-                            const f = openFiles.find(file => file.path === path);
-                            if (f) f.content = newContent;
-
-                            document.getElementById('diff-view-pane').classList.add('hidden');
-                            document.getElementById('diff-controls').classList.add('hidden');
-                            addChatMessage('bot', 'Changes accepted and saved securely.');
                         } else {
-                            addChatMessage('bot', 'Failed to save changes.');
+                            addChatMessage('bot', `I couldn't process the files correctly. Please try again!`);
                         }
+                    })
+                    .catch((err) => {
+                        loadMsg.remove();
+                        addChatMessage('bot', `Communication failed: ${err.message || 'Unknown error'}`);
                     });
-            });
-
-            document.getElementById('reject-diff').addEventListener('click', () => {
-                document.getElementById('diff-view-pane').classList.add('hidden');
-                document.getElementById('diff-controls').classList.add('hidden');
-                addChatMessage('bot', 'Changes rejected.');
             });
 
             // Initial load
@@ -846,16 +858,16 @@
                     <label class="block text-sm font-medium text-gray-300 mb-1">Nama Aplikasi / Konsep</label>
                     <input type="text" id="app-concept"
                         class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        placeholder="e.g. Sistem Manajemen Gudang">
+                        placeholder="e.g. Sistem Manajemen Gudang" value="{{ $projectDescription ?? '' }}">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Daftar Fitur Utama</label>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Daftar Fitur Utama (AI Prompt)</label>
                     <textarea id="app-features" rows="4"
                         class="w-full bg-gray-800 border border-gray-700 rounded-lg text-white px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                         placeholder="e.g. 
 - CRUD Barang (Nama, Deskripsi, Harga, Stok)
 - CRUD Kategori (Nama)
-- Relasi Barang belongsTo Kategori"></textarea>
+- Relasi Barang belongsTo Kategori">{{ $aiPrompt ?? '' }}</textarea>
                 </div>
                 <div class="pt-2">
                     <button id="start-generate-btn"

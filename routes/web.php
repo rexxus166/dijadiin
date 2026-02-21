@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectExplorerController;
 use App\Http\Controllers\ProjectStreamController;
 use App\Http\Controllers\GeminiChatController;
 use App\Http\Controllers\AutoScaffoldController;
+use App\Http\Controllers\ApiKeyController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -148,10 +149,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/ai-builder/explorer/{project}/tree', [ProjectExplorerController::class, 'tree'])->name('project.explorer.tree');
     Route::get('/ai-builder/explorer/{project}/file', [ProjectExplorerController::class, 'file'])->name('project.explorer.file');
     Route::put('/ai-builder/explorer/{project}/save-file', [ProjectExplorerController::class, 'saveFile'])->name('project.explorer.saveFile');
+    Route::get('/ai-builder/explorer/{project}/download', [ProjectExplorerController::class, 'download'])->name('project.explorer.download');
     Route::get('/ai-builder/auto-scaffold', [AutoScaffoldController::class, 'stream'])->name('project.generator.auto-scaffold');
 
     // Gemini Chat API
     Route::post('/ai-builder/chat', [GeminiChatController::class, 'chat'])->name('gemini.chat');
+
+    // API Keys CRUD
+    Route::get('/ai-builder/api-keys', [ApiKeyController::class, 'index'])->name('api-keys.index');
+    Route::post('/ai-builder/api-keys', [ApiKeyController::class, 'store'])->name('api-keys.store');
+    Route::put('/ai-builder/api-keys/{apiKey}', [ApiKeyController::class, 'update'])->name('api-keys.update');
+    Route::delete('/ai-builder/api-keys/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api-keys.destroy');
+    Route::post('/ai-builder/api-keys/{apiKey}/activate', [ApiKeyController::class, 'setActive'])->name('api-keys.activate');
 
 
 

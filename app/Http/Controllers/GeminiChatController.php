@@ -3,62 +3,103 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Services\GeminiService;
 
 class GeminiChatController extends Controller
 {
     public function chat(Request $request)
     {
         $request->validate([
-            'prompt' => 'required|string',
-            'file_content' => 'required|string',
+            'prompt'       => 'required|string',
+            'file_content' => 'nullable|string',
+            'project'      => 'required|string',
         ]);
 
-        $apiKey = env('GEMINI_API_KEY');
+        $prompt      = $request->input('prompt');
+        $fileContent = $request->input('file_content', '');
+        $project     = $request->input('project');
 
-        if (empty($apiKey)) {
-            return response()->json(['error' => 'GEMINI_API_KEY is not configured in the host environment.'], 500);
+        $basePath    = storage_path('app/generated_projects/' . Auth::id());
+        $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $project);
+
+        if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {
+            return response()->json(['error' => 'Invalid project path.'], 403);
         }
 
-        $prompt = $request->input('prompt');
-        $fileContent = $request->input('file_content');
+        // Fetch original AI blueprint for context
+        $genProjectInfo  = \App\Models\GeneratedProject::where('name', $project)->first();
+        $originalContext = $genProjectInfo ? $genProjectInfo->ai_prompt : '';
+        $contextString   = $originalContext ? "Master Project Blueprint/Context from User: {$originalContext}\n" : '';
 
-        $systemInstruction = "You are an expert AI software engineer. The user will provide their current file content and a request to modify it. You must return ONLY the raw modified code for the entire file. Do not wrap it in markdown codeblocks (like ```php). Do not add any conversational text. Return exactly the string that should replace the file content.";
+        $systemInstruction = <<<PROMPT
+You are an expert Senior Laravel Architect AI. The user will provide a prompt and optionally their currently opened file. 
+You are fully capable of modifying the current file or creating/modifying multiple files (like CRUD, Auth, Controllers, Models, etc.) across the project.
+You MUST respond IN STRICT JSON FORMAT ONLY. Do not use markdown blocks like ```json.
+{$contextString}
+The JSON must follow this precise schema:
+{
+  "message": "A friendly short message describing what you did.",
+  "files": [
+    {
+      "path": "app/Http/Controllers/ExampleController.php",
+      "content": "<?php\\n\\nnamespace App\\\\Http\\\\Controllers;\\n..."
+    }
+  ]
+}
+If the user's request pertains to the opened file, ensure 'path' is the same relative path.
+For multiple files, provide each in the 'files' array. Remember this is a fresh Laravel 10 project using Tailwind.
+PROMPT;
 
-        $fullPrompt = "{$systemInstruction}\n\nCURRENT FILE CONTENT:\n{$fileContent}\n\nUSER REQUEST: {$prompt}";
+        $userPrompt = "CURRENT OPENED FILE:\n{$fileContent}\n\nUSER REQUEST: {$prompt}";
 
-        try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $fullPrompt]
-                        ]
-                    ]
-                ]
-            ]);
+        // --- Call Gemini with automatic failover ---
+        $result = GeminiService::call(Auth::id(), $systemInstruction, $userPrompt, 60);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $generatedCode = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        if (!$result['success']) {
+            return response()->json(['error' => $result['error']], 500);
+        }
 
-                // Clean up any stray markdown blocks if the model ignored our instructions
-                $generatedCode = preg_replace('/^```[a-z]*\n/i', '', $generatedCode);
-                $generatedCode = preg_replace('/```$/', '', $generatedCode);
-                // Also clean trailing/leading newlines that might be leftovers from stripping ticks, but be careful not to strip valid code newlines. Let's just trim markdown ticks.
-                $generatedCode = preg_replace('/^```.*\n/', '', $generatedCode);
+        $rawText  = $result['text'];
+        $keyUsed  = $result['key_used'];
 
-                return response()->json(['code' => trim($generatedCode, "`\n\r")]);
+        // Extract JSON block (robust against conversational noise)
+        $jsonStart = strpos($rawText, '{');
+        $jsonEnd   = strrpos($rawText, '}');
+
+        if ($jsonStart !== false && $jsonEnd !== false && $jsonEnd >= $jsonStart) {
+            $possibleJson = substr($rawText, $jsonStart, $jsonEnd - $jsonStart + 1);
+            $jsonResponse = json_decode($possibleJson, true);
+        } else {
+            $jsonResponse = json_decode($rawText, true);
+        }
+
+        if (json_last_error() !== JSON_ERROR_NONE || !isset($jsonResponse['files'])) {
+            Log::error("Gemini JSON Parse Error [{$keyUsed}]. Raw: " . $rawText);
+            return response()->json([
+                'error'     => 'The AI returned an invalid response format. Please try again.',
+                'debug_raw' => $rawText,
+            ], 500);
+        }
+
+        // Write all files immediately to disk
+        foreach ($jsonResponse['files'] as $fileObj) {
+            $filePath = ltrim(str_replace(['../', '..\\'], '', $fileObj['path']), '/\\');
+            $absPath  = $projectPath . DIRECTORY_SEPARATOR . $filePath;
+            $dir      = dirname($absPath);
+
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
             }
 
-            Log::error('Gemini API Error: ' . $response->body());
-            return response()->json(['error' => 'Failed to reach Gemini API. Please try again.'], 500);
-        } catch (\Exception $e) {
-            Log::error('Gemini Exception: ' . $e->getMessage());
-            return response()->json(['error' => 'An error occurred connecting to the AI.'], 500);
+            file_put_contents($absPath, $fileObj['content']);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => $jsonResponse['message'] ?? 'Actions executed successfully.',
+            'files'   => $jsonResponse['files'],
+        ]);
     }
 }

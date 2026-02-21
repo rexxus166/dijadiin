@@ -21,8 +21,7 @@ class ProjectGeneratorController extends Controller
     {
         $data = $request->validated();
 
-        $userName = \Illuminate\Support\Str::slug(\Illuminate\Support\Facades\Auth::user()->name);
-        $basePath = storage_path('app/generated_projects/' . $userName);
+        $basePath    = storage_path('app/generated_projects/' . Auth::id());
         $projectName = $data['project_name'];
 
         // 1. Scaffold the project

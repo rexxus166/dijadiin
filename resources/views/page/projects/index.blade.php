@@ -23,6 +23,15 @@
                         class="pl-9 pr-4 py-2 bg-[#161b22] border border-[#30363d] text-sm text-gray-300 placeholder-gray-600 rounded-lg focus:outline-none focus:border-blue-500 w-52 transition-colors">
                 </div>
 
+                {{-- API Keys Link --}}
+                <a href="{{ route('api-keys.index') }}"
+                    class="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm rounded-lg hover:bg-yellow-500/20 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    API Keys
+                </a>
+
                 {{-- Sort --}}
                 <button
                     class="flex items-center gap-2 px-4 py-2 bg-[#161b22] border border-[#30363d] text-gray-400 text-sm rounded-lg hover:border-gray-500 transition-colors">
@@ -151,16 +160,16 @@
                         </a>
 
                         <div class="flex items-center gap-2 w-full">
-                            <button type="button" disabled
-                                class="flex-1 flex items-center justify-center gap-2 bg-[#21262d] border border-[#30363d] text-gray-500 cursor-not-allowed text-xs font-semibold py-2.5 px-3 rounded-xl">
+                            <a href="{{ route('project.explorer.download', ['project' => $project->name]) }}"
+                                class="flex-1 flex items-center justify-center gap-2 bg-[#21262d] hover:bg-[#30363d] hover:text-white border border-[#30363d] text-gray-400 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
                                 </svg>
-                                Download ZIP (Soon)
-                            </button>
+                                Download ZIP
+                            </a>
 
                             <form action="{{ route('projects.destroy', $project) }}" method="POST"
                                 onsubmit="return confirm('Hapus proyek \'{{ addslashes($project->name) }}\'?')"

@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Services\GeminiService;
 
 class AutoScaffoldController extends Controller
 {
@@ -25,20 +26,15 @@ class AutoScaffoldController extends Controller
             return response()->json(['error' => 'No active project found'], 400);
         }
 
-        $userName = \Illuminate\Support\Str::slug(\Illuminate\Support\Facades\Auth::user()->name);
-        $basePath = storage_path('app/generated_projects/' . $userName);
+        $userId      = Auth::id();
+        $basePath    = storage_path('app/generated_projects/' . $userId);
         $projectPath = realpath($basePath . DIRECTORY_SEPARATOR . $projectName);
 
         if (!$projectPath || !str_starts_with($projectPath, realpath($basePath))) {
             return response()->json(['error' => 'Invalid project path'], 403);
         }
 
-        $apiKey = env('GEMINI_API_KEY');
-        if (empty($apiKey)) {
-            return response()->json(['error' => 'GEMINI_API_KEY is missing'], 500);
-        }
-
-        $response = new StreamedResponse(function () use ($projectName, $projectPath, $concept, $features, $apiKey) {
+        $response = new StreamedResponse(function () use ($projectName, $projectPath, $concept, $features, $userId) {
             set_time_limit(0);
             while (ob_get_level() > 0) {
                 ob_end_flush();
@@ -72,7 +68,7 @@ PROMPT;
 
             $userPromptPlan = "Concept: {$concept}\nFeatures: {$features}\nGenerate the JSON plan based on these requirements.";
 
-            $planJson = $this->callGemini($apiKey, $systemPromptPlan, $userPromptPlan);
+            $planJson = GeminiService::callRaw($userId, $systemPromptPlan, $userPromptPlan, 120);
             if (!$planJson) {
                 $sendStatus("Gagal mendapatkan respon (Plan) dari AI.", 'error');
                 return;
@@ -109,7 +105,7 @@ PROMPT;
 
                 $userPromptFile = "{$fileContextStr}\n\nPlease generate ONLY the raw code content for this file:\nPath: {$filePath}\nType: {$fileObj['type']}";
 
-                $code = $this->callGemini($apiKey, $systemPromptFile, $userPromptFile);
+                $code = GeminiService::callRaw($userId, $systemPromptFile, $userPromptFile, 120);
                 if (!$code) {
                     $sendStatus("Gagal generate kode untuk {$filePath}.", 'error');
                     continue;
@@ -146,44 +142,5 @@ PROMPT;
         $response->headers->set('Connection', 'keep-alive');
 
         return $response;
-    }
-
-    private function callGemini(string $apiKey, string $systemPrompt, string $userPrompt): ?string
-    {
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}";
-        try {
-            $response = Http::timeout(120)->post($url, [
-                'system_instruction' => [
-                    'parts' => [
-                        ['text' => $systemPrompt]
-                    ]
-                ],
-                'contents' => [
-                    [
-                        'role' => 'user',
-                        'parts' => [
-                            ['text' => $userPrompt]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.2, // low temp for code logic consistency
-                ]
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-                // strip markdown if AI leaked them
-                $content = preg_replace('/^```[a-z]*\s*/i', '', trim($content));
-                $content = preg_replace('/\s*```$/i', '', $content);
-                return trim($content);
-            }
-            Log::error('Gemini API Error Autoscaffold: ' . $response->body());
-            return null;
-        } catch (\Exception $e) {
-            Log::error('Gemini API Exception Autoscaffold: ' . $e->getMessage());
-            return null;
-        }
     }
 }
