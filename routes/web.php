@@ -15,7 +15,28 @@ Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
     return view('page.dashboard.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+use App\Http\Controllers\ProjectGeneratorController;
+use App\Http\Controllers\ProjectExplorerController;
+use App\Http\Controllers\ProjectStreamController;
+use App\Http\Controllers\GeminiChatController;
+
 Route::middleware('auth')->group(function () {
+    // AI Builder Project Generator Routes
+    Route::get('/ai-builder', [ProjectGeneratorController::class, 'index'])->name('project.generator.index');
+    Route::post('/ai-builder/generate', [ProjectGeneratorController::class, 'store'])->name('project.generator.store');
+    Route::get('/ai-builder/stream', [ProjectStreamController::class, 'stream'])->name('project.generator.stream');
+
+    // Web File Explorer Routes
+    Route::get('/ai-builder/explorer/{project}', [ProjectExplorerController::class, 'index'])->name('project.explorer.index');
+    Route::get('/ai-builder/explorer/{project}/tree', [ProjectExplorerController::class, 'tree'])->name('project.explorer.tree');
+    Route::get('/ai-builder/explorer/{project}/file', [ProjectExplorerController::class, 'file'])->name('project.explorer.file');
+    Route::put('/ai-builder/explorer/{project}/save-file', [ProjectExplorerController::class, 'saveFile'])->name('project.explorer.saveFile');
+
+    // Gemini Chat API
+    Route::post('/ai-builder/chat', [GeminiChatController::class, 'chat'])->name('gemini.chat');
+
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
