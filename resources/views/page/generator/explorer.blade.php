@@ -588,10 +588,12 @@
                             updateHighlight(`Error: ${data.error}`, 'error.txt');
                             autoTriggerGemini = false;
                         } else {
-                            codeViewer.value = data.content;
-                            // ✨ Apply syntax highlighting
-                            updateHighlight(data.content, name);
-                            document.getElementById('save-file-btn').classList.remove('hidden');
+                            openFiles.push({
+                                path: path,
+                                name: name,
+                                content: data.content
+                            });
+                            switchTab(path);
 
                             if (autoTriggerGemini) {
                                 autoTriggerGemini = false;
@@ -601,7 +603,8 @@
                             }
                         }
                     })
-                    .catch(() => {
+                    .catch((err) => {
+                        console.error(err);
                         codeLoading.style.display = 'none';
                         alert(`Error failed to fetch file`);
                     });
