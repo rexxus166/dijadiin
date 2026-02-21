@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectGeneratorController;
 use App\Http\Controllers\ProjectExplorerController;
 use App\Http\Controllers\ProjectStreamController;
 use App\Http\Controllers\GeminiChatController;
+use App\Http\Controllers\AutoScaffoldController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/ai-builder/explorer/{project}/tree', [ProjectExplorerController::class, 'tree'])->name('project.explorer.tree');
     Route::get('/ai-builder/explorer/{project}/file', [ProjectExplorerController::class, 'file'])->name('project.explorer.file');
     Route::put('/ai-builder/explorer/{project}/save-file', [ProjectExplorerController::class, 'saveFile'])->name('project.explorer.saveFile');
+    Route::get('/ai-builder/auto-scaffold', [AutoScaffoldController::class, 'stream'])->name('project.generator.auto-scaffold');
 
     // Gemini Chat API
     Route::post('/ai-builder/chat', [GeminiChatController::class, 'chat'])->name('gemini.chat');
