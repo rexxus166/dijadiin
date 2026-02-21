@@ -41,10 +41,10 @@
                     x-transition:leave-end="opacity-0" class="whitespace-nowrap">Dashboard</span>
             </a>
 
-            {{-- User Management (coming soon) --}}
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 cursor-not-allowed select-none"
-                :title="!sidebarOpen ? 'User Management (Soon)' : ''">
+            {{-- User Management --}}
+            <a href="{{ route('admin.users.index') }}"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.users.index') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-500 hover:bg-[#161b22] hover:text-gray-300' }}"
+                :title="!sidebarOpen ? 'User Management' : ''">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="shrink-0">
@@ -58,7 +58,6 @@
                     x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0" class="whitespace-nowrap flex items-center gap-2">
                     User Management
-                    <span class="text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span>
                 </span>
             </a>
 
@@ -291,10 +290,9 @@
                 @if (Auth::user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}"
                         class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-400 hover:bg-[#161b22]' }}">Dashboard</a>
-                    <a href="#"
-                        class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 cursor-not-allowed flex items-center justify-between">User
-                        Management <span
-                            class="text-[10px] bg-[#21262d] text-gray-600 px-1.5 py-0.5 rounded-md">Soon</span></a>
+                    <a href="{{ route('admin.users.index') }}"
+                        class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.users.index') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-400 hover:bg-[#161b22]' }}">User
+                        Management</a>
                     <a href="#"
                         class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 cursor-not-allowed flex items-center justify-between">AI
                         Logs <span
