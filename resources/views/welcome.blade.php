@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DIJADIIN - Ubah Ide Jadi Aplikasi Laravel dalam Detik</title>
+    <title>Di-Jadiin - Tim Poliwindra | Ubah Ide Jadi Aplikasi Laravel dalam Detik</title>
     <meta name="description" content="Bangun aplikasi Laravel 12 yang siap pakai dengan mendeskripsikan gagasan Anda. Tanpa boilerplate, langsung jadi coding.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
