@@ -193,23 +193,25 @@
                 x-transition:leave-end="opacity-0" class="whitespace-nowrap">Settings</span>
         </a>
 
-        {{-- Divider --}}
-        <div class="pt-2 mt-2 border-t border-[#21262d]">
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-400 transition-colors"
-                :title="!sidebarOpen ? 'Documentation' : ''">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" class="shrink-0">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                </svg>
-                <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="whitespace-nowrap">Documentation</span>
-            </a>
-        </div>
+        @if (auth()->user()->role !== 'admin')
+            {{-- Divider --}}
+            <div class="pt-2 mt-2 border-t border-[#21262d]">
+                <a href="{{ route('documentation.index') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('documentation.index') ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' : 'text-gray-600 hover:bg-[#161b22] hover:text-gray-400' }}"
+                    :title="!sidebarOpen ? 'Documentation' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="shrink-0">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>
+                    <span x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200 delay-100"
+                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition-opacity duration-100" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0" class="whitespace-nowrap">Documentation</span>
+                </a>
+            </div>
+        @endif
 
     </nav>
 

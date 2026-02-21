@@ -155,6 +155,13 @@ Route::middleware('auth')->group(function () {
 
 
 
+    Route::get('/documentation', function () {
+        if (request()->user()->role === 'admin') {
+            return redirect()->route('dashboard');
+        }
+        return view('page.documentation.index');
+    })->name('documentation.index');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
