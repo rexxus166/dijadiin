@@ -2,23 +2,30 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProjectGeneratorController;
+use App\Http\Controllers\ProjectExplorerController;
+use App\Http\Controllers\ProjectStreamController;
+use App\Http\Controllers\GeminiChatController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+Route::get('/projects', function (\Illuminate\Http\Request $request) {
     if ($request->user()->role === 'admin') {
-        return view('admin.dashboard.index');
+        return redirect()->route('admin.dashboard');
     }
 
-    return view('page.dashboard.index');
+    return view('page.projects.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-use App\Http\Controllers\ProjectGeneratorController;
-use App\Http\Controllers\ProjectExplorerController;
-use App\Http\Controllers\ProjectStreamController;
-use App\Http\Controllers\GeminiChatController;
+Route::get('/admin/dashboard', function (\Illuminate\Http\Request $request) {
+    if ($request->user()->role !== 'admin') {
+        return redirect()->route('dashboard');
+    }
+
+    return view('admin.dashboard.index');
+})->middleware(['auth', 'verified'])->name('admin.dashboard');
 
 Route::middleware('auth')->group(function () {
     // AI Builder Project Generator Routes
@@ -40,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
 });
 
 require __DIR__ . '/auth.php';

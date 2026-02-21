@@ -17,15 +17,15 @@ class DatabaseSeeder extends Seeder
     {
         // Admin User
         User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'name' => 'Admin Refactory',
+            'email' => 'admin@gmail.com',
             'role' => 'admin',
         ]);
 
         // Regular User
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'user@jadiin.com',
+            'name' => 'Refactory',
+            'email' => 'refactory@gmail.com',
             'role' => 'user',
         ]);
     }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
             $table->text('bio')->nullable();
             $table->string('avatar')->nullable();
+            $table->json('custom_avatars')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -45,9 +45,6 @@ class ProjectStreamController extends Controller
                 $status = $scaffoldService->generateWithStream($projectName, $basePath, function ($type, $buffer) use ($sendStatus) {
                     // Send stdout/stderr from composer immediately to frontend
                     $sendStatus($buffer, 'log');
-
-                    // Also log to storage/logs/laravel.log so we can trace it in real-time
-                    Log::channel('single')->info("Composer Chunk: " . trim($buffer));
                 });
 
                 if (!$status['success']) {

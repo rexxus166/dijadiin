@@ -41,10 +41,13 @@
                 <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333]">
                     <!-- Editor Header / Tabs -->
                     <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] overflow-x-auto justify-between pr-4">
-                        <div class="py-2 px-4 bg-[#1e1e1e] text-[#cccccc] border-t-2 border-indigo-500 flex items-center gap-2 text-sm font-sans min-w-max cursor-default">
-                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span id="active-file-name">welcome.blade.php</span>
-                            <input type="hidden" id="active-file-path" value="">
+                        <div class="flex-1 py-2 px-4 bg-[#1e1e1e] text-[#cccccc] border-t-2 border-indigo-500 flex justify-between items-center text-sm font-sans min-w-max cursor-default">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span id="active-file-name">No file selected</span>
+                                <input type="hidden" id="active-file-path" value="">
+                            </div>
+                            <button id="save-file-btn" class="hidden bg-indigo-600/50 hover:bg-indigo-500 text-white text-[11px] px-2 py-0.5 rounded transition-all" title="Save File (Ctrl+S)">Save (Ctrl+S)</button>
                         </div>
 
                         <!-- Diff Controls (Hidden by default) -->
@@ -56,9 +59,9 @@
 
                     <!-- Editor Content Container -->
                     <div class="flex-1 relative overflow-hidden flex" id="editor-container">
-                        <!-- Original View -->
+                        <!-- Original View Edit Panel -->
                         <div class="flex-1 h-full relative" id="original-view-pane">
-                            <pre class="w-full h-full p-6 m-0 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-sm overflow-auto focus:outline-none" id="code-viewer"><code><!-- Content injected here -->Select a file from the explorer to preview contents.</code></pre>
+                            <textarea class="w-full h-full p-6 m-0 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-sm overflow-auto focus:outline-none resize-none leading-relaxed" id="code-viewer" spellcheck="false" placeholder="Select a file from the explorer to preview/edit contents."></textarea>
                         </div>
 
                         <!-- Diff View (Modified) Hidden -->
@@ -197,20 +200,69 @@
                     .then(data => {
                         codeLoading.style.display = 'none';
                         if(data.error) {
-                            codeViewer.innerHTML = `<span style="color:red">Error: ${data.error}</span>`;
+                            codeViewer.value = `Error: ${data.error}`;
                         } else {
-                            // Using textContent to automatically escape HTML sequences for display inside <pre>
-                            const codeBlock = document.createElement('code');
-                            codeBlock.textContent = data.content;
-                            codeViewer.innerHTML = '';
-                            codeViewer.appendChild(codeBlock);
+                            codeViewer.value = data.content;
+                            document.getElementById('save-file-btn').classList.remove('hidden');
                         }
                     })
                     .catch(() => {
                         codeLoading.style.display = 'none';
-                        codeViewer.innerHTML = `<span style="color:red">Error failed to fetch file bounds</span>`;
+                        codeViewer.value = `Error failed to fetch file bounds`;
                     });
             }
+
+            // Manual Save Functionality
+            const saveFileBtn = document.getElementById('save-file-btn');
+            
+            function saveActiveFile() {
+                const path = document.getElementById('active-file-path').value;
+                const currentContent = codeViewer.value;
+                if (!path) return;
+
+                saveFileBtn.textContent = 'Saving...';
+                saveFileBtn.classList.add('opacity-50', 'pointer-events-none');
+
+                fetch(`/ai-builder/explorer/${window.ProjectConfig.projectName}/save-file`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ path, content: currentContent })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    saveFileBtn.textContent = data.success ? 'Saved!' : 'Error';
+                    setTimeout(() => {
+                        saveFileBtn.textContent = 'Save (Ctrl+S)';
+                        saveFileBtn.classList.remove('opacity-50', 'pointer-events-none');
+                    }, 2000);
+                });
+            }
+
+            saveFileBtn.addEventListener('click', saveActiveFile);
+
+            // Ctrl+S functionality
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (!saveFileBtn.classList.contains('hidden')) {
+                        saveActiveFile();
+                    }
+                }
+            });
+
+            // Prevent Tab key from leaving the textarea natively, and indent instead
+            codeViewer.addEventListener('keydown', function(e) {
+                if (e.key == 'Tab') {
+                    e.preventDefault();
+                    var start = this.selectionStart;
+                    var end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 1;
+                }
+            });
 
             document.getElementById('refresh-tree').addEventListener('click', loadTree);
             
@@ -245,9 +297,9 @@
             chatSendBtn.addEventListener('click', () => {
                 const prompt = chatInput.value.trim();
                 const path = document.getElementById('active-file-path').value;
-                const currentContent = codeViewer.textContent;
+                const currentContent = codeViewer.value;
 
-                if (!prompt || !path || currentContent.includes('Select a file')) return;
+                if (!prompt || !path) return;
 
                 addChatMessage('user', prompt);
                 chatInput.value = '';
@@ -295,7 +347,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.success) {
-                        codeViewer.textContent = newContent; // visually update master
+                        codeViewer.value = newContent; // visually update master
                         document.getElementById('diff-view-pane').classList.add('hidden');
                         document.getElementById('diff-controls').classList.add('hidden');
                         addChatMessage('bot', 'Changes accepted and saved securely.');

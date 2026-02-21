@@ -16,8 +16,16 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
+        $user = $request->user();
+
+        if ($user->role === 'admin') {
+            return view('admin.user.index', [
+                'user' => $user,
+            ]);
+        }
+
+        return view('page.profile.index', [
+            'user' => $user,
         ]);
     }
 
@@ -26,15 +34,61 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        if ($request->hasFile('avatar_file')) {
+            $path = $request->file('avatar_file')->store('avatars', 'public');
+            $fullPath = 'storage/' . $path;
+
+            $customAvatars = is_array($user->custom_avatars) ? $user->custom_avatars : [];
+            if (!in_array($fullPath, $customAvatars)) {
+                array_unshift($customAvatars, $fullPath);
+                $user->custom_avatars = array_slice($customAvatars, 0, 10);
+            }
+
+            $user->avatar = $fullPath;
+        } elseif ($request->filled('avatar_path')) {
+            $user->avatar = $request->avatar_path;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Delete a custom avatar from user's list.
+     */
+    public function destroyAvatar(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $pathToDelete = $request->input('avatar_path');
+
+        $customAvatars = is_array($user->custom_avatars) ? $user->custom_avatars : [];
+
+        if (($key = array_search($pathToDelete, $customAvatars)) !== false) {
+            unset($customAvatars[$key]);
+            $user->custom_avatars = array_values($customAvatars);
+
+            if ($user->avatar === $pathToDelete) {
+                // Determine fallback: previously selected custom avatar or default
+                $user->avatar = count($user->custom_avatars) > 0 ? $user->custom_avatars[0] : 'assets/avatar/avatar-1.png';
+            }
+
+            $user->save();
+
+            if (str_starts_with($pathToDelete, 'storage/')) {
+                $relativePath = substr($pathToDelete, 8);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath);
+            }
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'avatar-deleted');
     }
 
     /**
