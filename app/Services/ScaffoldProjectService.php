@@ -41,7 +41,7 @@ class ScaffoldProjectService
             'create-project',
             'laravel/laravel',
             $projectName
-        ]);
+        ], null, ['HOME' => '/tmp', 'COMPOSER_HOME' => '/tmp/composer'] + $_ENV);
 
         $process->setWorkingDirectory($basePath);
 
@@ -134,6 +134,10 @@ class ScaffoldProjectService
             $env['SystemRoot'] = $env['SystemRoot'] ?? 'C:\\Windows';
             $env['SystemDrive'] = $env['SystemDrive'] ?? 'C:';
             $env['COMPOSER_HOME'] = $env['COMPOSER_HOME'] ?? $env['APPDATA'] . '\\Composer';
+        } else {
+            // Fallbacks for Linux/Docker environments where www-data might lack HOME
+            $env['HOME'] = $env['HOME'] ?? '/tmp';
+            $env['COMPOSER_HOME'] = $env['COMPOSER_HOME'] ?? '/tmp/composer';
         }
 
         $process = new Process($processArgs, null, $env);

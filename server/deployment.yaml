@@ -42,7 +42,7 @@ spec:
         - containerPort: 80
         env:
         - name: APP_NAME
-          value: "dijadiin"
+          value: "DiJadiin - Tim Poliwindra"
         - name: APP_ENV
           value: "production"
         - name: APP_KEY
@@ -63,6 +63,10 @@ spec:
           value: "poliwindra"
         - name: DB_PASSWORD
           value: "x2519-_w6ZtV*>dPzKSC4XDn0-0u(#iH"
+        - name: GEMINI_API_KEY
+          value: "sk-IT5ilRNOckB-toa1C7G_RA"
+        - name: GEMINI_BASE_URL
+          value: "https://litellm.koboi2026.biz.id/v1"
 ---
 apiVersion: v1
 kind: Service
@@ -82,7 +86,14 @@ kind: Ingress
 metadata:
   name: dijadiin-ingress
   namespace: poliwindra
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  tls:
+  - hosts:
+    - poliwindra.hackathon.sev-2.com
+    secretName: dijadiin-tls
   rules:
   - host: poliwindra.hackathon.sev-2.com
     http:

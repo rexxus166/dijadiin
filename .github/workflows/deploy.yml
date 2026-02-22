@@ -33,29 +33,34 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    # Build dengan DUA tag sekaligus: :latest dan :<git-sha>
+    # Tag SHA memastikan setiap deploy punya image unik → Kubernetes otomatis restart pod
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
         context: .
         push: true
-        tags: ${{ env.IMAGE_NAME }}:latest
+        tags: |
+          ${{ env.IMAGE_NAME }}:latest
+          ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
       with:
         version: 'v1.28.0'
 
-    # Kita menggunakan Kubeconfig yang ada di repositori sebagai secret!
-    # Tambahkan tulisan id dari kubeconfig.yaml milik tim mu ke menu Secrets -> Actions -> 'KUBECONFIG'
-    - name: Set Kubernetes Context
-      uses: azure/k8s-set-context@v3
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG }}
-
-    # Terapkan perubahan dan ganti image placeholder pakai image yang barusan di build
+    # Delete dulu semua resource lama, lalu buat ulang
     - name: Deploy to Kubernetes
       run: |
-        sed -i 's|<username-dockerhub>/dijadiin:latest|${{ env.IMAGE_NAME }}:latest|g' server/deployment.yaml
-        kubectl apply -f server/deployment.yaml
-        kubectl rollout restart deployment/dijadiin-app -n poliwindra
+        SHA_IMAGE="${{ env.IMAGE_NAME }}:${{ github.sha }}"
+        sed -i "s|<username-dockerhub>/dijadiin:latest|${SHA_IMAGE}|g" server/deployment.yaml
+        # Hapus resource sample dari panitia yang konflik dengan ingress kita
+        kubectl --kubeconfig=server/kubeconfig.yaml delete deployment test-web -n poliwindra --ignore-not-found
+        kubectl --kubeconfig=server/kubeconfig.yaml delete service test-web-service -n poliwindra --ignore-not-found
+        kubectl --kubeconfig=server/kubeconfig.yaml delete ingress test-web-ingress -n poliwindra --ignore-not-found
+        # Hapus resource dijadiin lama
+        kubectl --kubeconfig=server/kubeconfig.yaml delete deployment dijadiin-app -n poliwindra --ignore-not-found
+        kubectl --kubeconfig=server/kubeconfig.yaml delete service dijadiin-service -n poliwindra --ignore-not-found
+        kubectl --kubeconfig=server/kubeconfig.yaml delete ingress dijadiin-ingress -n poliwindra --ignore-not-found
+        # Buat ulang semua dari file
+        kubectl --kubeconfig=server/kubeconfig.yaml create -f server/deployment.yaml

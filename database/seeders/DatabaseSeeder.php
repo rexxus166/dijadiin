@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,17 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin User
-        User::factory()->create([
-            'name' => 'Admin Refactory',
+        // Admin User - pakai create() langsung, tidak butuh Faker
+        User::create([
+            'name' => 'Admin Poliwindra',
             'email' => 'admin@gmail.com',
+            'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
 
         // Regular User
-        User::factory()->create([
-            'name' => 'Refactory',
+        User::create([
+            'name' => 'Poliwindra',
             'email' => 'refactory@gmail.com',
+            'password' => Hash::make('password'),
             'role' => 'user',
         ]);
     }
