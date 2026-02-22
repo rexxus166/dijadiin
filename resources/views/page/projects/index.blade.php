@@ -276,6 +276,40 @@
 
     </div>
 
+
+    <!-- MVP Warning Modal -->
+    <div id="preview-warning-modal"
+        class="fixed inset-0 z-[10000] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 opacity-0 px-4">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
+            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 p-6 flex flex-col items-center justify-center border-b border-indigo-100 dark:border-indigo-800/60 relative">
+                <div class="absolute top-3 right-3">
+                    <button id="close-warning-btn" type="button" class="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 p-1.5 rounded-full text-gray-500 dark:text-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center mb-3 border border-indigo-100 dark:border-indigo-500/30">
+                    <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center">Informasi Fitur Preview</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-[14px] text-gray-600 dark:text-gray-300 leading-relaxed text-center mb-6">
+                    Fitur <strong>Preview Web</strong> belum didukung untuk versi MVP saat ini.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="cancel-preview-btn" type="button" class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors text-sm text-center">
+                        Kembali
+                    </button>
+                    <button id="continue-preview-btn" type="button" class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-md shadow-indigo-500/30 transition-all active:scale-95 text-sm text-center">
+                        Tetap Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Preview Web Modal -->
     <div id="preview-modal" class="fixed inset-0 z-[10000] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none transition-opacity duration-300 opacity-0">
         <div class="bg-gray-100 dark:bg-gray-800 w-[95%] max-w-[1400px] h-[90vh] rounded-xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden transform scale-95 transition-transform duration-300">
@@ -335,25 +369,54 @@
         
         let activePreviewProject = null;
 
-        document.querySelectorAll('.preview-project-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const project = btn.dataset.project;
-                activePreviewProject = project;
+        // Warning Modal Logic
+        const warningModal = document.getElementById('preview-warning-modal');
+        const closeWarningBtn = document.getElementById('close-warning-btn');
+        const cancelPreviewBtn = document.getElementById('cancel-preview-btn');
+        const continuePreviewBtn = document.getElementById('continue-preview-btn');
+        let pendingPreviewProject = null;
 
-                previewModal.classList.remove('hidden');
+        function hideWarningModal() {
+            warningModal.classList.add('opacity-0');
+            warningModal.firstElementChild.classList.remove('scale-100');
+            warningModal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { warningModal.classList.add('hidden'); }, 300);
+        }
+
+        closeWarningBtn?.addEventListener('click', hideWarningModal);
+        cancelPreviewBtn?.addEventListener('click', hideWarningModal);
+
+        document.querySelectorAll('.preview-project-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                pendingPreviewProject = btn.dataset.project;
+                warningModal.classList.remove('hidden');
                 setTimeout(() => {
-                    previewModal.classList.remove('pointer-events-none', 'opacity-0');
-                    previewModal.firstElementChild.classList.remove('scale-95');
-                    previewModal.firstElementChild.classList.add('scale-100');
+                    warningModal.classList.remove('opacity-0');
+                    warningModal.firstElementChild.classList.remove('scale-95');
+                    warningModal.firstElementChild.classList.add('scale-100');
                 }, 10);
-                
-                previewIframe.src = 'about:blank';
-                previewIframe.classList.add('opacity-0');
-                previewLoading.classList.remove('opacity-0', 'pointer-events-none');
-                previewOpenNewBtn.classList.add('hidden');
-                previewUrlText.textContent = "Starting server and preparing project...";
-                previewLoadingText.textContent = "Starting PHP Server and compiling assets...";
+            });
+        });
+
+        continuePreviewBtn?.addEventListener('click', async () => {
+            hideWarningModal();
+            const project = pendingPreviewProject;
+            activePreviewProject = project;
+
+            previewModal.classList.remove('hidden');
+            setTimeout(() => {
+                previewModal.classList.remove('pointer-events-none', 'opacity-0');
+                previewModal.firstElementChild.classList.remove('scale-95');
+                previewModal.firstElementChild.classList.add('scale-100');
+            }, 10);
+            
+            previewIframe.src = 'about:blank';
+            previewIframe.classList.add('opacity-0');
+            previewLoading.classList.remove('opacity-0', 'pointer-events-none');
+            previewOpenNewBtn.classList.add('hidden');
+            previewUrlText.textContent = "Starting server and preparing project...";
+            previewLoadingText.textContent = "Starting PHP Server and compiling assets...";
 
                 try {
                     const csrfToken = '{{ csrf_token() }}';
@@ -397,8 +460,7 @@
                     console.error(err);
                     alert('Gagal request preview.');
                     stopAndClosePreview();
-                }
-            });
+            }
         });
 
         async function stopAndClosePreview() {
