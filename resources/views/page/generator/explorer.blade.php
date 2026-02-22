@@ -1,5 +1,17 @@
 <x-app-layout>
     <style>
+        /* Chat History Scrollbar Hidden */
+        #chat-history::-webkit-scrollbar {
+            display: none;
+        }
+
+        #chat-history {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
         /* Tabs styling */
         #editor-tabs::-webkit-scrollbar {
             height: 4px;
@@ -18,13 +30,16 @@
             width: 6px;
             height: 6px;
         }
+
         .explorer-scroll::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .explorer-scroll::-webkit-scrollbar-thumb {
             background: rgba(156, 163, 175, 0.3);
             border-radius: 4px;
         }
+
         .explorer-scroll::-webkit-scrollbar-thumb:hover {
             background: rgba(156, 163, 175, 0.6);
         }
@@ -279,33 +294,73 @@
 
                 <!-- LEFT PANE: Directory Tree -->
                 <div id="explorer-left-pane"
-                    class="w-full md:w-[260px] bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden shrink-0 transition-colors relative z-10" style="min-width: 150px; max-width: 50vw;">
+                    class="w-full md:w-[260px] bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden shrink-0 transition-colors relative z-10"
+                    style="min-width: 150px; max-width: 50vw;">
                     <div class="px-4 py-2 flex justify-between items-center bg-gray-50 dark:bg-gray-900 shrink-0">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Explorer</span>
+                        <span
+                            class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Explorer</span>
                         <button class="text-gray-400 hover:text-indigo-400 transition-colors" title="More Actions">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                            </svg>
                         </button>
                     </div>
-                    
+
                     <div class="px-2 pb-1 bg-gray-50 dark:bg-gray-900 shrink-0">
-                        <div class="flex justify-between items-center group cursor-default text-gray-600 dark:text-gray-300 font-bold text-[13px] rounded hover:bg-black/5 dark:hover:bg-white/5 pr-1 transition-colors">
+                        <div
+                            class="flex justify-between items-center group cursor-default text-gray-600 dark:text-gray-300 font-bold text-[13px] rounded hover:bg-black/5 dark:hover:bg-white/5 pr-1 transition-colors">
                             <div class="flex items-center gap-1 overflow-hidden select-none py-1 pl-1">
-                                 <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                 <span class="truncate uppercase tracking-wider text-[11px] text-gray-500 dark:text-gray-400" title="{{ $projectName ?? 'Project' }}">{{ $projectName ?? 'Project' }}</span>
+                                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                                <span
+                                    class="truncate uppercase tracking-wider text-[11px] text-gray-500 dark:text-gray-400"
+                                    title="{{ $projectName ?? 'Project' }}">{{ $projectName ?? 'Project' }}</span>
                             </div>
                             <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                 <button type="button" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="New File..." onclick="alert('Feature coming soon!')">
-                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                 </button>
-                                 <button type="button" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="New Folder..." onclick="alert('Feature coming soon!')">
-                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 13h6m-3-3v6m4-9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h7a2 2 0 012 2z"></path></svg>
-                                 </button>
-                                 <button type="button" id="refresh-tree" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="Refresh Explorer">
-                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                 </button>
-                                 <button type="button" id="collapse-tree" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="Collapse Folders in Explorer">
-                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
-                                 </button>
+                                <button type="button"
+                                    class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer"
+                                    title="New File..." onclick="alert('Feature coming soon!')">
+                                    <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                            d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button type="button"
+                                    class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer"
+                                    title="New Folder..." onclick="alert('Feature coming soon!')">
+                                    <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                            d="M9 13h6m-3-3v6m4-9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h7a2 2 0 012 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button type="button" id="refresh-tree"
+                                    class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer"
+                                    title="Refresh Explorer">
+                                    <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button type="button" id="collapse-tree"
+                                    class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer"
+                                    title="Collapse Folders in Explorer">
+                                    <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
+                                        </path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -315,8 +370,8 @@
                         <div class="flex items-center justify-center h-20 text-indigo-500" id="tree-loading">
                             <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4"></circle>
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                 </path>
@@ -331,12 +386,15 @@
                 </div>
 
                 <!-- RESIZER HANDLER FOR LEFT PANE -->
-                <div id="explorer-resizer" class="hidden md:block w-1.5 hover:w-2 cursor-col-resize bg-transparent hover:bg-indigo-500 transition-all opacity-0 hover:opacity-100 z-20 shrink-0 select-none" style="margin-left: -3px; margin-right: -3px;" title="Drag to Resize"></div>
+                <div id="explorer-resizer"
+                    class="hidden md:block w-1.5 hover:w-2 cursor-col-resize bg-transparent hover:bg-indigo-500 transition-all opacity-0 hover:opacity-100 z-20 shrink-0 select-none"
+                    style="margin-left: -3px; margin-right: -3px;" title="Drag to Resize"></div>
 
                 <!-- MIDDLE PANE: Code Preview -->
                 <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333] min-w-0">
                     <!-- Editor Header / Tabs -->
-                    <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
+                    <div
+                        class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
                         <!-- Left: Scrollable Tabs -->
                         <div class="flex-1 flex overflow-hidden bg-[#1a1a1a] border-b border-[#2d2d2d]">
                             <button id="toggle-left-pane"
@@ -350,21 +408,30 @@
                             <div id="editor-tabs" class="flex-1 flex overflow-x-auto select-none">
                                 <!-- Fallback empty state -->
                                 <div id="tab-empty-state"
-                                    class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No
+                                    class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">
+                                    No
                                     file open</div>
                             </div>
                         </div>
 
                         <!-- Right: Auto Save & Controls -->
                         <div class="flex items-center gap-2 shrink-0 ml-3 py-1.5 overflow-hidden">
-                            <label class="flex items-center cursor-pointer group" title="Auto Save edited files (Cloud Sync)">
-                                <svg class="w-3.5 h-3.5 text-gray-500 mr-1.5 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                            <label class="flex items-center cursor-pointer group"
+                                title="Auto Save edited files (Cloud Sync)">
+                                <svg class="w-3.5 h-3.5 text-gray-500 mr-1.5 group-hover:text-emerald-400 transition-colors"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                    </path>
                                 </svg>
                                 <div class="relative">
                                     <input type="checkbox" id="auto-save-toggle" class="sr-only" checked>
-                                    <div class="w-7 h-3.5 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200"></div>
-                                    <div class="toggle-dot absolute w-3.5 h-3.5 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200"></div>
+                                    <div
+                                        class="w-7 h-3.5 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200">
+                                    </div>
+                                    <div
+                                        class="toggle-dot absolute w-3.5 h-3.5 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200">
+                                    </div>
                                 </div>
                             </label>
 
@@ -430,8 +497,7 @@
                             id="diff-view-pane">
                             <div class="absolute top-0 right-0 p-1 text-xs text-yellow-500 bg-[#333] rounded-bl">Gemini
                                 Suggestion</div>
-                            <pre class="w-full h-full p-6 m-0 text-emerald-400 font-mono text-sm overflow-auto"
-                                id="diff-viewer"><code></code></pre>
+                            <pre class="w-full h-full p-6 m-0 text-emerald-400 font-mono text-sm overflow-auto" id="diff-viewer"><code></code></pre>
                         </div>
 
                         <!-- Loading Code Overlay -->
@@ -460,14 +526,15 @@
                     <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4" id="chat-history">
                         <!-- Welcome MSG -->
                         <div
-                            class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
-                            Halo! Saya Asisten AI Anda 👋. Pilih file di kolom Explorer sebelah kiri, lalu beri tahu saya bagian mana yang ingin Anda ubah atau tambahkan.
+                            class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-sm text-white shadow-sm border border-gray-200 dark:border-gray-700">
+                            Halo! Saya Asisten AI Anda 👋. Pilih file di kolom Explorer sebelah kiri, lalu beri tahu
+                            saya bagian mana yang ingin Anda ubah atau tambahkan.
                         </div>
                     </div>
 
                     <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                         <textarea id="chat-input" rows="3"
-                            class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm p-3 resize-none"
+                            class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm p-3 resize-none"
                             placeholder="e.g. Turn this layout into a grid with 3 columns..."></textarea>
                         <button id="chat-send"
                             class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all">
@@ -495,7 +562,8 @@
                 <div
                     class="flex items-center gap-2 pt-1 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 justify-between">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2 pb-1">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -579,14 +647,20 @@
         let monacoEditor;
 
         document.addEventListener('DOMContentLoaded', () => {
-            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
-            require(['vs/editor/editor.main'], function () {
+            require.config({
+                paths: {
+                    'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs'
+                }
+            });
+            require(['vs/editor/editor.main'], function() {
                 monacoEditor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
                     value: "Select a file from the explorer...",
                     language: "plaintext",
                     theme: "vs-dark",
                     automaticLayout: true,
-                    minimap: { enabled: false },
+                    minimap: {
+                        enabled: false
+                    },
                     fontSize: 13,
                     wordWrap: "off",
                     readOnly: true,
@@ -595,22 +669,25 @@
                 });
 
                 // Set default blade formatting to use HTML syntax checking
-                monaco.languages.register({ id: 'blade' });
+                monaco.languages.register({
+                    id: 'blade'
+                });
 
                 const uri = monaco.Uri.parse('a://b/blade.html');
                 monaco.editor.createModel('', 'html', uri); // trigger worker load
 
                 // Set HTML formatting/validation options to tolerate curly braces
                 setTimeout(() => {
-                    monaco.languages.html && monaco.languages.html.htmlDefaults && monaco.languages.html.htmlDefaults.setOptions({
-                        format: {
-                            templating: true,
-                            unformatted: 'template, a, span, img, code, pre, sub, sup, em, strong, b, i, u, strike, s, del, wbr'
-                        },
-                        suggest: {
-                            html5: true
-                        }
-                    });
+                    monaco.languages.html && monaco.languages.html.htmlDefaults && monaco.languages
+                        .html.htmlDefaults.setOptions({
+                            format: {
+                                templating: true,
+                                unformatted: 'template, a, span, img, code, pre, sub, sup, em, strong, b, i, u, strike, s, del, wbr'
+                            },
+                            suggest: {
+                                html5: true
+                            }
+                        });
                 }, 1000);
 
                 initializeApp();
@@ -626,7 +703,7 @@
             const activeFileName = document.getElementById('active-file-name');
             const editorTabsContainer = document.getElementById('editor-tabs');
             const autoSaveToggle = document.getElementById('auto-save-toggle');
-            
+
             // Persist Auto-Save state using localStorage
             const savedAutoSave = localStorage.getItem('dijadiin_auto_save_state');
             if (savedAutoSave !== null) {
@@ -685,7 +762,8 @@
 
             function showFsHeader() {
                 if (!fsAppHeader) return;
-                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document
+                    .mozFullScreenElement);
                 if (!isFs) return; // Jangan jalankan jika bukan fullscreen
 
                 fsAppHeader.style.transform = 'translateY(0)';
@@ -696,7 +774,8 @@
 
             function hideFsHeader() {
                 if (!fsAppHeader) return;
-                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+                const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document
+                    .mozFullScreenElement);
                 if (!isFs) return; // Jangan jalankan jika bukan fullscreen
 
                 fsAppHeader.style.transform = 'translateY(-110%)';
@@ -710,8 +789,8 @@
 
                 // Elemen layout yang perlu di-adjust
                 const explorerRoot = document.getElementById('explorer-root');
-                const innerWrap = explorerRoot?.firstElementChild;          // max-w-8xl div
-                const editorPanel = innerWrap?.firstElementChild;             // the card flex row
+                const innerWrap = explorerRoot?.firstElementChild; // max-w-8xl div
+                const editorPanel = innerWrap?.firstElementChild; // the card flex row
 
                 if (isFs) {
                     // ── Header: position fixed, siap untuk slide ke atas ──
@@ -808,13 +887,14 @@
 
             ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(ev => {
                 document.addEventListener(ev, () => {
-                    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+                    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement ||
+                        document.mozFullScreenElement);
                     updateFsUI(isFs);
                     applyFullscreenHeader(isFs);
                 });
             });
 
-            document.addEventListener('keydown', function (e) {
+            document.addEventListener('keydown', function(e) {
                 if (e.key === 'F11') {
                     e.preventDefault();
                     !!document.fullscreenElement ? exitFullscreen() : enterFullscreen();
@@ -845,7 +925,7 @@
             toggleRightBtn?.addEventListener('click', toggleRightSidebar);
 
             // Shortcuts (Ctrl+B / Cmd+B and Ctrl+J / Cmd+J)
-            document.addEventListener('keydown', function (e) {
+            document.addEventListener('keydown', function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
                     e.preventDefault();
                     toggleLeftSidebar();
@@ -869,17 +949,17 @@
 
                 document.addEventListener('mousemove', function(e) {
                     if (!isResizing) return;
-                    
+
                     // Root flex container that holds both panes
                     const container = leftPane.parentElement;
                     const containerRect = container.getBoundingClientRect();
-                    
+
                     let newWidth = e.clientX - containerRect.left;
-                    
+
                     // Min & Max constraints
                     if (newWidth < 150) newWidth = 150;
                     if (newWidth > window.innerWidth * 0.5) newWidth = window.innerWidth * 0.5;
-                    
+
                     leftPane.style.width = newWidth + 'px';
                 });
 
@@ -896,49 +976,49 @@
             function getFolderIcon(name) {
                 const n = name.toLowerCase();
                 const colors = {
-                    'app': ['#60a5fa', '#3b82f6'],  // blue
-                    'controllers': ['#818cf8', '#6366f1'],  // indigo
-                    'models': ['#4ade80', '#22c55e'],  // green
-                    'views': ['#f472b6', '#ec4899'],  // pink
-                    'routes': ['#fb923c', '#f97316'],  // orange
-                    'database': ['#a78bfa', '#8b5cf6'],  // purple
-                    'migrations': ['#c084fc', '#a855f7'],  // violet
-                    'seeders': ['#86efac', '#4ade80'],  // light green
-                    'public': ['#67e8f9', '#22d3ee'],  // cyan
-                    'storage': ['#fcd34d', '#f59e0b'],  // amber
-                    'resources': ['#f9a8d4', '#f472b6'],  // rose
-                    'config': ['#94a3b8', '#64748b'],  // slate
-                    'lang': ['#fde68a', '#fbbf24'],  // yellow
-                    'tests': ['#6ee7b7', '#34d399'],  // emerald
-                    'bootstrap': ['#fca5a1', '#f87171'],  // red
-                    'vendor': ['#9ca3af', '#6b7280'],  // gray
-                    'node_modules': ['#6b7280', '#4b5563'],  // dark gray
-                    'js': ['#fde68a', '#f59e0b'],  // yellow
-                    'css': ['#93c5fd', '#3b82f6'],  // blue
-                    'images': ['#86efac', '#22c55e'],  // green
-                    'http': ['#fb923c', '#f97316'],  // orange
-                    'middleware': ['#c4b5fd', '#a78bfa'],  // purple
-                    'requests': ['#fda4af', '#fb7185'],  // rose
-                    'services': ['#67e8f9', '#06b6d4'],  // cyan
-                    'providers': ['#a5b4fc', '#818cf8'],  // indigo
-                    'console': ['#6ee7b7', '#10b981'],  // emerald
-                    'exceptions': ['#fca5a1', '#ef4444'],  // red
-                    'mail': ['#fde68a', '#f59e0b'],  // yellow
-                    'events': ['#c084fc', '#9333ea'],  // purple
-                    'listeners': ['#86efac', '#16a34a'],  // green
-                    'jobs': ['#fb923c', '#ea580c'],  // orange
-                    'factories': ['#a78bfa', '#7c3aed'],  // violet
-                    'policies': ['#fda4af', '#e11d48'],  // rose
-                    'helpers': ['#7dd3fc', '#0284c7'],  // light blue
-                    'traits': ['#bfdbfe', '#2563eb'],  // blue
-                    'interfaces': ['#d9f99d', '#65a30d'],  // lime
-                    'components': ['#fed7aa', '#f97316'],  // orange
-                    'layouts': ['#fce7f3', '#db2777'],  // pink
-                    'partials': ['#e9d5ff', '#7c3aed'],  // purple
-                    'pages': ['#cffafe', '#0891b2'],  // cyan
-                    'page': ['#cffafe', '#0891b2'],  // cyan
-                    'api': ['#dcfce7', '#16a34a'],  // green
-                    'auth': ['#fee2e2', '#dc2626'],  // red
+                    'app': ['#60a5fa', '#3b82f6'], // blue
+                    'controllers': ['#818cf8', '#6366f1'], // indigo
+                    'models': ['#4ade80', '#22c55e'], // green
+                    'views': ['#f472b6', '#ec4899'], // pink
+                    'routes': ['#fb923c', '#f97316'], // orange
+                    'database': ['#a78bfa', '#8b5cf6'], // purple
+                    'migrations': ['#c084fc', '#a855f7'], // violet
+                    'seeders': ['#86efac', '#4ade80'], // light green
+                    'public': ['#67e8f9', '#22d3ee'], // cyan
+                    'storage': ['#fcd34d', '#f59e0b'], // amber
+                    'resources': ['#f9a8d4', '#f472b6'], // rose
+                    'config': ['#94a3b8', '#64748b'], // slate
+                    'lang': ['#fde68a', '#fbbf24'], // yellow
+                    'tests': ['#6ee7b7', '#34d399'], // emerald
+                    'bootstrap': ['#fca5a1', '#f87171'], // red
+                    'vendor': ['#9ca3af', '#6b7280'], // gray
+                    'node_modules': ['#6b7280', '#4b5563'], // dark gray
+                    'js': ['#fde68a', '#f59e0b'], // yellow
+                    'css': ['#93c5fd', '#3b82f6'], // blue
+                    'images': ['#86efac', '#22c55e'], // green
+                    'http': ['#fb923c', '#f97316'], // orange
+                    'middleware': ['#c4b5fd', '#a78bfa'], // purple
+                    'requests': ['#fda4af', '#fb7185'], // rose
+                    'services': ['#67e8f9', '#06b6d4'], // cyan
+                    'providers': ['#a5b4fc', '#818cf8'], // indigo
+                    'console': ['#6ee7b7', '#10b981'], // emerald
+                    'exceptions': ['#fca5a1', '#ef4444'], // red
+                    'mail': ['#fde68a', '#f59e0b'], // yellow
+                    'events': ['#c084fc', '#9333ea'], // purple
+                    'listeners': ['#86efac', '#16a34a'], // green
+                    'jobs': ['#fb923c', '#ea580c'], // orange
+                    'factories': ['#a78bfa', '#7c3aed'], // violet
+                    'policies': ['#fda4af', '#e11d48'], // rose
+                    'helpers': ['#7dd3fc', '#0284c7'], // light blue
+                    'traits': ['#bfdbfe', '#2563eb'], // blue
+                    'interfaces': ['#d9f99d', '#65a30d'], // lime
+                    'components': ['#fed7aa', '#f97316'], // orange
+                    'layouts': ['#fce7f3', '#db2777'], // pink
+                    'partials': ['#e9d5ff', '#7c3aed'], // purple
+                    'pages': ['#cffafe', '#0891b2'], // cyan
+                    'page': ['#cffafe', '#0891b2'], // cyan
+                    'api': ['#dcfce7', '#16a34a'], // green
+                    'auth': ['#fee2e2', '#dc2626'], // red
                 };
                 const [topColor, botColor] = colors[n] || ['#6b7280', '#4b5563'];
                 return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
@@ -998,7 +1078,8 @@
                     'txt': `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#6b7280"/><text x="3" y="22" font-size="10" fill="white" font-family="monospace" font-weight="bold">TXT</text></svg>`,
                 };
 
-                return icons[ext] || `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#374151"/><text x="5" y="22" font-size="11" fill="#9ca3af" font-family="monospace">\u2609</text></svg>`;
+                return icons[ext] ||
+                    `<svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="32" height="32" rx="4" fill="#374151"/><text x="5" y="22" font-size="11" fill="#9ca3af" font-family="monospace">\u2609</text></svg>`;
             }
 
 
@@ -1018,7 +1099,8 @@
                             if (lintErrors[path].length > 0) {
                                 treeEl.classList.add('has-lint-error');
                                 const badge = treeEl.querySelector('.lint-badge');
-                                if (badge) badge.textContent = lintErrors[path].length > 9 ? '!' : lintErrors[path].length;
+                                if (badge) badge.textContent = lintErrors[path].length > 9 ? '!' : lintErrors[path]
+                                    .length;
                             } else {
                                 treeEl.classList.remove('has-lint-error');
                                 const badge = treeEl.querySelector('.lint-badge');
@@ -1034,7 +1116,7 @@
                             }
                         }
                     })
-                    .catch(() => { }); // silent fail
+                    .catch(() => {}); // silent fail
             }
 
             function renderLintPanel(path) {
@@ -1076,18 +1158,34 @@
             function detectLanguage(filename) {
                 const ext = filename.split('.').pop().toLowerCase();
                 const map = {
-                    'php': 'php', 'blade.php': 'html',
-                    'js': 'javascript', 'mjs': 'javascript', 'cjs': 'javascript',
+                    'php': 'php',
+                    'blade.php': 'html',
+                    'js': 'javascript',
+                    'mjs': 'javascript',
+                    'cjs': 'javascript',
                     'ts': 'typescript',
-                    'json': 'json', 'jsonc': 'json',
-                    'css': 'css', 'scss': 'scss', 'sass': 'scss',
-                    'html': 'html', 'htm': 'html', 'xml': 'xml', 'svg': 'xml',
-                    'md': 'markdown', 'markdown': 'markdown',
-                    'sh': 'shell', 'bash': 'shell', 'zsh': 'shell',
+                    'json': 'json',
+                    'jsonc': 'json',
+                    'css': 'css',
+                    'scss': 'scss',
+                    'sass': 'scss',
+                    'html': 'html',
+                    'htm': 'html',
+                    'xml': 'xml',
+                    'svg': 'xml',
+                    'md': 'markdown',
+                    'markdown': 'markdown',
+                    'sh': 'shell',
+                    'bash': 'shell',
+                    'zsh': 'shell',
                     'sql': 'sql',
-                    'yaml': 'yaml', 'yml': 'yaml',
-                    'env': 'shell', 'gitignore': 'shell',
-                    'vue': 'html', 'jsx': 'javascript', 'tsx': 'typescript',
+                    'yaml': 'yaml',
+                    'yml': 'yaml',
+                    'env': 'shell',
+                    'gitignore': 'shell',
+                    'vue': 'html',
+                    'jsx': 'javascript',
+                    'tsx': 'typescript',
                 };
                 if (filename.endsWith('.blade.php')) return 'html';
                 return map[ext] || 'plaintext';
@@ -1095,6 +1193,7 @@
 
             // ===== Update Monaco text =====
             let isApplyingModelContent = false;
+
             function updateHighlight(code, filename) {
                 const lang = detectLanguage(filename || 'file.php');
                 currentLanguage = lang;
@@ -1110,7 +1209,9 @@
                     monaco.editor.setModelLanguage(monacoEditor.getModel(), lang);
                 }
 
-                monacoEditor.updateOptions({ readOnly: false });
+                monacoEditor.updateOptions({
+                    readOnly: false
+                });
                 isApplyingModelContent = false;
             }
 
@@ -1155,7 +1256,8 @@
                     .then(data => {
                         treeLoading.style.display = 'none';
                         if (data.error) {
-                            treeContainer.innerHTML = `<li class="text-red-500 bg-red-100 p-2 rounded">${data.error}</li>`;
+                            treeContainer.innerHTML =
+                                `<li class="text-red-500 bg-red-100 p-2 rounded">${data.error}</li>`;
                             return;
                         }
                         treeContainer.appendChild(buildTreeDom(data));
@@ -1173,7 +1275,8 @@
                     })
                     .catch(e => {
                         treeLoading.style.display = 'none';
-                        treeContainer.innerHTML = `<li class="text-red-500 bg-red-100 p-2 rounded">Failed to load tree.</li>`;
+                        treeContainer.innerHTML =
+                            `<li class="text-red-500 bg-red-100 p-2 rounded">Failed to load tree.</li>`;
                     });
             }
 
@@ -1185,12 +1288,14 @@
                     const li = document.createElement('li');
 
                     if (item.type === 'directory') {
-                        const chevron = `<svg class="tree-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+                        const chevron =
+                            `<svg class="tree-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
                         const folderIcon = getFolderIcon(item.name);
 
                         const rowDiv = document.createElement('div');
                         rowDiv.className = 'tree-row';
-                        rowDiv.innerHTML = `${chevron}${folderIcon}<span class="text-gray-300 font-medium">${item.name}</span>`;
+                        rowDiv.innerHTML =
+                            `${chevron}${folderIcon}<span class="text-gray-300 font-medium">${item.name}</span>`;
 
                         const childrenUl = buildTreeDom(item.children);
                         childrenUl.style.display = 'none';
@@ -1211,11 +1316,13 @@
                         const rowDiv = document.createElement('div');
                         rowDiv.className = 'tree-row file-item';
                         rowDiv.dataset.path = item.path;
-                        rowDiv.innerHTML = `${fileIcon}<span class="whitespace-nowrap text-[#cccccc]">${item.name}</span><span class="lint-badge" title="Syntax errors">!</span>`;
+                        rowDiv.innerHTML =
+                            `${fileIcon}<span class="whitespace-nowrap text-[#cccccc]">${item.name}</span><span class="lint-badge" title="Syntax errors">!</span>`;
 
                         rowDiv.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active-file'));
+                            document.querySelectorAll('.file-item').forEach(el => el.classList.remove(
+                                'active-file'));
                             rowDiv.classList.add('active-file');
                             loadFile(item.path, item.name);
                         });
@@ -1231,11 +1338,14 @@
             function renderTabs() {
                 editorTabsContainer.innerHTML = '';
                 if (openFiles.length === 0) {
-                    editorTabsContainer.innerHTML = `<div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>`;
+                    editorTabsContainer.innerHTML =
+                        `<div id="tab-empty-state" class="py-2 px-4 text-[#888888] text-[13px] italic border-t-2 border-transparent">No file open</div>`;
 
                     isApplyingModelContent = true;
                     monacoEditor.setValue("Select a file from the explorer...");
-                    monacoEditor.updateOptions({ readOnly: true });
+                    monacoEditor.updateOptions({
+                        readOnly: true
+                    });
                     isApplyingModelContent = false;
 
                     activeFilePath = null;
@@ -1248,7 +1358,8 @@
                     const isActive = fileObj.path === activeFilePath;
                     const tab = document.createElement('div');
                     tab.id = `tab-${fileObj.path}`;
-                    tab.className = `px-3 py-1.5 flex items-center gap-2 cursor-pointer border-t-2 transition-colors duration-150 min-w-max group
+                    tab.className =
+                        `px-3 py-1.5 flex items-center gap-2 cursor-pointer border-t-2 transition-colors duration-150 min-w-max group
                         ${isActive ? 'border-indigo-500 bg-[#1e1e1e] text-white' : 'border-transparent bg-[#141414] text-[#888] hover:bg-[#1a1a1a] hover:text-[#ccc]'}`;
 
                     // Tab content inner HTML
@@ -1338,7 +1449,9 @@
                         codeLoading.style.display = 'none';
                         if (data.error) {
                             updateHighlight(`Error: ${data.error}`, 'error.txt');
-                            monacoEditor.updateOptions({ readOnly: true });
+                            monacoEditor.updateOptions({
+                                readOnly: true
+                            });
                             autoTriggerGemini = false;
                         } else {
                             openFiles.push({
@@ -1360,7 +1473,8 @@
 
             function showSaveStatus(text, colorClass = 'text-gray-500') {
                 saveStatusMsg.textContent = text;
-                saveStatusMsg.className = `text-[10px] w-16 text-right transition-opacity duration-300 opacity-100 ${colorClass}`;
+                saveStatusMsg.className =
+                    `text-[10px] w-16 text-right transition-opacity duration-300 opacity-100 ${colorClass}`;
                 setTimeout(() => {
                     saveStatusMsg.classList.remove('opacity-100');
                     saveStatusMsg.classList.add('opacity-0');
@@ -1388,13 +1502,16 @@
                 if (!isAuto) showSaveStatus('Saving...');
 
                 fetch(`/ai-builder/explorer/${window.ProjectConfig.projectName}/save-file`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ path, content: content })
-                })
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            path,
+                            content: content
+                        })
+                    })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
@@ -1413,7 +1530,7 @@
             }
 
             // Custom Save override for Ctrl+S using Monaco action
-            monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function () {
+            monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
                 if (activeFilePath) {
                     const contentObj = openFiles.find(f => f.path === activeFilePath);
                     if (contentObj) {
@@ -1437,7 +1554,8 @@
 
             function addChatMessage(role, text) {
                 const div = document.createElement('div');
-                div.className = `p-3 rounded-lg text-sm shadow-sm border ${role === 'user' ? 'bg-indigo-50 dark:bg-indigo-900 border-indigo-200 dark:border-indigo-800 ml-4' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 mr-4'}`;
+                div.className =
+                    `p-3 rounded-lg text-sm text-white shadow-sm border ${role === 'user' ? 'bg-indigo-50 dark:bg-indigo-900 border-indigo-200 dark:border-indigo-800 ml-4' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 mr-4'}`;
                 div.textContent = text;
                 chatHistory.appendChild(div);
                 chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -1478,17 +1596,17 @@
                 loadMsg.classList.add('animate-pulse');
 
                 fetch('/ai-builder/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        prompt,
-                        file_content: currentContent,
-                        project: window.ProjectConfig.projectName
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            prompt,
+                            file_content: currentContent,
+                            project: window.ProjectConfig.projectName
+                        })
                     })
-                })
                     .then(async res => {
                         if (!res.ok && res.status !== 422 && res.status !== 500) {
                             throw new Error('Network response was not ok');
@@ -1503,7 +1621,8 @@
                         } else if (data.error) {
                             addChatMessage('bot', `Error: ${data.error}`);
                         } else if (data.success && data.files) {
-                            addChatMessage('bot', `I have successfully applied the changes. ${data.message || ''}`);
+                            addChatMessage('bot',
+                                `I have successfully applied the changes. ${data.message || ''}`);
 
                             // Re-load the tree to pick up any newly generated files
                             loadTree();
@@ -1517,7 +1636,8 @@
                                 if (existingTab) {
                                     existingTab.content = f.content;
                                     // Remove unsaved dot since AI just saved it strictly to disk
-                                    const dot = document.getElementById(`tab-${f.path}`)?.querySelector('.save-dot');
+                                    const dot = document.getElementById(`tab-${f.path}`)?.querySelector(
+                                        '.save-dot');
                                     if (dot) dot.classList.add('opacity-0');
                                 }
 
@@ -1662,9 +1782,10 @@
             };
 
             const queryParam = encodeURIComponent(JSON.stringify(payload));
-            genEventSource = new EventSource(`{{ route('project.generator.auto-scaffold') }}?payload=${queryParam}`);
+            genEventSource = new EventSource(
+                `{{ route('project.generator.auto-scaffold') }}?payload=${queryParam}`);
 
-            genEventSource.onmessage = function (event) {
+            genEventSource.onmessage = function(event) {
                 const data = JSON.parse(event.data);
 
                 if (data.type === 'info') {
@@ -1677,13 +1798,14 @@
                     resetBtnUI();
                 } else if (data.type === 'done') {
                     addLog(`[SELESAI] Semua file telah di-generate!`, 'text-purple-400 font-bold');
-                    addLog(`Silakan refresh File Explorer (Icon Refresh) di sebelah kiri.`, 'text-white font-bold');
+                    addLog(`Silakan refresh File Explorer (Icon Refresh) di sebelah kiri.`,
+                        'text-white font-bold');
                     genEventSource.close();
                     resetBtnUI();
                 }
             };
 
-            genEventSource.onerror = function (err) {
+            genEventSource.onerror = function(err) {
                 addLog(`[FATAL] Koneksi terputus dari server.`, 'text-red-500');
                 genEventSource.close();
                 resetBtnUI();
@@ -1734,7 +1856,10 @@
 
                 const response = await fetch(window.ProjectConfig.apiPreviewStartUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken }
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
                 });
 
                 clearInterval(loadInterval);
@@ -1785,7 +1910,9 @@
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                 await fetch(window.ProjectConfig.apiPreviewStopUrl, {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrfToken }
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
                 });
             } catch (err) {
                 console.error('Failed to stop preview', err);
