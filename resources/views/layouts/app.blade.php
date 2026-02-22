@@ -22,7 +22,7 @@
 
         <div class="flex-1 flex flex-col min-w-0 transition-all duration-300">
             <!-- Page Heading -->
-            @if(isset($header) || View::hasSection('header'))
+            @if (isset($header) || View::hasSection('header'))
                 <header class="bg-white dark:bg-[#161b22] shadow dark:shadow-none dark:border-b dark:border-gray-800">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header ?? '' }}
@@ -37,12 +37,15 @@
                 @yield('content')
             </main>
         </div>
+
+        @include('auth.logout-modal')
     </div>
 
     <script>
         function sidebarLayout() {
             return {
                 sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+                showLogoutModal: false,
                 toggleSidebar() {
                     this.sidebarOpen = !this.sidebarOpen;
                     localStorage.setItem('sidebarOpen', this.sidebarOpen);
