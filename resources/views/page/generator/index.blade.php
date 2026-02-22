@@ -1,4 +1,38 @@
 <x-app-layout>
+    <style>
+        @keyframes fadeInFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(-5px) scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes gentleFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .animate-float {
+            animation: gentleFloat 3s ease-in-out infinite;
+        }
+    </style>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('AI Builder Project Generator') }}
@@ -148,16 +182,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
-                                AI Context Prompt (Gemini Builder)
+                                AI Context Prompt (Windra Builder)
                             </h4>
                             <div>
                                 <label for="ai_prompt"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tell Gemini
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tell Windra
                                     what you want this project to be <span class="text-red-500">*</span></label>
                                 <textarea name="ai_prompt" id="ai_prompt" rows="4" required
                                     placeholder="e.g. I want to build a pos application with a dashboard for admin and pos for user..."
                                     class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm transition-colors"></textarea>
-                                <p class="mt-2 text-xs text-gray-500">The context prompt and gemini token will be
+                                <p class="mt-2 text-xs text-gray-500">The context prompt and windra token will be
                                     automatically injected into your generated .env file.</p>
                             </div>
                         </div>
@@ -209,56 +243,14 @@
                                 <!-- Illustration Box -->
                                 <div
                                     class="relative w-full max-w-[420px] aspect-[16/10] mt-5 rounded-2xl border border-gray-800/60 bg-[#161c2d]/70 overflow-hidden shadow-2xl backdrop-blur-sm bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:2rem_2rem]">
-                                    <!-- Animated elements inside box -->
+                                    <!-- Bird Logo with Fade-in + Float -->
                                     <div class="absolute inset-0 flex items-center justify-center">
-                                        <div
-                                            class="relative flex flex-col items-center justify-center animate-bounce duration-[3000ms]">
+                                        <div class="relative flex flex-col items-center justify-center animate-float">
                                             <div
-                                                class="bg-[#e2e8f0] rounded-2xl p-4 shadow-[0_0_30px_rgba(255,255,255,0.1)] flex items-center justify-center gap-4 relative z-10 w-48 h-28 mb-2 border-b-4 border-gray-300">
-                                                <div
-                                                    class="bg-[#1e293b] rounded-xl w-14 h-14 flex items-center justify-center shadow-inner">
-                                                    <div class="w-2.5 h-6 bg-blue-400 rounded-sm mx-1 animate-pulse">
-                                                    </div>
-                                                    <div
-                                                        class="w-2.5 h-6 bg-blue-400 rounded-sm mx-1 animate-pulse delay-75">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    class="absolute -right-6 -top-5 bg-blue-500 rounded-xl p-3 shadow-[0_0_25px_rgba(59,130,246,0.6)]">
-                                                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"
-                                                        stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2.5"
-                                                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                                                    </svg>
-                                                </div>
+                                                class="absolute inset-0 bg-blue-500/15 rounded-full blur-3xl scale-150 animate-pulse">
                                             </div>
-                                            <!-- Bottom Base Component -->
-                                            <div
-                                                class="bg-gray-300 w-32 h-14 rounded-b-xl shadow-inner flex items-center justify-center -mt-4 z-0 relative overflow-hidden flex-col gap-1">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shadow mt-3">
-                                                    <svg class="w-4 h-4 text-blue-500" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd"
-                                                            d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                                                            clip-rule="evenodd"></path>
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <!-- Server Racks Behind Elements -->
-                                            <div
-                                                class="absolute -bottom-24 z-[-1] flex gap-4 w-64 items-end justify-center">
-                                                <div
-                                                    class="w-12 h-20 bg-gradient-to-t from-blue-500/20 to-transparent border border-blue-500/30 rounded-t-lg">
-                                                </div>
-                                                <div
-                                                    class="w-16 h-32 bg-gradient-to-t from-blue-500/30 to-transparent border border-blue-500/40 rounded-t-lg shadow-[0_0_20px_rgba(59,130,246,0.2)]">
-                                                </div>
-                                                <div
-                                                    class="w-12 h-16 bg-gradient-to-t from-blue-500/10 to-transparent border border-gray-600/30 rounded-t-lg">
-                                                </div>
-                                            </div>
+                                            <img src="{{ asset('assets/icon/burung-utama.png') }}" alt="DIJADIIN AI"
+                                                class="w-28 h-28 object-contain relative z-10 drop-shadow-[0_0_25px_rgba(59,130,246,0.5)] opacity-0 animate-[fadeInFloat_1s_ease-out_0.3s_forwards]" />
                                         </div>
                                     </div>
                                     <!-- Decorative gradients -->
@@ -303,7 +295,8 @@
                                             <p
                                                 class="text-[9px] text-gray-500 uppercase tracking-widest font-semibold mb-1">
                                                 ESTIMASI SELESAI</p>
-                                            <p class="text-xl sm:text-2xl font-semibold text-blue-400 tracking-tight">
+                                            <p class="text-xl sm:text-2xl font-semibold text-blue-400 tracking-tight"
+                                                id="estimate-display">
                                                 ~45 <span class="text-sm text-gray-500 font-sans">dtk</span></p>
                                         </div>
                                     </div>
@@ -551,13 +544,39 @@
                     }
                 }, 1500);
 
-                // Start Timer Loop
+                // Start Timer Loop + Dynamic Estimate
+                const estimateDisplay = document.getElementById('estimate-display');
+                let lastProgress = 2;
+                let lastProgressTime = Date.now();
+                let estimatedRemaining = 45; // initial guess
+
                 timerInterval = setInterval(() => {
                     const ms = Date.now() - startTime;
                     const totalSec = Math.floor(ms / 1000);
                     const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
                     const sec = String(totalSec % 60).padStart(2, '0');
                     timerDisplay.innerHTML = `${min}:${sec} <span class="text-sm text-gray-500 font-sans">mnt</span>`;
+
+                    // Hitung estimasi berdasarkan kecepatan progress
+                    if (progress > lastProgress && progress < 100) {
+                        const elapsedSec = (Date.now() - startTime) / 1000;
+                        const progressPerSec = progress / elapsedSec;
+                        if (progressPerSec > 0) {
+                            estimatedRemaining = Math.ceil((100 - progress) / progressPerSec);
+                        }
+                        lastProgress = progress;
+                    }
+
+                    // Format estimasi
+                    if (progress >= 100) {
+                        estimateDisplay.innerHTML = `Selesai! <span class="text-sm text-emerald-400">✓</span>`;
+                    } else if (estimatedRemaining > 60) {
+                        const estMin = Math.floor(estimatedRemaining / 60);
+                        const estSec = estimatedRemaining % 60;
+                        estimateDisplay.innerHTML = `~${estMin}:${String(estSec).padStart(2, '0')} <span class="text-sm text-gray-500 font-sans">mnt</span>`;
+                    } else {
+                        estimateDisplay.innerHTML = `~${Math.max(1, estimatedRemaining)} <span class="text-sm text-gray-500 font-sans">dtk</span>`;
+                    }
                 }, 1000);
 
                 // Start Server Request
@@ -574,8 +593,7 @@
                         evtSource.close();
                         clearInterval(fakeProgressInterval);
                         clearInterval(timerInterval);
-                        alert("Gagal membangun aplikasi: " + data.message);
-                        window.location.reload();
+                        showErrorModal(data.message);
                     } else if (data.type === 'done') {
                         evtSource.close();
                         clearInterval(fakeProgressInterval);
@@ -596,5 +614,57 @@
                 };
             });
         });
+
+        function showErrorModal(message) {
+            const modal = document.getElementById('error-modal');
+            const msgEl = document.getElementById('error-modal-message');
+            const hintEl = document.getElementById('error-modal-hint');
+
+            msgEl.textContent = message || 'Terjadi kesalahan saat membangun aplikasi.';
+
+            // Kontekstual hint
+            if (message && message.toLowerCase().includes('already exists')) {
+                hintEl.textContent = 'Nama project ini sudah pernah dibuat sebelumnya. Coba gunakan nama lain atau hapus project lama di halaman My Projects.';
+            } else {
+                hintEl.textContent = 'Silakan coba lagi atau hubungi tim support jika masalah berlanjut.';
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
     </script>
+
+    <!-- Error Modal -->
+    <div id="error-modal"
+        class="fixed inset-0 z-[10000] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 opacity-0 px-4">
+        <div
+            class="bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
+            <div
+                class="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/40 dark:to-orange-900/30 p-6 flex flex-col items-center justify-center border-b border-red-100 dark:border-red-800/60 relative">
+                <div
+                    class="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center mb-3 border border-red-100 dark:border-red-500/30">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center">Gagal Membangun Aplikasi</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-[14px] text-gray-600 dark:text-gray-300 leading-relaxed text-center mb-2"
+                    id="error-modal-message"></p>
+                <p class="text-[12px] text-gray-400 dark:text-gray-500 text-center mb-6" id="error-modal-hint"></p>
+                <button type="button" onclick="window.location.reload()"
+                    class="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-md shadow-red-500/30 transition-all active:scale-95 text-sm text-center">
+                    Kembali ke Halaman
+                </button>
+            </div>
+        </div>
+    </div>
+
 </x-app-layout>

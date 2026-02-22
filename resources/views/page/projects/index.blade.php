@@ -190,11 +190,11 @@
                             </a>
 
                             <form action="{{ route('projects.destroy', $project) }}" method="POST"
-                                onsubmit="return confirm('Hapus proyek \'{{ addslashes($project->name) }}\'?')"
-                                class="shrink-0">
+                                class="shrink-0 delete-form">
                                 @csrf @method('DELETE')
-                                <button type="submit"
-                                    class="w-10 h-10 flex items-center justify-center bg-[#21262d] hover:bg-red-500/15 border border-[#30363d] hover:border-red-500/30 text-gray-500 hover:text-red-400 rounded-xl transition-all">
+                                <button type="button"
+                                    class="delete-project-btn w-10 h-10 flex items-center justify-center bg-[#21262d] hover:bg-red-500/15 border border-[#30363d] hover:border-red-500/30 text-gray-500 hover:text-red-400 rounded-xl transition-all"
+                                    data-project-name="{{ $project->name }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
@@ -502,5 +502,84 @@
                 }, 2000);
             }
         });
+
+        // Delete Modal Logic
+        let pendingDeleteForm = null;
+
+        function showDeleteModal(name, form) {
+            const deleteModal = document.getElementById('delete-modal');
+            const deleteModalName = document.getElementById('delete-modal-name');
+            pendingDeleteForm = form;
+            deleteModalName.textContent = name;
+            deleteModal.classList.remove('hidden');
+            setTimeout(() => {
+                deleteModal.classList.remove('opacity-0');
+                deleteModal.firstElementChild.classList.remove('scale-95');
+                deleteModal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function hideDeleteModal() {
+            const deleteModal = document.getElementById('delete-modal');
+            deleteModal.classList.add('opacity-0');
+            deleteModal.firstElementChild.classList.remove('scale-100');
+            deleteModal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { deleteModal.classList.add('hidden'); }, 300);
+            pendingDeleteForm = null;
+        }
+
+        document.querySelectorAll('.delete-project-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const name = btn.dataset.projectName;
+                const form = btn.closest('.delete-form');
+                showDeleteModal(name, form);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#cancel-delete-btn') || e.target.closest('#close-delete-btn')) {
+                hideDeleteModal();
+            }
+            if (e.target.closest('#confirm-delete-btn')) {
+                if (pendingDeleteForm) pendingDeleteForm.submit();
+            }
+        });
     </script>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal"
+        class="fixed inset-0 z-[10000] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 opacity-0 px-4">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
+            <div class="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/40 dark:to-orange-900/30 p-6 flex flex-col items-center justify-center border-b border-red-100 dark:border-red-800/60 relative">
+                <div class="absolute top-3 right-3">
+                    <button id="close-delete-btn" type="button" class="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 p-1.5 rounded-full text-gray-500 dark:text-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center mb-3 border border-red-100 dark:border-red-500/30">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center">Hapus Project?</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-[14px] text-gray-600 dark:text-gray-300 leading-relaxed text-center mb-1">
+                    Kamu yakin ingin menghapus project
+                </p>
+                <p class="text-[15px] font-bold text-white text-center mb-1" id="delete-modal-name"></p>
+                <p class="text-[12px] text-gray-400 dark:text-gray-500 text-center mb-6">
+                    Semua file dan data project ini akan dihapus secara permanen.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="cancel-delete-btn" type="button" class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors text-sm text-center">
+                        Batal
+                    </button>
+                    <button id="confirm-delete-btn" type="button" class="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-md shadow-red-500/30 transition-all active:scale-95 text-sm text-center">
+                        Hapus Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

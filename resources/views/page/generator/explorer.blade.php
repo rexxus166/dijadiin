@@ -531,6 +531,8 @@
                             Halo! Saya Asisten AI Anda 👋. Pilih file di kolom Explorer sebelah kiri, lalu beri tahu
                             saya bagian mana yang ingin Anda ubah atau tambahkan.
                         </div>
+                        <!-- Keyword Suggestions (generated dynamically via JS) -->
+                        <div class="flex flex-wrap gap-1.5" id="keyword-suggestions"></div>
                     </div>
 
                     <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
@@ -1596,9 +1598,93 @@
             const chatHistory = document.getElementById('chat-history');
             const chatStorageKey = 'dijadiin_chat_hist_' + window.ProjectConfig.projectName;
 
+            // Keyword suggestion chips — dinamis berdasarkan nama project
+            const suggestionsContainer = document.getElementById('keyword-suggestions');
+            const projectName = window.ProjectConfig.projectName || 'Project';
+            const pn = projectName.toLowerCase();
+
+            // Mapping kata kunci → saran yang relevan
+            const keywordMap = {
+                'toko': ["Buatkan halaman produk untuk {name}", "Tambahkan fitur keranjang belanja", "Buat halaman checkout & pembayaran", "Tambahkan filter kategori produk"],
+                'shop': ["Buatkan product listing page", "Tambahkan shopping cart feature", "Buat halaman order tracking", "Tambahkan fitur wishlist"],
+                'kasir': ["Buatkan form transaksi penjualan", "Tambahkan fitur cetak struk", "Buat laporan penjualan harian", "Tambahkan manajemen stok barang"],
+                'pos': ["Buatkan form point of sale", "Tambahkan fitur barcode scanner", "Buat laporan transaksi", "Tambahkan manajemen kasir"],
+                'kalkulator': ["Buatkan tampilan kalkulator modern", "Tambahkan operasi matematika lanjutan", "Buat history perhitungan", "Tambahkan mode scientific calculator"],
+                'calculator': ["Create a modern calculator UI", "Add advanced math operations", "Add calculation history", "Add unit converter feature"],
+                'blog': ["Buatkan halaman daftar artikel", "Tambahkan fitur komentar", "Buat halaman detail post", "Tambahkan fitur kategori & tag"],
+                'portfolio': ["Buatkan section project showcase", "Tambahkan halaman about me", "Buat contact form", "Tambahkan animasi scroll"],
+                'sekolah': ["Buatkan halaman data siswa", "Tambahkan fitur absensi", "Buat halaman jadwal pelajaran", "Tambahkan rapor digital"],
+                'school': ["Create student management page", "Add attendance tracking", "Build class schedule view", "Add grade report feature"],
+                'resto': ["Buatkan menu makanan digital", "Tambahkan fitur order online", "Buat halaman reservasi meja", "Tambahkan review & rating"],
+                'restaurant': ["Create digital food menu", "Add online ordering system", "Build table reservation page", "Add review & rating feature"],
+                'hotel': ["Buatkan halaman booking kamar", "Tambahkan gallery foto kamar", "Buat halaman cek ketersediaan", "Tambahkan fitur review tamu"],
+                'inventory': ["Buatkan halaman stok barang", "Tambahkan fitur barang masuk/keluar", "Buat laporan inventory", "Tambahkan alert stok minimum"],
+                'keuangan': ["Buatkan halaman pemasukan & pengeluaran", "Tambahkan grafik laporan keuangan", "Buat fitur budgeting", "Tambahkan export laporan PDF"],
+                'finance': ["Create income & expense tracker", "Add financial report charts", "Build budgeting feature", "Add PDF export for reports"],
+                'chat': ["Buatkan tampilan chat real-time", "Tambahkan fitur kirim gambar", "Buat daftar kontak", "Tambahkan notifikasi pesan baru"],
+                'todo': ["Buatkan tampilan task list", "Tambahkan fitur drag & drop", "Buat filter berdasarkan prioritas", "Tambahkan due date reminder"],
+                'berita': ["Buatkan halaman breaking news", "Tambahkan fitur pencarian berita", "Buat kategori berita", "Tambahkan halaman trending"],
+                'news': ["Create news feed page", "Add article search feature", "Build category filtering", "Add trending news section"],
+                'travel': ["Buatkan halaman destinasi wisata", "Tambahkan fitur booking trip", "Buat gallery foto destinasi", "Tambahkan review wisatawan"],
+                'laundry': ["Buatkan form order laundry", "Tambahkan tracking status cucian", "Buat halaman daftar harga", "Tambahkan fitur pickup & delivery"],
+                'apotek': ["Buatkan halaman katalog obat", "Tambahkan fitur resep dokter", "Buat manajemen stok obat", "Tambahkan reminder minum obat"],
+                'gym': ["Buatkan halaman jadwal kelas", "Tambahkan fitur membership", "Buat tracking progress latihan", "Tambahkan halaman trainer"],
+                'perpustakaan': ["Buatkan katalog buku digital", "Tambahkan fitur peminjaman", "Buat halaman pencarian buku", "Tambahkan denda keterlambatan"],
+                'library': ["Create digital book catalog", "Add book borrowing system", "Build book search page", "Add late fee management"],
+            };
+
+            // Cari saran yang cocok
+            let matched = [];
+            for (const [keyword, prompts] of Object.entries(keywordMap)) {
+                if (pn.includes(keyword)) {
+                    matched = prompts;
+                    break;
+                }
+            }
+
+            // Fallback generic jika tidak ada yang cocok
+            if (matched.length === 0) {
+                matched = [
+                    `Buatkan halaman utama untuk ${projectName}`,
+                    `Tambahkan fitur CRUD di ${projectName}`,
+                    `Buat tampilan dashboard ${projectName}`,
+                    `Tambahkan validasi form`,
+                    `Perbaiki styling halaman ini`,
+                ];
+            }
+
+            // Render chips
+            matched.forEach(text => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'keyword-chip text-[11px] px-2.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40 transition-all cursor-pointer';
+                btn.textContent = text.replace('{name}', projectName);
+                btn.dataset.prompt = text.replace('{name}', projectName);
+                btn.addEventListener('click', () => {
+                    chatInput.value = btn.dataset.prompt;
+                    chatInput.focus();
+                    suggestionsContainer.style.display = 'none';
+                });
+                suggestionsContainer.appendChild(btn);
+            });
+
             if (localStorage.getItem(chatStorageKey)) {
                 chatHistory.innerHTML = localStorage.getItem(chatStorageKey);
                 chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+
+            // Auto-send AI Context Prompt saat pertama kali generate project (sekali saja)
+            const autoPromptKey = 'dijadiin_prompt_sent_' + window.ProjectConfig.projectName;
+            const aiPrompt = window.ProjectConfig.aiPrompt;
+            if (aiPrompt && !localStorage.getItem(autoPromptKey) && !localStorage.getItem(chatStorageKey)) {
+                localStorage.setItem(autoPromptKey, '1');
+                // Delay sedikit agar UI sudah render sempurna
+                setTimeout(() => {
+                    chatInput.value = aiPrompt;
+                    chatSendBtn.click();
+                    // Sembunyikan keyword suggestions karena sudah ada prompt
+                    if (suggestionsContainer) suggestionsContainer.style.display = 'none';
+                }, 1500);
             }
 
             function saveChat() {
