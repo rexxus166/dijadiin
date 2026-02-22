@@ -39,7 +39,10 @@ spec:
         image: <username-dockerhub>/dijadiin:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - name: web
+          containerPort: 80
+        - name: preview
+          containerPort: 8001
         env:
         - name: APP_NAME
           value: "DiJadiin - Tim Poliwindra"
@@ -79,9 +82,14 @@ spec:
   selector:
     app: dijadiin-app
   ports:
-    - protocol: TCP
+    - name: web
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: preview
+      protocol: TCP
+      port: 8001
+      targetPort: 8001
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -95,6 +103,7 @@ spec:
   tls:
   - hosts:
     - poliwindra.hackathon.sev-2.com
+    - preview.poliwindra.hackathon.sev-2.com
     secretName: dijadiin-tls
   rules:
   - host: poliwindra.hackathon.sev-2.com
@@ -107,3 +116,13 @@ spec:
             name: dijadiin-service
             port:
               number: 80
+  - host: preview.poliwindra.hackathon.sev-2.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dijadiin-service
+            port:
+              number: 8001
