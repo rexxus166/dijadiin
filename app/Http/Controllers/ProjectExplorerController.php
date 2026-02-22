@@ -331,15 +331,19 @@ class ProjectExplorerController extends Controller
         // Wait a little bit for server to hook the port
         sleep(2);
 
-        // Get dynamic host (works for both localhost and production domain)
+        // Get dynamic host
         $domain = $request->getHost();
-        if ($domain === 'localhost') {
-            $domain = '127.0.0.1';
+        if ($domain === 'localhost' || $domain === '127.0.0.1') {
+            // Local fallback
+            $previewUrl = "http://127.0.0.1:{$port}";
+        } else {
+            // Cloud/Server via Kubernetes Ingress
+            $previewUrl = "https://preview.{$domain}";
         }
 
         return response()->json([
             'success' => true,
-            'url'     => "http://{$domain}:{$port}"
+            'url'     => $previewUrl
         ]);
     }
 
