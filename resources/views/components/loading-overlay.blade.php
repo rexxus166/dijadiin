@@ -5,6 +5,12 @@
             startLoading(event = null) {
                 // Jangan start loading kalau user nge-klik tombol kanan atau pencet ctrl/cmd (open new tab)
                 if (event && (event.ctrlKey || event.metaKey || event.shiftKey)) return;
+
+                // Membatalkan loading screen jika event sudah dibatalkan (menggunakan ajax e.preventDefault()) 
+                if (event && event.defaultPrevented) return;
+
+                // Membatalkan loading screen jika elemen yang memicunya memiliki atribut 'data-no-global-loading'
+                if (event && event.target && event.target.closest && event.target.closest('[data-no-global-loading]')) return;
                 
                 this.isNavigating = true;
                 this.progress = 0;
@@ -27,7 +33,7 @@
                     this.startLoading(e);
                 }
             }
-        }" @submit.window="startLoading()" @click.window="handleLinkClick($event)" x-show="isNavigating"
+        }" @submit.window="startLoading($event)" @click.window="handleLinkClick($event)" x-show="isNavigating"
     x-transition.opacity.duration.300ms style="display: none;"
     class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/80 dark:bg-[#0f1115]/80 backdrop-blur-sm">
 

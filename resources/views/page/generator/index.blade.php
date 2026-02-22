@@ -19,7 +19,7 @@
                     </div>
 
                     <form id="generator-form" action="{{ route('project.generator.store') }}" method="POST"
-                        class="space-y-6">
+                        data-no-global-loading="true" class="space-y-6">
                         @csrf
 
                         @if ($errors->any())
