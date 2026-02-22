@@ -116,30 +116,29 @@ class ScaffoldProjectService
         // This prevents the parent Laravel application (dijadiin) variables like APP_KEY, APP_ENV
         // from leaking into the newly minted application and causing 'artisan key:generate' to abort or fail.
         $env = [];
-        $allowedSystemVars = ['PATH', 'TEMP', 'TMP', 'APPDATA', 'SystemRoot', 'SystemDrive', 'SystemDirectory', 'COMSPEC', 'PATHEXT', 'USERNAME', 'USERPROFILE', 'HOME'];
 
-        foreach ($allowedSystemVars as $key) {
-            $val = getenv($key) ?: ($_SERVER[$key] ?? ($_ENV[$key] ?? null));
-            if ($val !== null) {
-                $env[$key] = $val;
-            }
+        // Unset variables that could leak from the parent Laravel app and cause 
+        // artisan commands (like key:generate) in the new project to fail or act in production mode.
+        $laravelVars = ['APP_ENV', 'APP_KEY', 'APP_DEBUG', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD', 'REDIS_PASSWORD'];
+        foreach ($laravelVars as $var) {
+            $env[$var] = false; // Symfony Process treats false as "unset this variable"
         }
 
         if ($isWindows) {
             // Critical fallbacks for cURL DNS resolution and temp extraction in sterile Laragon web server environments
-            $env['PATH'] = $env['PATH'] ?? 'C:\\Windows\\System32;C:\\Windows';
-            $env['TEMP'] = $env['TEMP'] ?? 'C:\\Windows\\Temp';
-            $env['TMP'] = $env['TMP'] ?? 'C:\\Windows\\Temp';
-            $env['APPDATA'] = $env['APPDATA'] ?? 'C:\\Windows\\Temp';
-            $env['SystemRoot'] = $env['SystemRoot'] ?? 'C:\\Windows';
-            $env['SystemDrive'] = $env['SystemDrive'] ?? 'C:';
-            $env['COMPOSER_HOME'] = $env['COMPOSER_HOME'] ?? $env['APPDATA'] . '\\Composer';
+            $env['PATH'] = env('PATH') ?: 'C:\\Windows\\System32;C:\\Windows';
+            $env['TEMP'] = env('TEMP') ?: 'C:\\Windows\\Temp';
+            $env['TMP'] = env('TMP') ?: 'C:\\Windows\\Temp';
+            $env['APPDATA'] = env('APPDATA') ?: 'C:\\Windows\\Temp';
+            $env['SystemRoot'] = env('SystemRoot') ?: 'C:\\Windows';
+            $env['SystemDrive'] = env('SystemDrive') ?: 'C:';
+            $env['COMPOSER_HOME'] = env('COMPOSER_HOME') ?: (env('APPDATA') . '\\Composer');
         } else {
             // Fallbacks for Linux/Docker environments where www-data might lack HOME
-            $env['HOME'] = $env['HOME'] ?? '/tmp';
-            $env['COMPOSER_HOME'] = $env['COMPOSER_HOME'] ?? '/tmp/composer';
+            $env['HOME'] = env('HOME') ?: '/tmp';
+            $env['COMPOSER_HOME'] = env('COMPOSER_HOME') ?: '/tmp/composer';
             // Ensure PATH is always available on linux
-            $env['PATH'] = $env['PATH'] ?? getenv('PATH') ?: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
+            $env['PATH'] = env('PATH') ?: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
         }
 
         // Disable composer memory limit to prevent OOM errors during heavy extraction phases
@@ -156,8 +155,19 @@ class ScaffoldProjectService
 
             // Wait for composer to truly finish before returning success
             if (!$process->isSuccessful()) {
-                $errorDetails = $process->getErrorOutput() ?: 'Unknown composer failure. Status code: ' . $process->getExitCode();
-                return ['success' => false, 'message' => "Composer execution failed: " . $errorDetails];
+                $fullError = $process->getErrorOutput() ?: $process->getOutput();
+                $exitCode = $process->getExitCode();
+
+                // Log the full error to storage/logs/laravel.log so we can inspect it serverside
+                Log::error("Scaffolding Composer failed with code {$exitCode}. Full Output:\n" . $fullError);
+
+                // Grab the last 1000 characters of the error, as the top part is usually just "Downloading..."
+                $errorTail = substr($fullError, -1000) ?: 'Unknown failure. Code: ' . $exitCode;
+
+                return [
+                    'success' => false,
+                    'message' => "Composer execution failed (Code {$exitCode})...\n" . trim($errorTail)
+                ];
             }
 
             return ['success' => true, 'message' => "Laravel project scaffolded.", 'path' => $targetDir];
