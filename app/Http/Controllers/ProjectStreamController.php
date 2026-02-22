@@ -113,8 +113,15 @@ PROMPT;
                         if ($planJson) {
                             // Strip out markdown fences if the AI ignores our "raw only" instruction
                             $planJson = trim($planJson);
-                            if (preg_match('/```[a-zA-Z]*\s*(.*?)\s*```/is', $planJson, $matches)) {
-                                $planJson = $matches[1];
+                            if (preg_match('/```(?:json)?[a-zA-Z]*\s*(.*?)\s*```/is', $planJson, $matches)) {
+                                $planJson = trim($matches[1]);
+                            }
+
+                            // Aggressively extract the JSON object by finding the first '{' and last '}'
+                            $firstBrace = strpos($planJson, '{');
+                            $lastBrace = strrpos($planJson, '}');
+                            if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
+                                $planJson = substr($planJson, $firstBrace, $lastBrace - $firstBrace + 1);
                             }
 
                             $planData = json_decode($planJson, true);
@@ -148,8 +155,8 @@ PROMPT;
                                     if ($code) {
                                         // Strip out markdown fences if the AI ignores our "raw only" instruction
                                         $code = trim($code);
-                                        if (preg_match('/```[a-zA-Z]*\s*(.*?)\s*```/is', $code, $matches)) {
-                                            $code = $matches[1];
+                                        if (preg_match('/```(?:php|html|blade|json)?[a-zA-Z]*\s*(.*?)\s*```/is', $code, $matches)) {
+                                            $code = trim($matches[1]);
                                         }
 
                                         $absPath = rtrim($projectPath, '/\\') . DIRECTORY_SEPARATOR . $filePath;
@@ -174,7 +181,8 @@ PROMPT;
                                 }
                                 $sendStatus("Semua file khusus berhasil dibangun oleh AI!", 'info');
                             } else {
-                                $sendStatus("Konsep terlalu kompleks atau format JSON balasan rusak.", 'error');
+                                Log::error("Gemini failed to generate valid JSON plan. Input length: " . strlen($planJson) . " Raw Output:\n" . $planJson);
+                                $sendStatus("Konsep terlalu kompleks atau format JSON balasan rusak. Coba lebih disederhanakan.", 'error');
                             }
                         } else {
                             $sendStatus("Gagal mendapatkan respon blueprint Blueprint dari AI.", 'error');
