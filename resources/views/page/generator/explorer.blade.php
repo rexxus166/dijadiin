@@ -247,6 +247,7 @@
                     Auto Generate App
                 </button>
                 <a href="{{ route('project.explorer.download', ['project' => $projectName]) }}"
+                    data-no-global-loading="true"
                     class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-1.5 rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
