@@ -26,7 +26,7 @@ class ProjectStreamController extends Controller
         }
 
         $data = json_decode($payloadRaw, true);
-        $projectName = $data['project_name'] ?? 'ai-project';
+        $projectName = trim($data['project_name'] ?? 'ai-project');
         $userId   = Auth::id();
         $basePath = storage_path('app/generated_projects/' . $userId);
 
@@ -94,6 +94,8 @@ class ProjectStreamController extends Controller
 You are an expert Senior Laravel Architect. You MUST output ONLY valid JSON format, with NO markdown formatting (do not wrap in ```json).
 The user wants to add features to an existing fresh Laravel 10 project.
 Create a JSON plan that details the files needed to build the features requested.
+CRITICAL MANDATORY INSTRUCTION: DO NOT INCLUDE ANY ACTUAL SOURCE CODE OR CONTENT IN THE JSON PLAN! ONLY PROVIDE THE ARRAY OF FILE PATHS AND TYPES!
+
 Schema:
 {
   "files": [

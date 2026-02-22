@@ -1551,6 +1551,31 @@
             const chatSendBtn = document.getElementById('chat-send');
             const chatInput = document.getElementById('chat-input');
             const chatHistory = document.getElementById('chat-history');
+            const chatStorageKey = 'dijadiin_chat_hist_' + window.ProjectConfig.projectName;
+
+            if (localStorage.getItem(chatStorageKey)) {
+                chatHistory.innerHTML = localStorage.getItem(chatStorageKey);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+
+            function saveChat() {
+                localStorage.setItem(chatStorageKey, chatHistory.innerHTML);
+            }
+
+            // Provide a manual clear button if user wants to reset AI memory
+            const clearChatBtn = document.createElement('button');
+            clearChatBtn.innerHTML = '<svg class="w-4 h-4 text-gray-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
+            clearChatBtn.className = 'absolute top-2 right-2 p-1 bg-gray-800 rounded-md shadow-md z-10 transition-colors';
+            clearChatBtn.title = 'Clear Chat History';
+            clearChatBtn.onclick = () => {
+                if(confirm('Clear AI Chat history?')) {
+                    chatHistory.innerHTML = '<div class="text-center text-xs text-gray-500 mb-4 my-4">Halo! Saya Asisten AI Anda 👋. Pilih file di kolom Explorer sebelah kiri, lalu beri tahu saya bagian mana yang ingin Anda ubah atau tambahkan.</div>';
+                    saveChat();
+                }
+            };
+            chatHistory.parentElement.style.position = 'relative';
+            chatHistory.parentElement.appendChild(clearChatBtn);
+
 
             function addChatMessage(role, text) {
                 const div = document.createElement('div');
@@ -1559,6 +1584,7 @@
                 div.textContent = text;
                 chatHistory.appendChild(div);
                 chatHistory.scrollTop = chatHistory.scrollHeight;
+                saveChat();
                 return div;
             }
 
