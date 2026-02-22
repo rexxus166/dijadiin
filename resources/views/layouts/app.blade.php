@@ -56,6 +56,7 @@
             }
         }
     </script>
+    <x-loading-overlay />
 </body>
 
 </html>
