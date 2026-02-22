@@ -67,6 +67,8 @@ spec:
           value: "sk-IT5ilRNOckB-toa1C7G_RA"
         - name: GEMINI_BASE_URL
           value: "https://litellm.koboi2026.biz.id/v1"
+        - name: GEMINI_MODEL
+          value: "gemini/gemini-2.5-flash-lite"
 ---
 apiVersion: v1
 kind: Service
