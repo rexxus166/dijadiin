@@ -21,7 +21,7 @@ class TemplateUserController extends Controller
 
         if ($request->filled('q')) {
             $query->where('name', 'like', '%' . $request->q . '%')
-                  ->orWhere('description', 'like', '%' . $request->q . '%');
+                ->orWhere('description', 'like', '%' . $request->q . '%');
         }
 
         $templates   = $query->get();
@@ -52,7 +52,7 @@ class TemplateUserController extends Controller
         }
 
         // Get the ZIP file path
-        $zipFilePath = storage_path('app/' . $template->zip_path);
+        $zipFilePath = Storage::path($template->zip_path);
         if (!file_exists($zipFilePath)) {
             return back()->with('error', 'File template tidak ditemukan di server.');
         }
@@ -66,6 +66,23 @@ class TemplateUserController extends Controller
         mkdir($projectPath, 0755, true);
         $zip->extractTo($projectPath);
         $zip->close();
+
+        // -------------------------------------------------------------
+        // UN-NEST LOGIC: Often ZIPS contain a single root folder. 
+        // If the extraction results in exactly ONE folder inside, 
+        // we move everything from inside that folder up one level.
+        // -------------------------------------------------------------
+        $extractedItems = array_values(array_diff(scandir($projectPath), array('.', '..')));
+        if (count($extractedItems) === 1) {
+            $singleItemPath = $projectPath . DIRECTORY_SEPARATOR . $extractedItems[0];
+            if (is_dir($singleItemPath)) {
+                $subItems = array_values(array_diff(scandir($singleItemPath), array('.', '..')));
+                foreach ($subItems as $item) {
+                    rename($singleItemPath . DIRECTORY_SEPARATOR . $item, $projectPath . DIRECTORY_SEPARATOR . $item);
+                }
+                rmdir($singleItemPath);
+            }
+        }
 
         // Save to DB
         GeneratedProject::create([
