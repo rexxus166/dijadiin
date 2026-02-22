@@ -111,6 +111,12 @@ PROMPT;
 
                         $planJson = GeminiService::callRaw($userId, $systemPromptPlan, $userPromptPlan, 120);
                         if ($planJson) {
+                            // Strip out markdown fences if the AI ignores our "raw only" instruction
+                            $planJson = trim($planJson);
+                            if (preg_match('/```[a-zA-Z]*\s*(.*?)\s*```/is', $planJson, $matches)) {
+                                $planJson = $matches[1];
+                            }
+
                             $planData = json_decode($planJson, true);
                             if (json_last_error() === JSON_ERROR_NONE && isset($planData['files'])) {
                                 $filesGen = $planData['files'];
@@ -140,6 +146,12 @@ PROMPT;
 
                                     $code = GeminiService::callRaw($userId, $systemPromptFile, $userPromptFile, 120);
                                     if ($code) {
+                                        // Strip out markdown fences if the AI ignores our "raw only" instruction
+                                        $code = trim($code);
+                                        if (preg_match('/```[a-zA-Z]*\s*(.*?)\s*```/is', $code, $matches)) {
+                                            $code = $matches[1];
+                                        }
+
                                         $absPath = rtrim($projectPath, '/\\') . DIRECTORY_SEPARATOR . $filePath;
                                         $dir = dirname($absPath);
 
