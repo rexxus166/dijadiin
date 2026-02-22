@@ -138,6 +138,8 @@ class ScaffoldProjectService
             // Fallbacks for Linux/Docker environments where www-data might lack HOME
             $env['HOME'] = $env['HOME'] ?? '/tmp';
             $env['COMPOSER_HOME'] = $env['COMPOSER_HOME'] ?? '/tmp/composer';
+            // Ensure PATH is always available on linux
+            $env['PATH'] = $env['PATH'] ?? getenv('PATH') ?: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
         }
 
         // Disable composer memory limit to prevent OOM errors during heavy extraction phases
