@@ -251,7 +251,7 @@ class ProjectExplorerController extends Controller
 
             // Simple unmatched tag check using a small heuristic
             $openTags  = [];
-            $voidTags  = ['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'];
+            $voidTags  = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
             foreach ($lines as $lineNum => $ln) {
                 // Find all tags in line
                 preg_match_all('/<\/?([a-zA-Z][a-zA-Z0-9]*)[^>]*\/?>/u', $ln, $matches, PREG_SET_ORDER);
@@ -317,11 +317,12 @@ class ProjectExplorerController extends Controller
         }
 
         // Run serve
+        $bindHost = '0.0.0.0'; // Allow external access when on server
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $cmd = "start /B php artisan serve --port={$port} > NUL 2>&1";
+            $cmd = "start /B php artisan serve --host={$bindHost} --port={$port} > NUL 2>&1";
             pclose(popen("cd /d " . escapeshellarg($projectPath) . " && " . $cmd, "r"));
         } else {
-            $cmd = "php artisan serve --port={$port} > /dev/null 2>&1 &";
+            $cmd = "php artisan serve --host={$bindHost} --port={$port} > /dev/null 2>&1 &";
             exec("cd " . escapeshellarg($projectPath) . " && " . $cmd);
         }
 
@@ -330,9 +331,15 @@ class ProjectExplorerController extends Controller
         // Wait a little bit for server to hook the port
         sleep(2);
 
+        // Get dynamic host (works for both localhost and production domain)
+        $domain = $request->getHost();
+        if ($domain === 'localhost') {
+            $domain = '127.0.0.1';
+        }
+
         return response()->json([
             'success' => true,
-            'url'     => "http://127.0.0.1:{$port}"
+            'url'     => "http://{$domain}:{$port}"
         ]);
     }
 
