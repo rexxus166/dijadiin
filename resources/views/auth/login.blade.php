@@ -58,7 +58,8 @@
         <div class="flex-grow border-t border-slate-100 dark:border-slate-800/60"></div>
     </div>
 
-    <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-3.5">
+    <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-3.5" x-data="{ loading: false }"
+        @submit="loading = true">
         @csrf
 
         <!-- Email Address -->
@@ -117,9 +118,18 @@
         </div>
 
         <!-- Submit Button -->
-        <button type="submit"
+        <button type="submit" :disabled="loading" :class="{ 'opacity-80 cursor-wait': loading }"
             class="w-full flex items-center justify-center gap-1.5 bg-primary hover:bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg shadow-lg shadow-blue-500/20 transition-all duration-200 mt-1">
-            <span class="text-sm">{{ __('Sign In') }}</span>
+            <!-- Loading Spinner SVG -->
+            <svg x-show="loading" style="display: none;" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+            <span x-show="!loading" class="text-sm">{{ __('Sign In') }}</span>
+            <span x-show="loading" style="display: none;" class="text-sm">Signing in...</span>
         </button>
     </form>
 
