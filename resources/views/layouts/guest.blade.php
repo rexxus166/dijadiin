@@ -143,11 +143,11 @@
                             class="h-14 w-14 object-contain" />
                         <span class="text-2xl font-bold tracking-tight dark:text-white">DIJADIIN</span>
                     </div>
-                </div>
 
-                <!-- Form Content from Views -->
-                {{ $slot ?? '' }}
-                @yield('content')
+                    <!-- Form Content from Views -->
+                    {{ $slot ?? '' }}
+                    @yield('content')
+                </div>
             </div>
         </div>
         </div>

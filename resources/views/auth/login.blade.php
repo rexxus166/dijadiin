@@ -107,13 +107,11 @@
         </div>
 
         <!-- Remember Me -->
-        <div class="flex items-start gap-2 pt-1">
-            <div class="flex items-center h-4 mt-0.5 cursor-pointer group">
-                <input id="remember_me" type="checkbox" name="remember"
-                    class="w-3.5 h-3.5 text-primary bg-slate-50 dark:bg-[#111318] border-slate-300 dark:border-[#3b4354] rounded focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer">
-            </div>
+        <div class="flex items-center gap-2 pt-1 mt-2">
+            <input id="remember_me" type="checkbox" name="remember"
+                class="w-4 h-4 text-primary bg-slate-50 dark:bg-[#111318] border-slate-300 dark:border-[#3b4354] rounded focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer">
             <label for="remember_me"
-                class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight group-hover:text-slate-900 dark:group-hover:text-white transition-colors cursor-pointer">
+                class="text-xs text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors cursor-pointer select-none">
                 {{ __('Remember me for 30 days') }}
             </label>
         </div>
