@@ -521,7 +521,7 @@
                             <path
                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z" />
                         </svg>
-                        <span class="font-bold text-gray-700 dark:text-gray-200">Gemini Builder</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200">Windra Builder</span>
                     </div>
 
                     <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4" id="chat-history">
@@ -539,7 +539,7 @@
                             placeholder="e.g. Turn this layout into a grid with 3 columns..."></textarea>
                         <button id="chat-send"
                             class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all">
-                            <span>Ask Gemini</span>
+                            <span>Tanya Windra</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M13 10V3L4 14h7v7l9-11h-7z"></path>
