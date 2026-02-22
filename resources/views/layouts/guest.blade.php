@@ -8,6 +8,9 @@
 
     <title>{{ config('app.name', 'Di-Jadiin - Tim Poliwindra') }}</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('assets/icon/burung.png') }}">
+    <link rel="shortcut icon" href="{{ asset('assets/icon/burung.png') }}">
+
     <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
@@ -102,9 +105,10 @@
                 <!-- Content -->
                 <div class="relative z-10 flex flex-col h-full justify-between">
                     <!-- Logo Area -->
-                    <div class="flex items-center gap-3">
-                        <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="h-10 w-10 rounded-lg" />
-                        <span class="text-2xl font-bold tracking-tight text-white">DIJADIIN</span>
+                    <div class="flex items-center gap-1">
+                        <img src="{{ asset('assets/icon/burung-utama.png') }}" alt="Dijadiin"
+                            class="h-16 w-16 object-contain" />
+                        <span class="text-3xl font-bold tracking-tight text-white">DIJADIIN</span>
                     </div>
 
                     <!-- Hero Text -->
@@ -134,16 +138,18 @@
                 class="flex w-full lg:w-1/2 flex-col justify-center items-center bg-background-light dark:bg-background-dark py-8 px-4 sm:px-6 lg:px-20 lg:overflow-y-auto">
                 <div class="w-full max-w-[420px] flex flex-col gap-5">
                     <!-- Mobile Logo (Visible only on small screens) -->
-                    <div class="lg:hidden flex items-center gap-2 mb-4 self-center">
-                        <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin" class="h-8 w-8 rounded" />
-                        <span class="text-xl font-bold tracking-tight dark:text-white">DIJADIIN</span>
+                    <div class="lg:hidden flex items-center gap-0 mb-4 self-center">
+                        <img src="{{ asset('assets/icon/burung-utama.png') }}" alt="Dijadiin"
+                            class="h-14 w-14 object-contain" />
+                        <span class="text-2xl font-bold tracking-tight dark:text-white">DIJADIIN</span>
                     </div>
-
-                    <!-- Form Content from Views -->
-                    {{ $slot ?? '' }}
-                    @yield('content')
                 </div>
+
+                <!-- Form Content from Views -->
+                {{ $slot ?? '' }}
+                @yield('content')
             </div>
+        </div>
         </div>
     @endif
 </body>

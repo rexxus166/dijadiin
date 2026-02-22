@@ -182,7 +182,7 @@
                         style="background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px;">
                         <!-- Header Logo -->
                         <div class="absolute top-6 left-8 flex items-center gap-3">
-                            <img src="{{ asset('assets/icon/icon.png') }}" alt="Dijadiin"
+                            <img src="{{ asset('assets/icon/burung-utama.png') }}" alt="Dijadiin"
                                 class="h-8 w-auto filter drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
                             <span class="font-bold text-lg tracking-wider text-white">DIJADIIN</span>
                         </div>
@@ -426,7 +426,8 @@
 
                         <!-- Footer text -->
                         <div class="absolute bottom-6 w-full text-center text-xs text-gray-500 font-light">
-                            &copy; {{ date('Y') }} DIJADIIN AI. &bull; Dibuat dengan <span class="text-red-500">❤️</span> untuk
+                            &copy; {{ date('Y') }} DIJADIIN AI. &bull; Dibuat dengan <span
+                                class="text-red-500">❤️</span> untuk
                             kreator.
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-[#0a0d12] text-gray-100 px-8 py-8">
+    <div x-data="{ search: '', sortOrder: 'desc' }" class="min-h-screen bg-[#0a0d12] text-gray-100 px-8 py-8">
 
         {{-- ===== HEADER ===== --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -19,7 +19,7 @@
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
-                    <input id="search-projects" type="text" placeholder="Search projects..."
+                    <input id="search-projects" type="text" x-model="search" placeholder="Search projects..."
                         class="pl-9 pr-4 py-2 bg-[#161b22] border border-[#30363d] text-sm text-gray-300 placeholder-gray-600 rounded-lg focus:outline-none focus:border-blue-500 w-52 transition-colors">
                 </div>
 
@@ -33,16 +33,15 @@
                 </a>
 
                 {{-- Sort --}}
-                <button
+                <button @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
                     class="flex items-center gap-2 px-4 py-2 bg-[#161b22] border border-[#30363d] text-gray-400 text-sm rounded-lg hover:border-gray-500 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="21" y1="10" x2="7" y2="10" />
-                        <line x1="21" y1="6" x2="3" y2="6" />
-                        <line x1="21" y1="14" x2="3" y2="14" />
-                        <line x1="21" y1="18" x2="7" y2="18" />
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        :class="sortOrder === 'asc' ? 'rotate-180 transition-transform' : 'transition-transform'">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <polyline points="19 12 12 19 5 12" />
                     </svg>
-                    Sort
+                    <span x-text="sortOrder === 'desc' ? 'Newest' : 'Oldest'">Sort</span>
                 </button>
             </div>
         </div>
@@ -60,10 +59,11 @@
         @endif
 
         {{-- ===== PROJECT GRID ===== --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8" id="projects-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8" id="projects-grid" x-ref="grid">
 
             {{-- ── CREATE NEW PROJECT CARD ── --}}
             <a href="{{ route('project.generator.index') }}"
+                x-show="search === ''"
                 class="group border-2 border-dashed border-[#30363d] hover:border-blue-500/60 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 transition-all duration-300 min-h-[260px] hover:bg-blue-500/5">
                 <div
                     class="w-14 h-14 rounded-full bg-[#1c2128] group-hover:bg-blue-600 border border-[#30363d] group-hover:border-blue-500 flex items-center justify-center transition-all duration-300 shadow-lg group-hover:shadow-blue-500/30">
@@ -107,7 +107,10 @@
                 @endphp
 
                 <div class="project-card bg-[#161b22] border border-[#30363d] hover:border-[#484f58] rounded-2xl p-5 flex flex-col gap-4 transition-all duration-200 hover:shadow-2xl hover:shadow-black/30"
-                    data-name="{{ strtolower($project->name) }} {{ strtolower($project->description ?? '') }}">
+                    data-name="{{ strtolower($project->name) }} {{ strtolower($project->description ?? '') }}"
+                    :style="sortOrder === 'asc' ? 'order: {{ $projects->count() - $i }}' : 'order: {{ $i }}'"
+                    x-show="search === '' || $el.dataset.name.includes(search.toLowerCase())"
+                    x-transition>
 
                     {{-- Card top: avatar + status --}}
                     <div class="flex items-start justify-between">
@@ -213,6 +216,13 @@
             @endforelse
         </div>
 
+        {{-- Pagination --}}
+        @if($projects->hasPages())
+            <div class="mb-8">
+                {{ $projects->links() }}
+            </div>
+        @endif
+
         {{-- ===== STATS ROW ===== --}}
         <div class="grid grid-cols-3 gap-5">
             {{-- Total Projects --}}
@@ -312,16 +322,6 @@
 
     {{-- Search filter JS & Preview --}}
     <script>
-        const searchInput = document.getElementById('search-projects');
-        const cards = document.querySelectorAll('.project-card');
-
-        searchInput.addEventListener('input', () => {
-            const q = searchInput.value.toLowerCase().trim();
-            cards.forEach(card => {
-                const name = card.dataset.name || '';
-                card.style.display = (!q || name.includes(q)) ? '' : 'none';
-            });
-        });
 
         // Preview Logic
         const previewModal = document.getElementById('preview-modal');

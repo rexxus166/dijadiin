@@ -14,7 +14,7 @@ class ProjectController extends Controller
     {
         $projects = GeneratedProject::where('user_id', Auth::id())
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('page.projects.index', compact('projects'));
     }
