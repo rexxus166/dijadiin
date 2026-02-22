@@ -13,6 +13,22 @@
             background: #424242;
         }
 
+        /* Tree container scrollbar */
+        .explorer-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .explorer-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .explorer-scroll::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 4px;
+        }
+        .explorer-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.6);
+        }
+
         /* Auto Save Toggle animation */
         input:checked~.toggle-bg {
             background-color: #4ade80;
@@ -263,21 +279,38 @@
 
                 <!-- LEFT PANE: Directory Tree -->
                 <div id="explorer-left-pane"
-                    class="w-full md:w-1/4 lg:w-1/5 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden shrink-0 transition-all duration-300">
-                    <div
-                        class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 flex justify-between items-center">
-                        <span
-                            class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Explorer</span>
-                        <button id="refresh-tree" class="text-gray-400 hover:text-indigo-500 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                </path>
-                            </svg>
+                    class="w-full md:w-[260px] bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden shrink-0 transition-colors relative z-10" style="min-width: 150px; max-width: 50vw;">
+                    <div class="px-4 py-2 flex justify-between items-center bg-gray-50 dark:bg-gray-900 shrink-0">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Explorer</span>
+                        <button class="text-gray-400 hover:text-indigo-400 transition-colors" title="More Actions">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                         </button>
                     </div>
+                    
+                    <div class="px-2 pb-1 bg-gray-50 dark:bg-gray-900 shrink-0">
+                        <div class="flex justify-between items-center group cursor-default text-gray-600 dark:text-gray-300 font-bold text-[13px] rounded hover:bg-black/5 dark:hover:bg-white/5 pr-1 transition-colors">
+                            <div class="flex items-center gap-1 overflow-hidden select-none py-1 pl-1">
+                                 <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                 <span class="truncate uppercase tracking-wider text-[11px] text-gray-500 dark:text-gray-400" title="{{ $projectName ?? 'Project' }}">{{ $projectName ?? 'Project' }}</span>
+                            </div>
+                            <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                 <button type="button" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="New File..." onclick="alert('Feature coming soon!')">
+                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                 </button>
+                                 <button type="button" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="New Folder..." onclick="alert('Feature coming soon!')">
+                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 13h6m-3-3v6m4-9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h7a2 2 0 012 2z"></path></svg>
+                                 </button>
+                                 <button type="button" id="refresh-tree" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="Refresh Explorer">
+                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                 </button>
+                                 <button type="button" id="collapse-tree" class="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors cursor-pointer" title="Collapse Folders in Explorer">
+                                     <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                 </button>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="flex-1 overflow-y-auto p-2" id="file-tree-container">
+                    <div class="flex-1 overflow-auto p-2 explorer-scroll" id="file-tree-container">
                         <!-- Loading Tree State -->
                         <div class="flex items-center justify-center h-20 text-indigo-500" id="tree-loading">
                             <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -297,8 +330,11 @@
                     </div>
                 </div>
 
+                <!-- RESIZER HANDLER FOR LEFT PANE -->
+                <div id="explorer-resizer" class="hidden md:block w-1.5 hover:w-2 cursor-col-resize bg-transparent hover:bg-indigo-500 transition-all opacity-0 hover:opacity-100 z-20 shrink-0 select-none" style="margin-left: -3px; margin-right: -3px;" title="Drag to Resize"></div>
+
                 <!-- MIDDLE PANE: Code Preview -->
-                <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333]">
+                <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333] min-w-0">
                     <!-- Editor Header / Tabs -->
                     <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
                         <!-- Left: Scrollable Tabs -->
@@ -320,25 +356,21 @@
                         </div>
 
                         <!-- Right: Auto Save & Controls -->
-                        <div class="flex items-center gap-3 shrink-0 ml-4 py-1.5">
-                            <label class="flex items-center cursor-pointer group" title="Auto Save edited files">
-                                <span
-                                    class="text-xs text-gray-400 mr-2 group-hover:text-gray-300 transition-colors font-medium">Auto
-                                    Save</span>
+                        <div class="flex items-center gap-2 shrink-0 ml-3 py-1.5 overflow-hidden">
+                            <label class="flex items-center cursor-pointer group" title="Auto Save edited files (Cloud Sync)">
+                                <svg class="w-3.5 h-3.5 text-gray-500 mr-1.5 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                </svg>
                                 <div class="relative">
                                     <input type="checkbox" id="auto-save-toggle" class="sr-only" checked>
-                                    <div
-                                        class="w-8 h-4 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200">
-                                    </div>
-                                    <div
-                                        class="toggle-dot absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200">
-                                    </div>
+                                    <div class="w-7 h-3.5 bg-gray-600 rounded-full shadow-inner toggle-bg transition-colors duration-200"></div>
+                                    <div class="toggle-dot absolute w-3.5 h-3.5 bg-white rounded-full shadow inset-y-0 left-0 transition-transform duration-200"></div>
                                 </div>
                             </label>
 
                             <!-- Save status indicator -->
                             <span id="save-status-msg"
-                                class="text-[10px] text-gray-500 w-16 text-right transition-opacity duration-300 opacity-0">Saved</span>
+                                class="text-[10px] text-gray-500 w-12 text-right transition-opacity duration-300 opacity-0 whitespace-nowrap">Saved</span>
 
                             <!-- Hidden info for Active file, kept for compatibility -->
                             <span id="active-file-name" class="hidden"></span>
@@ -429,8 +461,7 @@
                         <!-- Welcome MSG -->
                         <div
                             class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
-                            Hi! I'm your AI Engineer. Select a file on the left, then tell me what you want to change in
-                            it.
+                            Halo! Saya Asisten AI Anda 👋. Pilih file di kolom Explorer sebelah kiri, lalu beri tahu saya bagian mana yang ingin Anda ubah atau tambahkan.
                         </div>
                     </div>
 
@@ -595,6 +626,16 @@
             const activeFileName = document.getElementById('active-file-name');
             const editorTabsContainer = document.getElementById('editor-tabs');
             const autoSaveToggle = document.getElementById('auto-save-toggle');
+            
+            // Persist Auto-Save state using localStorage
+            const savedAutoSave = localStorage.getItem('dijadiin_auto_save_state');
+            if (savedAutoSave !== null) {
+                autoSaveToggle.checked = savedAutoSave === 'true';
+            }
+            autoSaveToggle.addEventListener('change', () => {
+                localStorage.setItem('dijadiin_auto_save_state', autoSaveToggle.checked);
+            });
+
             const saveStatusMsg = document.getElementById('save-status-msg');
             let currentLanguage = 'plaintext';
             const lintErrorPanel = document.getElementById('lint-error-panel');
@@ -814,6 +855,42 @@
                     toggleRightSidebar();
                 }
             });
+
+            // ── Pane Resizer (Left Sidebar) ──
+            const resizer = document.getElementById('explorer-resizer');
+            let isResizing = false;
+
+            if (resizer && leftPane) {
+                resizer.addEventListener('mousedown', function(e) {
+                    isResizing = true;
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none'; // Prevent text selection
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (!isResizing) return;
+                    
+                    // Root flex container that holds both panes
+                    const container = leftPane.parentElement;
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    let newWidth = e.clientX - containerRect.left;
+                    
+                    // Min & Max constraints
+                    if (newWidth < 150) newWidth = 150;
+                    if (newWidth > window.innerWidth * 0.5) newWidth = window.innerWidth * 0.5;
+                    
+                    leftPane.style.width = newWidth + 'px';
+                });
+
+                document.addEventListener('mouseup', function(e) {
+                    if (isResizing) {
+                        isResizing = false;
+                        document.body.style.cursor = '';
+                        document.body.style.userSelect = '';
+                    }
+                });
+            }
 
             // ===== Colorful Folder Icons by name =====
             function getFolderIcon(name) {
@@ -1134,7 +1211,7 @@
                         const rowDiv = document.createElement('div');
                         rowDiv.className = 'tree-row file-item';
                         rowDiv.dataset.path = item.path;
-                        rowDiv.innerHTML = `${fileIcon}<span class="truncate text-[#cccccc]" style="max-width:120px">${item.name}</span><span class="lint-badge" title="Syntax errors">!</span>`;
+                        rowDiv.innerHTML = `${fileIcon}<span class="whitespace-nowrap text-[#cccccc]">${item.name}</span><span class="lint-badge" title="Syntax errors">!</span>`;
 
                         rowDiv.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -1345,7 +1422,13 @@
                 }
             });
 
-            document.getElementById('refresh-tree').addEventListener('click', loadTree);
+            document.getElementById('refresh-tree')?.addEventListener('click', loadTree);
+            document.getElementById('collapse-tree')?.addEventListener('click', () => {
+                const containers = document.querySelectorAll('#file-tree-container ul ul');
+                const chevrons = document.querySelectorAll('#file-tree-container .tree-chevron');
+                containers.forEach(el => el.style.display = 'none');
+                chevrons.forEach(el => el.classList.remove('open'));
+            });
 
             // Gemini Integration Logic
             const chatSendBtn = document.getElementById('chat-send');
