@@ -41,7 +41,7 @@ class ScaffoldProjectService
             'create-project',
             'laravel/laravel',
             $projectName
-        ], null, ['HOME' => '/tmp', 'COMPOSER_HOME' => '/tmp/composer'] + $_ENV);
+        ], null, ['HOME' => '/tmp', 'COMPOSER_HOME' => '/tmp/composer', 'COMPOSER_MEMORY_LIMIT' => '-1'] + $_ENV);
 
         $process->setWorkingDirectory($basePath);
 
@@ -139,6 +139,9 @@ class ScaffoldProjectService
             $env['HOME'] = $env['HOME'] ?? '/tmp';
             $env['COMPOSER_HOME'] = $env['COMPOSER_HOME'] ?? '/tmp/composer';
         }
+
+        // Disable composer memory limit to prevent OOM errors during heavy extraction phases
+        $env['COMPOSER_MEMORY_LIMIT'] = '-1';
 
         $process = new Process($processArgs, null, $env);
 
