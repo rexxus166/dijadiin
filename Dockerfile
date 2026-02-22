@@ -2,6 +2,7 @@ FROM php:8.2-apache
 
 # Install required packages and PHP extensions for Laravel and PostgreSQL
 RUN apt-get update && apt-get install -y \
+    git \
     libpq-dev \
     libpng-dev \
     libzip-dev \
@@ -10,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     && docker-php-ext-install pdo pdo_pgsql pgsql gd zip
+
+# Prevent "dubious ownership" git errors when www-data runs composer
+RUN git config --system --add safe.directory '*'
 
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite

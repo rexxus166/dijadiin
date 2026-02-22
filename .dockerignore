@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env
+.github
+node_modules
+vendor
+public/build
+public/hot
+tests
+*phpunit*
