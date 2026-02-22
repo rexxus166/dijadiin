@@ -39,32 +39,30 @@ class GeminiService
 
         $lastError = 'Unknown error';
 
+        $baseUrl = rtrim(env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/openai'), '/');
+        $endpoint = $baseUrl . '/chat/completions';
+        $model = env('GEMINI_MODEL', 'gemini-2.5-flash-lite'); // Default model name
+
         foreach ($keys as $index => $apiKey) {
             $label = $index === 0 ? 'active key' : "fallback key #$index";
 
             try {
-                $response = Http::timeout($timeout)->post(
-                    self::GEMINI_URL . "?key={$apiKey}",
+                $response = Http::withToken($apiKey)->timeout($timeout)->post(
+                    $endpoint,
                     [
-                        'system_instruction' => [
-                            'parts' => [['text' => $systemPrompt]]
+                        'model' => $model,
+                        'messages' => [
+                            ['role' => 'system', 'content' => $systemPrompt],
+                            ['role' => 'user', 'content' => $userPrompt]
                         ],
-                        'contents' => [
-                            [
-                                'role'  => 'user',
-                                'parts' => [['text' => $userPrompt]]
-                            ]
-                        ],
-                        'generationConfig' => [
-                            'temperature' => 0.2,
-                        ]
+                        'temperature' => 0.2,
                     ]
                 );
 
                 // Success
                 if ($response->successful()) {
                     $data    = $response->json();
-                    $rawText = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                    $rawText = $data['choices'][0]['message']['content'] ?? '';
 
                     // Strip markdown backticks if AI sneaked them in
                     $rawText = preg_replace('/^```[a-z]*\s*/mi', '', $rawText);
@@ -100,7 +98,6 @@ class GeminiService
                     'error'    => $lastError,
                     'key_used' => $label,
                 ];
-
             } catch (\Exception $e) {
                 $lastError = "Exception with {$label}: " . $e->getMessage();
                 Log::error("GeminiService: {$lastError}");

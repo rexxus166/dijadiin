@@ -64,7 +64,9 @@ spec:
         - name: DB_PASSWORD
           value: "x2519-_w6ZtV*>dPzKSC4XDn0-0u(#iH"
         - name: GEMINI_API_KEY
-          value: "AIzaSyB2x523E4oLS64pl4IvF1ZK4GJaDCrnKXw"
+          value: "sk-IT5ilRNOckB-toa1C7G_RA"
+        - name: GEMINI_BASE_URL
+          value: "https://litellm.koboi2026.biz.id/v1"
 ---
 apiVersion: v1
 kind: Service
