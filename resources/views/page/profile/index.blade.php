@@ -63,8 +63,14 @@
                         $refs.avatarFileInput.removeAttribute('capture');
                         setTimeout(() => $refs.avatarFileInput.click(), 50);
                     },
+                    avatarToDelete: null,
+                    showDeleteAvatarModal: false,
                     deleteAvatar(path) {
-                        if (confirm('Are you sure you want to delete this custom avatar?')) {
+                        this.avatarToDelete = path;
+                        this.showDeleteAvatarModal = true;
+                    },
+                    confirmDeleteAvatar() {
+                        if (this.avatarToDelete) {
                             const form = document.createElement('form');
                             form.method = 'POST';
                             form.action = '{{ route('profile.avatar.destroy') }}';
@@ -84,7 +90,7 @@
                             const avatarInput = document.createElement('input');
                             avatarInput.type = 'hidden';
                             avatarInput.name = 'avatar_path';
-                            avatarInput.value = path;
+                            avatarInput.value = this.avatarToDelete;
                             form.appendChild(avatarInput);
                 
                             document.body.appendChild(form);
@@ -288,7 +294,54 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Delete Avatar Confirmation Modal -->
+                <div x-show="showDeleteAvatarModal"
+                    class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;"
+                    @click.self="showDeleteAvatarModal = false" x-cloak>
+
+                    <div class="relative bg-[#161b22] border border-gray-800 rounded-2xl p-6 shadow-2xl max-w-sm w-full text-center"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
+                        <!-- Close button -->
+                        <button type="button" @click="showDeleteAvatarModal = false"
+                            class="absolute top-4 right-4 text-gray-500 hover:text-white bg-[#0d1015] hover:bg-gray-800 rounded-full p-1.5 transition-colors cursor-pointer border border-[#30363d]">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div
+                            class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4 text-red-500">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Hapus Avatar Custom?</h3>
+                        <p class="text-sm text-gray-400 mb-6 px-2">Anda yakin ingin menghapus avatar custom ini? Tindakan
+                            ini tidak dapat diurungkan atau dibatalkan.</p>
+
+                        <div class="flex flex-col sm:flex-row justify-center gap-3">
+                            <button type="button" @click="showDeleteAvatarModal = false"
+                                class="flex-1 py-2.5 px-4 bg-[#0d1015] hover:bg-[#1a202c] border border-gray-800 text-gray-300 rounded-xl font-medium text-sm transition-colors cursor-pointer">Batal</button>
+                            <button type="button" @click="confirmDeleteAvatar()"
+                                class="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white border border-red-500 rounded-xl font-medium text-sm shadow-lg shadow-red-600/20 transition-all cursor-pointer">Ya,
+                                Hapus</button>
+                        </div>
+                    </div>
+                </div>
             </form>
+
 
             <!-- Account Security Section -->
             <div class="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden mb-8" x-data="{ showNewPassword: false, showConfirmPassword: false }">
@@ -391,7 +444,8 @@
                                     <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TOTAL
                                         PROJECTS
                                         BUILT</span>
-                                    <div class="text-[32px] font-bold mt-1 text-white leading-none">{{ $user->generatedProjects()->count() }}</div>
+                                    <div class="text-[32px] font-bold mt-1 text-white leading-none">
+                                        {{ $user->generatedProjects()->count() }}</div>
                                 </div>
                                 <div class="bg-[#161b22] p-2.5 rounded-lg border border-gray-800">
                                     <!-- Box Icon -->
@@ -422,7 +476,8 @@
                                     <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">AI PROJECTS
                                         GENERATED</span>
                                     <div class="text-[32px] font-bold mt-1 flex items-baseline text-white leading-none">
-                                        {{ $aiUsage }} <span class="text-sm font-normal text-gray-500 ml-1.5 align-baseline">/
+                                        {{ $aiUsage }} <span
+                                            class="text-sm font-normal text-gray-500 ml-1.5 align-baseline">/
                                             {{ $aiQuota }}</span>
                                     </div>
                                 </div>
@@ -437,7 +492,8 @@
                             </div>
                             <div class="mt-auto">
                                 <div class="w-full bg-[#1e2532] rounded-full h-1.5 mb-2 overflow-hidden">
-                                    <div class="bg-blue-500 h-full rounded-full" style="width: {{ $aiPercentage }}%"></div>
+                                    <div class="bg-blue-500 h-full rounded-full" style="width: {{ $aiPercentage }}%">
+                                    </div>
                                 </div>
                                 <div class="text-[9px] text-gray-500 font-bold text-right uppercase tracking-[0.15em]">
                                     {{ $aiPercentage }}% OF MONTHLY QUOTA CONSUMED
