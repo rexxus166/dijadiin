@@ -370,8 +370,8 @@
                         <div class="flex items-center justify-center h-20 text-indigo-500" id="tree-loading">
                             <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10"
-                                    stroke="currentColor" stroke-width="4"></circle>
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                 </path>
@@ -393,8 +393,7 @@
                 <!-- MIDDLE PANE: Code Preview -->
                 <div class="w-full md:flex-1 flex flex-col h-full bg-[#1e1e1e] border-r border-[#333] min-w-0">
                     <!-- Editor Header / Tabs -->
-                    <div
-                        class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
+                    <div class="bg-[#2d2d2d] flex items-center border-b border-[#1e1e1e] justify-between pr-4 relative">
                         <!-- Left: Scrollable Tabs -->
                         <div class="flex-1 flex overflow-hidden bg-[#1a1a1a] border-b border-[#2d2d2d]">
                             <button id="toggle-left-pane"
@@ -497,7 +496,8 @@
                             id="diff-view-pane">
                             <div class="absolute top-0 right-0 p-1 text-xs text-yellow-500 bg-[#333] rounded-bl">Gemini
                                 Suggestion</div>
-                            <pre class="w-full h-full p-6 m-0 text-emerald-400 font-mono text-sm overflow-auto" id="diff-viewer"><code></code></pre>
+                            <pre class="w-full h-full p-6 m-0 text-emerald-400 font-mono text-sm overflow-auto"
+                                id="diff-viewer"><code></code></pre>
                         </div>
 
                         <!-- Loading Code Overlay -->
@@ -551,6 +551,49 @@
         </div>
     </div>
 
+    <!-- MVP Warning Modal -->
+    <div id="preview-warning-modal"
+        class="fixed inset-0 z-[10000] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 opacity-0 px-4">
+        <div
+            class="bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
+            <div
+                class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 p-6 flex flex-col items-center justify-center border-b border-indigo-100 dark:border-indigo-800/60 relative">
+                <div class="absolute top-3 right-3">
+                    <button id="close-warning-btn" type="button"
+                        class="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 p-1.5 rounded-full text-gray-500 dark:text-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div
+                    class="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center mb-3 border border-indigo-100 dark:border-indigo-500/30">
+                    <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center">Informasi Fitur Preview</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-[14px] text-gray-600 dark:text-gray-300 leading-relaxed text-center mb-6">
+                    Fitur <strong>Preview Web</strong> belum didukung untuk versi MVP saat ini.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="cancel-preview-btn" type="button"
+                        class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors text-sm text-center">
+                        Kembali
+                    </button>
+                    <button id="continue-preview-btn" type="button"
+                        class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-md shadow-indigo-500/30 transition-all active:scale-95 text-sm text-center">
+                        Tetap Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Preview Web Modal -->
     <div id="preview-modal"
         class="fixed inset-0 z-[10000] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none transition-opacity duration-300 opacity-0">
@@ -562,8 +605,7 @@
                 <div
                     class="flex items-center gap-2 pt-1 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 justify-between">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2 pb-1">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -652,7 +694,7 @@
                     'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs'
                 }
             });
-            require(['vs/editor/editor.main'], function() {
+            require(['vs/editor/editor.main'], function () {
                 monacoEditor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
                     value: "Select a file from the explorer...",
                     language: "plaintext",
@@ -894,7 +936,7 @@
                 });
             });
 
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.key === 'F11') {
                     e.preventDefault();
                     !!document.fullscreenElement ? exitFullscreen() : enterFullscreen();
@@ -925,7 +967,7 @@
             toggleRightBtn?.addEventListener('click', toggleRightSidebar);
 
             // Shortcuts (Ctrl+B / Cmd+B and Ctrl+J / Cmd+J)
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
                     e.preventDefault();
                     toggleLeftSidebar();
@@ -941,13 +983,13 @@
             let isResizing = false;
 
             if (resizer && leftPane) {
-                resizer.addEventListener('mousedown', function(e) {
+                resizer.addEventListener('mousedown', function (e) {
                     isResizing = true;
                     document.body.style.cursor = 'col-resize';
                     document.body.style.userSelect = 'none'; // Prevent text selection
                 });
 
-                document.addEventListener('mousemove', function(e) {
+                document.addEventListener('mousemove', function (e) {
                     if (!isResizing) return;
 
                     // Root flex container that holds both panes
@@ -963,7 +1005,7 @@
                     leftPane.style.width = newWidth + 'px';
                 });
 
-                document.addEventListener('mouseup', function(e) {
+                document.addEventListener('mouseup', function (e) {
                     if (isResizing) {
                         isResizing = false;
                         document.body.style.cursor = '';
@@ -1116,7 +1158,7 @@
                             }
                         }
                     })
-                    .catch(() => {}); // silent fail
+                    .catch(() => { }); // silent fail
             }
 
             function renderLintPanel(path) {
@@ -1502,16 +1544,16 @@
                 if (!isAuto) showSaveStatus('Saving...');
 
                 fetch(`/ai-builder/explorer/${window.ProjectConfig.projectName}/save-file`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            path,
-                            content: content
-                        })
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        path,
+                        content: content
                     })
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
@@ -1530,7 +1572,7 @@
             }
 
             // Custom Save override for Ctrl+S using Monaco action
-            monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
+            monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function () {
                 if (activeFilePath) {
                     const contentObj = openFiles.find(f => f.path === activeFilePath);
                     if (contentObj) {
@@ -1568,7 +1610,7 @@
             clearChatBtn.className = 'absolute top-2 right-2 p-1 bg-gray-800 rounded-md shadow-md z-10 transition-colors';
             clearChatBtn.title = 'Clear Chat History';
             clearChatBtn.onclick = () => {
-                if(confirm('Clear AI Chat history?')) {
+                if (confirm('Clear AI Chat history?')) {
                     chatHistory.innerHTML = '<div class="text-center text-xs text-gray-500 mb-4 my-4">Halo! Saya Asisten AI Anda 👋. Pilih file di kolom Explorer sebelah kiri, lalu beri tahu saya bagian mana yang ingin Anda ubah atau tambahkan.</div>';
                     saveChat();
                 }
@@ -1622,17 +1664,17 @@
                 loadMsg.classList.add('animate-pulse');
 
                 fetch('/ai-builder/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            prompt,
-                            file_content: currentContent,
-                            project: window.ProjectConfig.projectName
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        prompt,
+                        file_content: currentContent,
+                        project: window.ProjectConfig.projectName
                     })
+                })
                     .then(async res => {
                         if (!res.ok && res.status !== 422 && res.status !== 500) {
                             throw new Error('Network response was not ok');
@@ -1811,7 +1853,7 @@
             genEventSource = new EventSource(
                 `{{ route('project.generator.auto-scaffold') }}?payload=${queryParam}`);
 
-            genEventSource.onmessage = function(event) {
+            genEventSource.onmessage = function (event) {
                 const data = JSON.parse(event.data);
 
                 if (data.type === 'info') {
@@ -1831,7 +1873,7 @@
                 }
             };
 
-            genEventSource.onerror = function(err) {
+            genEventSource.onerror = function (err) {
                 addLog(`[FATAL] Koneksi terputus dari server.`, 'text-red-500');
                 genEventSource.close();
                 resetBtnUI();
@@ -1854,7 +1896,34 @@
         const previewOpenNewBtn = document.getElementById('preview-open-new-btn');
         const previewUrlBox = document.getElementById('preview-url-box');
 
-        previewBtn?.addEventListener('click', async () => {
+        // Warning Modal Logic
+        const warningModal = document.getElementById('preview-warning-modal');
+        const closeWarningBtn = document.getElementById('close-warning-btn');
+        const cancelPreviewBtn = document.getElementById('cancel-preview-btn');
+        const continuePreviewBtn = document.getElementById('continue-preview-btn');
+
+        function hideWarningModal() {
+            warningModal.classList.add('opacity-0');
+            warningModal.firstElementChild.classList.remove('scale-100');
+            warningModal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { warningModal.classList.add('hidden'); }, 300);
+        }
+
+        previewBtn?.addEventListener('click', () => {
+            warningModal.classList.remove('hidden');
+            setTimeout(() => {
+                warningModal.classList.remove('opacity-0');
+                warningModal.firstElementChild.classList.remove('scale-95');
+                warningModal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        });
+
+        closeWarningBtn?.addEventListener('click', hideWarningModal);
+        cancelPreviewBtn?.addEventListener('click', hideWarningModal);
+
+        continuePreviewBtn?.addEventListener('click', async () => {
+            hideWarningModal();
+
             previewModal.classList.remove('hidden');
             // Sedikit delay untuk animasi CSS
             setTimeout(() => {
